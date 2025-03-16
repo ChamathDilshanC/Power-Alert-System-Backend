@@ -36,11 +36,6 @@ public class AlternativeResource {
     @Column(nullable = false)
     private Double longitude;
 
-    /* Remove PostGIS specific Point
-    @Column(columnDefinition = "geometry(Point,4326)")
-    private Point location;
-    */
-
     @Column(name = "contact_number")
     private String contactNumber;
 
