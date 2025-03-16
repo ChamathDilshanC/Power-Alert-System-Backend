@@ -64,7 +64,7 @@ public class SecurityConfig {
                         // User endpoints
                         .requestMatchers("/api/user/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
                         // Utility provider endpoints
-                        .requestMatchers("/api/provider/**").hasAuthority("ROLE_UTILITY_PROVIDER")
+                        .requestMatchers("/api/provider/**").hasAnyAuthority("ROLE_UTILITY_PROVIDER", "ROLE_ADMIN")
                         // Any other request needs authentication
                         .anyRequest().authenticated()
                 )

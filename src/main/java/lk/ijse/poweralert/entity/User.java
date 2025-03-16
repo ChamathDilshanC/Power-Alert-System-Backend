@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -40,11 +41,12 @@ public class User {
     @Column(name = "preferred_language", nullable = false)
     private String preferredLanguage;
 
+    // Initialize these lists to avoid null pointer exceptions
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Address> addresses;
+    private List<Address> addresses = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<NotificationPreference> notificationPreferences;
+    private List<NotificationPreference> notificationPreferences = new ArrayList<>();
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive;

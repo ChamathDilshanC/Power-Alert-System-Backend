@@ -1,6 +1,5 @@
 package lk.ijse.poweralert.config;
 
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,21 +8,39 @@ import lk.ijse.poweralert.util.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
+
+    private static final List<String> EXCLUDED_PATHS = Arrays.asList(
+            "/api/auth/login",
+            "/api/auth/register",
+            "/api/auth/refreshToken",
+            "/api/public/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/login",
+            "/css/**",
+            "/js/**",
+            "/images/**"
+    );
+
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -31,57 +48,65 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    @Value("${jwt.secret}")
-    private String secretKey;
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        final String requestTokenHeader = request.getHeader("Authorization");
-        String token = null;
-        String email = null;
+        // Get the request path
+        String path = request.getServletPath();
+        logger.debug("Request path: {}", path);
 
-        // Extract token from Authorization header
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            token = requestTokenHeader.substring(7);
-
-            try {
-                email = jwtUtil.getUsernameFromToken(token);
-                Claims claims = jwtUtil.getUserRoleFromToken(token);
-                String role = (String) claims.get("role");
-
-                logger.debug("JWT Token processing for user: {}, with role: {}", email, role);
-
-                // Add user email and role to request attributes
-                request.setAttribute("email", email);
-                request.setAttribute("role", role);
-            } catch (Exception e) {
-                logger.error("Unable to process JWT Token: {}", e.getMessage());
-            }
-        } else {
-            logger.debug("JWT Token does not begin with Bearer String or is missing");
+        // Skip JWT validation for excluded paths
+        if (isPathExcluded(path)) {
+            logger.debug("Skipping JWT validation for excluded path: {}", path);
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        // If email exists and security context is not yet set, validate token
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        // Check for Authorization header
+        final String authorizationHeader = request.getHeader("Authorization");
+        logger.debug("Authorization header: {}", authorizationHeader);
 
-            if (jwtUtil.validateToken(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
+        String username = null;
+        String jwt = null;
 
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        // Extract JWT token from Authorization header
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            jwt = authorizationHeader.substring(7);
+            try {
+                username = jwtUtil.extractUsername(jwt);
+                logger.debug("Extracted username from token: {}", username);
+            } catch (Exception e) {
+                logger.error("Error extracting username from token: {}", e.getMessage());
+            }
+        } else {
+            logger.debug("Authorization header is missing or does not start with 'Bearer '");
+        }
 
-                logger.debug("Authenticated user {}, setting security context", email);
-                logger.debug("User authorities: {}", userDetails.getAuthorities());
+        // Validate token and set authentication
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            try {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
-                logger.debug("Token validation failed for user {}", email);
+                if (jwtUtil.validateToken(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    logger.debug("Authentication set for user: {} with authorities: {}",
+                            username, userDetails.getAuthorities());
+                } else {
+                    logger.warn("Invalid JWT token for user: {}", username);
+                }
+            } catch (Exception e) {
+                logger.error("Error processing authentication: {}", e.getMessage());
             }
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isPathExcluded(String path) {
+        return EXCLUDED_PATHS.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
     }
 }

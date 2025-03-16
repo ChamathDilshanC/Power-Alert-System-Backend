@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-
 @Component
 public class JwtUtil {
 
@@ -27,34 +26,33 @@ public class JwtUtil {
     // Token valid for 12 days
     public static final long JWT_TOKEN_VALIDITY = 24 * 60 * 60 * 12;
 
-    @Value("${jwt.secret}")
+    // Use a default secret key if none provided in properties
+    @Value("${jwt.secret:powerAlertSecureSecretKeyWithAtLeast256BitsLength}")
     private String secretKeyString;
 
     private Key key;
 
     @PostConstruct
     public void init() {
-        // Initialize the key once when the bean is created
-        this.key = Keys.hmacShaKeyFor(secretKeyString.getBytes());
-        logger.info("JWT signing key initialized");
+        try {
+            // Initialize the key once when the bean is created
+            this.key = Keys.hmacShaKeyFor(secretKeyString.getBytes());
+            logger.info("JWT signing key initialized successfully");
+        } catch (Exception e) {
+            logger.error("Error initializing JWT signing key: {}", e.getMessage(), e);
+            // Create a fallback key if there's an issue with the configured one
+            this.key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+            logger.info("Fallback JWT signing key created");
+        }
     }
 
     // Retrieve username from JWT token
-    public String getUsernameFromToken(String token) {
+    public String extractUsername(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
-    // Retrieve user role from JWT token
-    public Claims getUserRoleFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-    }
-
     // Retrieve expiration date from JWT token
-    public Date getExpirationDateFromToken(String token) {
+    public Date extractExpiration(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
@@ -74,8 +72,13 @@ public class JwtUtil {
 
     // Check if the token has expired
     private Boolean isTokenExpired(String token) {
-        final Date expiration = getExpirationDateFromToken(token);
-        return expiration.before(new Date());
+        try {
+            final Date expiration = extractExpiration(token);
+            return expiration.before(new Date());
+        } catch (Exception e) {
+            logger.error("Error checking token expiration: {}", e.getMessage());
+            return true; // Consider expired if there's an error
+        }
     }
 
     // Generate token for user
@@ -83,9 +86,10 @@ public class JwtUtil {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", userDTO.getRole().name()); // Store role name as string
         claims.put("userId", userDTO.getId());
+        claims.put("email", userDTO.getEmail());
 
-        String token = doGenerateToken(claims, userDTO.getEmail());
-        logger.debug("Generated token for user {} with role {}", userDTO.getEmail(), userDTO.getRole().name());
+        String token = doGenerateToken(claims, userDTO.getUsername());
+        logger.debug("Generated token for user {} with role {}", userDTO.getUsername(), userDTO.getRole().name());
 
         return token;
     }
@@ -103,7 +107,12 @@ public class JwtUtil {
 
     // Validate token
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        try {
+            final String username = extractUsername(token);
+            return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        } catch (Exception e) {
+            logger.error("Error validating token: {}", e.getMessage());
+            return false;
+        }
     }
 }
