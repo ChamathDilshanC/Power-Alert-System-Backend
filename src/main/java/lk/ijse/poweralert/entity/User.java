@@ -41,15 +41,16 @@ public class User {
     @Column(name = "preferred_language", nullable = false)
     private String preferredLanguage;
 
-    // Initialize these lists to avoid null pointer exceptions
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    // Change fetch type to LAZY
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Address> addresses = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "utility_provider_id")
     private UtilityProvider utilityProvider;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    // Change fetch type to LAZY
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<NotificationPreference> notificationPreferences = new ArrayList<>();
 
     @Column(name = "is_active", nullable = false)

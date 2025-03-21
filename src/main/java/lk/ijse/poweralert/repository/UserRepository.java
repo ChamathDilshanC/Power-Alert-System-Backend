@@ -13,7 +13,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-
     /** Find a user by username  */
     Optional<User> findByUsername(String username);
 
@@ -36,10 +35,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT DISTINCT u FROM User u JOIN u.addresses a WHERE a.district = :district AND u.isActive = true")
     List<User> findUsersInDistrict(@Param("district") String district);
 
-    @Query("SELECT DISTINCT u FROM User u JOIN u.addresses a JOIN Area area ON a.district = area.district " +
-            "WHERE area.id = :areaId AND u.isActive = true")
+    /** Find users by geographical area */
+    @Query("SELECT DISTINCT u FROM User u JOIN u.addresses a JOIN Area area WHERE area.id = :areaId AND a.district = area.district AND u.isActive = true")
     List<User> findUsersByAreaId(@Param("areaId") Long areaId);
-
-    @Query("SELECT u FROM User u LEFT JOIN FETCH u.addresses LEFT JOIN FETCH u.notificationPreferences WHERE u.username = :username")
-    Optional<User> findByUsernameWithCollections(@Param("username") String username);
 }

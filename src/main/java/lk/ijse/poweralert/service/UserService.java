@@ -1,5 +1,7 @@
 package lk.ijse.poweralert.service;
 
+import lk.ijse.poweralert.dto.AddressDTO;
+import lk.ijse.poweralert.dto.NotificationPreferenceDTO;
 import lk.ijse.poweralert.dto.UserCreateDTO;
 import lk.ijse.poweralert.dto.UserDTO;
 import lk.ijse.poweralert.entity.User;
@@ -23,11 +25,32 @@ public interface UserService {
     UserDTO getUserByEmail(String email);
 
     /**
-     * Get user by username
+     * Get user by username with all collections
      * @param username the username
-     * @return the user with the given username
+     * @return the user with the given username including collections
      */
     UserDTO getUserByUsername(String username);
+
+    /**
+     * Get basic user information by username without loading collections
+     * @param username the username
+     * @return the user with the given username (basic info only)
+     */
+    UserDTO getUserBasicInfo(String username);
+
+    /**
+     * Get user addresses by user ID
+     * @param userId the user ID
+     * @return list of user addresses
+     */
+    List<AddressDTO> getUserAddresses(Long userId);
+
+    /**
+     * Get user notification preferences by user ID
+     * @param userId the user ID
+     * @return list of user notification preferences
+     */
+    List<NotificationPreferenceDTO> getUserNotificationPreferences(Long userId);
 
     /**
      * Get user entity by username
@@ -49,9 +72,23 @@ public interface UserService {
      */
     void updateLastLogin(String email);
 
+    /**
+     * Get user by ID
+     * @param id the user ID
+     * @return the user with the given ID
+     */
     UserDTO getUserById(Long id);
 
+    /**
+     * Get all users
+     * @return list of all users
+     */
     List<UserDTO> getAllUsers();
 
+    /**
+     * Deactivate a user
+     * @param id the user ID
+     * @return the deactivated user
+     */
     UserDTO deactivateUser(Long id);
 }

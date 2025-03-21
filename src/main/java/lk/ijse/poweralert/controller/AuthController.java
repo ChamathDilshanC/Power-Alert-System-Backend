@@ -38,8 +38,6 @@ public class AuthController {
     @Autowired
     private ResponseDTO responseDTO;
 
-
-
     @PostMapping("/login")
     public ResponseEntity<ResponseDTO> login(@Valid @RequestBody AuthRequestDTO authRequest) {
         try {
@@ -52,13 +50,13 @@ public class AuthController {
 
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-            UserDTO userDTO = userService.getUserByUsername(userDetails.getUsername());
+            // Get basic user info without eagerly loading collections
+            UserDTO userDTO = userService.getUserBasicInfo(userDetails.getUsername());
 
             // Generate JWT token
             String token = jwtUtil.generateToken(userDTO);
 
             // Auth Response
-
             AuthDTO authDTO = new AuthDTO();
             authDTO.setEmail(userDTO.getEmail());
             authDTO.setToken(token);
