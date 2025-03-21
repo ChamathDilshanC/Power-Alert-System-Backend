@@ -6,6 +6,8 @@ import lk.ijse.poweralert.enums.AppEnums;
 import lk.ijse.poweralert.service.UserService;
 import lk.ijse.poweralert.util.JwtUtil;
 import lk.ijse.poweralert.util.VarList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -38,42 +41,45 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ResponseDTO> login(@Valid @RequestBody AuthRequestDTO authRequest) {
         try {
+            logger.info("Login attempt for user: {}", authRequest.getUsername());
+
             // Authenticate user
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
             );
 
-            // User is authenticated, get user details
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            UserDTO userDTO = userService.getUserByEmail(userDetails.getUsername());
+
+            // Get basic user info without eagerly loading collections
+            UserDTO userDTO = userService.getUserBasicInfo(userDetails.getUsername());
 
             // Generate JWT token
             String token = jwtUtil.generateToken(userDTO);
 
-            // Create auth response
+            // Auth Response
             AuthDTO authDTO = new AuthDTO();
             authDTO.setEmail(userDTO.getEmail());
             authDTO.setToken(token);
-            authDTO.setRole(userDTO.getRole().name()); // Convert enum to string using name()
+            authDTO.setRole(userDTO.getRole().name());
             authDTO.setUsername(userDTO.getUsername());
 
             // Set response DTO
             responseDTO.setCode(VarList.OK);
             responseDTO.setMessage("Authentication successful");
+            responseDTO.setData(authDTO);
 
             userService.updateLastLogin(userDTO.getEmail());
-
-
-            responseDTO.setData(authDTO);
 
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
 
         } catch (BadCredentialsException e) {
+            logger.error("Authentication failed: Invalid credentials");
             responseDTO.setCode(VarList.Unauthorized);
             responseDTO.setMessage("Invalid credentials");
             responseDTO.setData(null);
             return new ResponseEntity<>(responseDTO, HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
+            logger.error("Login error: {}", e.getMessage(), e);
             responseDTO.setCode(VarList.Internal_Server_Error);
             responseDTO.setMessage("Error: " + e.getMessage());
             responseDTO.setData(null);
@@ -92,8 +98,6 @@ public class AuthController {
                 return new ResponseEntity<>(responseDTO, HttpStatus.CONFLICT);
             }
 
-            // Force role to be USER for normal registration
-            // This prevents unauthorized admin creation
             if (userCreateDTO.getRole() == AppEnums.Role.ADMIN) {
                 userCreateDTO.setRole(AppEnums.Role.USER);
             }
