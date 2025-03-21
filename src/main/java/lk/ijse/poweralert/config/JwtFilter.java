@@ -52,7 +52,6 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Get the request path
         String path = request.getServletPath();
         logger.debug("Request path: {}", path);
 
@@ -70,7 +69,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String username = null;
         String jwt = null;
 
-        // Extract JWT token from Authorization header
+
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
             try {

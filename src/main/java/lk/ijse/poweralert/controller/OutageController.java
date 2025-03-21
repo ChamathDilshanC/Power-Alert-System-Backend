@@ -1,5 +1,6 @@
 package lk.ijse.poweralert.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lk.ijse.poweralert.dto.OutageCreateDTO;
 import lk.ijse.poweralert.dto.OutageDTO;
@@ -128,14 +129,35 @@ public class OutageController {
     @PreAuthorize("hasAnyAuthority('ROLE_UTILITY_PROVIDER', 'ROLE_ADMIN')")
     public ResponseEntity<ResponseDTO> addOutageUpdate(
             @PathVariable Long id,
-            @Valid @RequestBody OutageUpdateDTO outageUpdateDTO) {
+            @RequestBody OutageUpdateDTO outageUpdateDTO) {
         try {
-            outageUpdateDTO.setOutageId(id); // Ensure the outage ID is set correctly
+            outageUpdateDTO.setOutageId(id);
+
+            if (outageUpdateDTO.getUpdateInfo() == null || outageUpdateDTO.getUpdateInfo().trim().isEmpty()) {
+                responseDTO.setCode(VarList.Bad_Request);
+                responseDTO.setMessage("Update information is required");
+                responseDTO.setData(null);
+                return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+            }
+
             OutageDTO updatedOutage = outageService.addOutageUpdate(outageUpdateDTO);
+
             responseDTO.setCode(VarList.OK);
             responseDTO.setMessage("Outage update added successfully");
             responseDTO.setData(updatedOutage);
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            logger.error("Outage not found with ID {}: {}", id, e.getMessage());
+            responseDTO.setCode(VarList.Not_Found);
+            responseDTO.setMessage(e.getMessage());
+            responseDTO.setData(null);
+            return new ResponseEntity<>(responseDTO, HttpStatus.NOT_FOUND);
+        } catch (IllegalStateException e) {
+            logger.error("Cannot update outage with ID {}: {}", id, e.getMessage());
+            responseDTO.setCode(VarList.Bad_Request);
+            responseDTO.setMessage(e.getMessage());
+            responseDTO.setData(null);
+            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             logger.error("Error adding update to outage with ID {}: {}", id, e.getMessage(), e);
             responseDTO.setCode(VarList.Internal_Server_Error);

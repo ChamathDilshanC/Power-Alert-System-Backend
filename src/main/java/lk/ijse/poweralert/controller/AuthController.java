@@ -43,7 +43,6 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ResponseDTO> login(@Valid @RequestBody AuthRequestDTO authRequest) {
         try {
-            // Log the login attempt to help debug
             logger.info("Login attempt for user: {}", authRequest.getUsername());
 
             // Authenticate user
@@ -51,17 +50,15 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
             );
 
-            // User is authenticated, get user details
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-            // If your UserDetailsService uses email as username, this should work
-            // Otherwise change to getUserByUsername if that's what your system expects
             UserDTO userDTO = userService.getUserByUsername(userDetails.getUsername());
 
             // Generate JWT token
             String token = jwtUtil.generateToken(userDTO);
 
-            // Create auth response
+            // Auth Response
+
             AuthDTO authDTO = new AuthDTO();
             authDTO.setEmail(userDTO.getEmail());
             authDTO.setToken(token);
@@ -103,8 +100,6 @@ public class AuthController {
                 return new ResponseEntity<>(responseDTO, HttpStatus.CONFLICT);
             }
 
-            // Force role to be USER for normal registration
-            // This prevents unauthorized admin creation
             if (userCreateDTO.getRole() == AppEnums.Role.ADMIN) {
                 userCreateDTO.setRole(AppEnums.Role.USER);
             }

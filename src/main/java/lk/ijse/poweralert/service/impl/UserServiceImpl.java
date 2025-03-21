@@ -13,8 +13,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -62,6 +65,7 @@ public class UserServiceImpl implements UserService {
         return convertToDTO(savedUser);
     }
 
+
     @Override
     public UserDTO getUserByEmail(String email) {
         logger.info("Fetching user with email: {}", email);
@@ -72,9 +76,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDTO getUserByUsername(String username) {
         logger.info("Fetching user with username: {}", username);
-        User user = getUserEntityByUsername(username);
+        User user = userRepository.findByUsernameWithCollections(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
 
         return convertToDTO(user);
     }
@@ -101,19 +107,40 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    public UserDTO getUserById(Long id) {
+        logger.info("Fetching user with ID: {}", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
+
+        return convertToDTO(user);
+    }
+
+    @Override
+    public List<UserDTO> getAllUsers() {
+        logger.info("Fetching all users");
+        List<User> users = userRepository.findAll();
+
+        return users.stream()
+                .map(this::convertToDTO)
+                .toList();
+    }
+
+    @Override
+    public UserDTO deactivateUser(Long id) {
+        logger.info("Deactivating user with ID: {}", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
+
+        user.setActive(false);
+        userRepository.save(user);
+
+        return convertToDTO(user);
+    }
+
     private UserDTO convertToDTO(User user) {
         try {
             UserDTO userDTO = modelMapper.map(user, UserDTO.class);
-
-            // Ensure collections are never null in the DTO
-            if (userDTO.getAddresses() == null) {
-                userDTO.setAddresses(new ArrayList<>());
-            }
-
-            if (userDTO.getNotificationPreferences() == null) {
-                userDTO.setNotificationPreferences(new ArrayList<>());
-            }
-
             return userDTO;
         } catch (Exception e) {
             logger.error("Error mapping User to UserDTO: {}", e.getMessage(), e);
@@ -128,8 +155,11 @@ public class UserServiceImpl implements UserService {
             userDTO.setActive(user.isActive());
             userDTO.setCreatedAt(user.getCreatedAt());
             userDTO.setLastLoginAt(user.getLastLoginAt());
+
+            // Empty collections to avoid null pointer exceptions
             userDTO.setAddresses(new ArrayList<>());
             userDTO.setNotificationPreferences(new ArrayList<>());
+
             return userDTO;
         }
     }

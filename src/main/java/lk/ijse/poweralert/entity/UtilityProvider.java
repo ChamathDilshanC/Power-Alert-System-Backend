@@ -36,6 +36,9 @@ public class UtilityProvider {
     private AppEnums.UtilityType type;
 
     @OneToMany(mappedBy = "utilityProvider")
+    private List<User> users;
+    
+    @OneToMany(mappedBy = "utilityProvider")
     private List<Outage> outages;
 
     @ManyToMany(mappedBy = "utilityProviders")

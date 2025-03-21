@@ -8,58 +8,27 @@ import java.util.List;
 
 public interface OutageService {
 
-    /**
-     * Create a new outage
-     * @param outageCreateDTO the outage creation data
-     * @return the created outage
-     */
+    /** Create a new outage  */
     OutageDTO createOutage(OutageCreateDTO outageCreateDTO);
 
-    /**
-     * Get all active outages
-     * @return list of active outages
-     */
+    /** Get all active outages */
     List<OutageDTO> getAllActiveOutages();
 
-    /**
-     * Get outage by ID
-     * @param id the outage ID
-     * @return the outage details
-     */
+    /** Get outage by ID */
     OutageDTO getOutageById(Long id);
 
-    /**
-     * Get outages for a specific area
-     * @param areaId the area ID
-     * @return list of outages for the area
-     */
+    /** Get outages for a specific area  */
     List<OutageDTO> getOutagesByArea(Long areaId);
 
-    /**
-     * Update an existing outage
-     * @param id the outage ID
-     * @param outageCreateDTO the updated outage data
-     * @return the updated outage
-     */
+    /** Update an existing outage    */
     OutageDTO updateOutage(Long id, OutageCreateDTO outageCreateDTO);
 
-    /**
-     * Add an update to an existing outage
-     * @param outageUpdateDTO the outage update data
-     * @return the updated outage
-     */
+    /** Add an update to an existing outage  */
     OutageDTO addOutageUpdate(OutageUpdateDTO outageUpdateDTO);
 
-    /**
-     * Cancel an outage
-     * @param id the outage ID
-     * @return the cancelled outage
-     */
+    /** Cancel an outage */
     OutageDTO cancelOutage(Long id);
 
-    /**
-     * Get outages relevant to the current authenticated user
-     * @return list of outages for the user's area
-     */
+    /** Get outages relevant to the current authenticated user */
     List<OutageDTO> getOutagesForCurrentUser();
 }

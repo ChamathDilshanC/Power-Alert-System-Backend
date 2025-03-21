@@ -4,6 +4,8 @@ import lk.ijse.poweralert.dto.UserCreateDTO;
 import lk.ijse.poweralert.dto.UserDTO;
 import lk.ijse.poweralert.entity.User;
 
+import java.util.List;
+
 public interface UserService {
 
     /**
@@ -46,4 +48,10 @@ public interface UserService {
      * @param email the user email
      */
     void updateLastLogin(String email);
+
+    UserDTO getUserById(Long id);
+
+    List<UserDTO> getAllUsers();
+
+    UserDTO deactivateUser(Long id);
 }

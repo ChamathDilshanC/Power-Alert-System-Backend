@@ -9,10 +9,6 @@ import java.util.List;
 @Repository
 public interface OutageUpdateRepository extends JpaRepository<OutageUpdate, Long> {
 
-    /**
-     * Find updates for a specific outage
-     * @param outageId the outage ID
-     * @return list of updates for the outage
-     */
+    /** Find updates for a specific outage   */
     List<OutageUpdate> findByOutageIdOrderByCreatedAtDesc(Long outageId);
 }

@@ -5,17 +5,20 @@ import lk.ijse.poweralert.enums.AppEnums.NotificationStatus;
 import lk.ijse.poweralert.enums.AppEnums.NotificationType;
 import lk.ijse.poweralert.repository.NotificationRepository;
 import lk.ijse.poweralert.repository.UserRepository;
-import lk.ijse.poweralert.service.NotificationService;
+import lk.ijse.poweralert.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -31,13 +34,22 @@ public class NotificationServiceImpl implements NotificationService {
     @Autowired
     private UserRepository userRepository;
 
-    // For email service
-    // @Autowired
-    // private EmailService emailService;
+    @Autowired
+    private EmailService emailService;
 
-    // For SMS service
-    // @Autowired
-    // private SmsService smsService;
+    @Autowired
+    @Qualifier("vonageSmsServiceImpl")
+
+    private SmsService smsService;
+    @Autowired(required = false)
+    private WhatsAppService whatsAppService;
+
+    @Autowired(required = false)
+    private PushNotificationService pushNotificationService;
+
+    // Optional: Add UserDeviceService for retrieving device tokens
+    @Autowired(required = false)
+    private UserDeviceService userDeviceService;
 
     @Override
     @Async
@@ -209,7 +221,7 @@ public class NotificationServiceImpl implements NotificationService {
             Outage dummyOutage = new Outage();
             dummyOutage.setId(-1L);  // Use -1 to indicate test outage
 
-            // Send test notification
+            // Send test notification via email (always, for testing)
             createAndSendNotification(dummyOutage, user, NotificationType.EMAIL, message);
 
             return true;
@@ -251,26 +263,40 @@ public class NotificationServiceImpl implements NotificationService {
         try {
             switch (type) {
                 case EMAIL:
-                    // Uncomment when implemented
-                    // sent = emailService.sendEmail(user.getEmail(), "Power Outage Notification", content);
-                    logger.info("Would send EMAIL to: {}", user.getEmail());
-                    sent = true; // For now, pretend it was sent
+                    sent = emailService.sendEmail(user.getEmail(), getEmailSubject(outage, user.getPreferredLanguage()), content);
                     break;
                 case SMS:
-                    // Uncomment when implemented
-                    // sent = smsService.sendSms(user.getPhoneNumber(), content);
-                    logger.info("Would send SMS to: {}", user.getPhoneNumber());
-                    sent = true; // For now, pretend it was sent
+                    // Uses VonageSmsServiceImpl through the SmsService interface
+                    sent = smsService.sendSms(user.getPhoneNumber(), content);
                     break;
                 case PUSH:
-                    // TODO: Implement push notification
-                    logger.info("Would send PUSH notification to user: {}", user.getId());
-                    sent = true; // For now, pretend it was sent
+                    // Create a data map for push notification
+                    Map<String, String> data = new HashMap<>();
+                    data.put("outageId", outage.getId().toString());
+                    data.put("type", outage.getType().toString());
+                    data.put("status", outage.getStatus().toString());
+
+                    // Get user's device token
+                    String deviceToken = getDeviceToken(user);
+
+                    if (pushNotificationService != null && deviceToken != null && !deviceToken.isEmpty()) {
+                        sent = pushNotificationService.sendNotification(
+                                deviceToken,
+                                getOutageTitle(outage, user.getPreferredLanguage()),
+                                content,
+                                data);
+                    } else {
+                        logger.warn("Push notification service or device token not available for user ID: {}", user.getId());
+                        sent = false;
+                    }
                     break;
                 case WHATSAPP:
-                    // TODO: Implement WhatsApp notification
-                    logger.info("Would send WHATSAPP message to: {}", user.getPhoneNumber());
-                    sent = true; // For now, pretend it was sent
+                    if (whatsAppService != null) {
+                        sent = whatsAppService.sendWhatsAppMessage(user.getPhoneNumber(), content);
+                    } else {
+                        logger.warn("WhatsApp service not available");
+                        sent = false;
+                    }
                     break;
                 default:
                     logger.warn("Unknown notification type: {}", type);
@@ -291,6 +317,43 @@ public class NotificationServiceImpl implements NotificationService {
             notification.setStatus(NotificationStatus.FAILED);
             notificationRepository.save(notification);
         }
+    }
+
+    // Helper method to get device token - improved implementation
+    private String getDeviceToken(User user) {
+        // Use UserDeviceService if available
+        if (userDeviceService != null) {
+            try {
+                List<String> tokens = userDeviceService.getFcmTokensForUser(user.getId());
+                if (tokens != null && !tokens.isEmpty()) {
+                    return tokens.get(0); // Return first token
+                }
+            } catch (Exception e) {
+                logger.error("Error getting device token for user {}: {}", user.getId(), e.getMessage());
+            }
+        }
+
+        // Fallback - no token available
+        return null;
+    }
+
+    // Helper method to get email subject
+    private String getEmailSubject(Outage outage, String language) {
+        ResourceBundle bundle = getResourceBundle(language);
+
+        String outageType = outage.getType().toString();
+        String areaName = outage.getAffectedArea().getName();
+
+        return String.format(bundle.getString("outage.email.subject"), outageType, areaName);
+    }
+
+    // Helper method to get outage title for push notifications
+    private String getOutageTitle(Outage outage, String language) {
+        ResourceBundle bundle = getResourceBundle(language);
+
+        String outageType = outage.getType().toString();
+
+        return String.format(bundle.getString("outage.push.title"), outageType);
     }
 
     // Helper methods to generate notification messages

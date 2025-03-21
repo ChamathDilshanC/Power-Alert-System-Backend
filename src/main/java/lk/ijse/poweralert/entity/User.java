@@ -45,6 +45,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Address> addresses = new ArrayList<>();
 
+    @ManyToOne
+    @JoinColumn(name = "utility_provider_id")
+    private UtilityProvider utilityProvider;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<NotificationPreference> notificationPreferences = new ArrayList<>();
 

@@ -1,5 +1,6 @@
 package lk.ijse.poweralert.config;
 
+import org.hibernate.collection.spi.PersistentCollection;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
@@ -11,12 +12,19 @@ public class ModelMapperConfig {
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
-
-        // Configure ModelMapper to handle collections properly
         modelMapper.getConfiguration()
-                .setSkipNullEnabled(true)
+                .setFieldMatchingEnabled(true)
+                .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE)
                 .setMatchingStrategy(MatchingStrategies.STRICT)
-                .setCollectionsMergeEnabled(false);
+                .setSkipNullEnabled(true)
+                .setCollectionsMergeEnabled(false)
+                .setPropertyCondition(context -> {
+                    // Skip uninitialized Hibernate collections
+                    if (context.getSource() instanceof PersistentCollection) {
+                        return ((PersistentCollection<?>) context.getSource()).wasInitialized();
+                    }
+                    return true;
+                });
 
         return modelMapper;
     }

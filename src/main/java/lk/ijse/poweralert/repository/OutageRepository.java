@@ -14,47 +14,21 @@ import java.util.List;
 @Repository
 public interface OutageRepository extends JpaRepository<Outage, Long> {
 
-    /**
-     * Find outages by status
-     * @param statuses the list of statuses to find
-     * @return list of outages with the given statuses
-     */
+    /** Find outages by status */
     List<Outage> findByStatusIn(List<OutageStatus> statuses);
 
-    /**
-     * Find outages for a specific area
-     * @param areaId the area ID
-     * @return list of outages for the area
-     */
+    /** Find outages for a specific area */
     List<Outage> findByAffectedAreaIdOrderByStartTimeDesc(Long areaId);
 
-    /**
-     * Find upcoming outages for a specific area
-     * @param areaId the area ID
-     * @param now the current time
-     * @param status the status to filter by
-     * @return list of upcoming outages for the area
-     */
+    /** Find upcoming outages for a specific area */
     List<Outage> findByAffectedAreaIdAndStartTimeAfterAndStatusOrderByStartTimeAsc(
             Long areaId, LocalDateTime now, OutageStatus status);
 
-    /**
-     * Find outages that should be notified in advance
-     * @param startTimeFrom the start time lower bound
-     * @param startTimeTo the start time upper bound
-     * @param status the outage status
-     * @return list of outages to be notified
-     */
+    /** Find outages that should be notified in advance  */
     List<Outage> findByStartTimeBetweenAndStatus(
             LocalDateTime startTimeFrom, LocalDateTime startTimeTo, OutageStatus status);
 
-    /**
-     * Find outages that affect the given addresses
-     * This query finds outages in districts where the user has addresses
-     * @param addresses the list of user addresses
-     * @param statuses the list of outage statuses to include
-     * @return list of outages affecting the addresses
-     */
+    /** Find outages that affect the given addresses */
     @Query("SELECT o FROM Outage o " +
             "JOIN o.affectedArea a " +
             "WHERE o.status IN :statuses " +
@@ -62,10 +36,6 @@ public interface OutageRepository extends JpaRepository<Outage, Long> {
             "ORDER BY o.startTime DESC")
     List<Outage> findOutagesForAddresses(@Param("addresses") List<Address> addresses, @Param("statuses") List<OutageStatus> statuses);
 
-    /**
-     * Find outages by utility provider
-     * @param providerId the utility provider ID
-     * @return list of outages for the provider
-     */
+    /** Find outages by utility provider */
     List<Outage> findByUtilityProviderIdOrderByStartTimeDesc(Long providerId);
 }

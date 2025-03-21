@@ -48,31 +48,28 @@ public class MessageTestController {
                 locale = Locale.ENGLISH;
         }
 
-        // Get messages in the specified language
         Map<String, String> messages = new HashMap<>();
 
-        // New outage message
         String newOutageMsg = messageSource.getMessage(
                 "outage.new",
                 new Object[]{"ELECTRICITY", areaName, startTime, endTime, "Scheduled maintenance"},
                 locale);
         messages.put("newOutage", newOutageMsg);
 
-        // Update message
         String updateMsg = messageSource.getMessage(
                 "outage.update",
                 new Object[]{"ELECTRICITY", areaName, "ONGOING", endTime},
                 locale);
         messages.put("updateOutage", updateMsg);
 
-        // Cancellation message
+
         String cancelMsg = messageSource.getMessage(
                 "outage.cancelled",
                 new Object[]{"ELECTRICITY", areaName, startTime},
                 locale);
         messages.put("cancelOutage", cancelMsg);
 
-        // Restoration message
+
         String restoreMsg = messageSource.getMessage(
                 "outage.restored",
                 new Object[]{"ELECTRICITY", areaName},
