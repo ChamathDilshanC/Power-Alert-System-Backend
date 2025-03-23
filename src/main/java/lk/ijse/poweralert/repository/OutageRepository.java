@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 public interface OutageRepository extends JpaRepository<Outage, Long> {
@@ -26,7 +25,7 @@ public interface OutageRepository extends JpaRepository<Outage, Long> {
     List<Outage> findByAffectedAreaIdAndStartTimeAfterAndStatusOrderByStartTimeAsc(
             Long areaId, LocalDateTime now, OutageStatus status);
 
-    /** Find outages that should be notified in advance  */
+    /** Find outages that should be notified in advance */
     List<Outage> findByStartTimeBetweenAndStatus(
             LocalDateTime startTimeFrom, LocalDateTime startTimeTo, OutageStatus status);
 
@@ -47,20 +46,26 @@ public interface OutageRepository extends JpaRepository<Outage, Long> {
     /** Count outages by type */
     long countByType(OutageType type);
 
-    /** Count outages by area */
-    long countByAffectedAreaId(Long areaId);
-
-    /** Get outage counts by month for current year */
-    @Query("SELECT MONTH(o.startTime) as month, COUNT(o) as count " +
-            "FROM Outage o " +
-            "WHERE YEAR(o.startTime) = :year " +
-            "GROUP BY MONTH(o.startTime) " +
-            "ORDER BY month")
-    List<Map<String, Object>> countByMonth(@Param("year") int year);
-
     /** Get average restoration time (in hours) for completed outages */
-    @Query("SELECT AVG(TIMESTAMPDIFF(SECOND, o.startTime, o.actualEndTime)) / 3600.0 " +
-            "FROM Outage o " +
-            "WHERE o.status = 'COMPLETED' AND o.actualEndTime IS NOT NULL")
+    @Query(value = "SELECT AVG(TIMESTAMPDIFF(SECOND, o.start_time, o.actual_end_time)) / 3600.0 " +
+            "FROM outages o " +
+            "WHERE o.status = 'COMPLETED' AND o.actual_end_time IS NOT NULL",
+            nativeQuery = true)
     Double getAverageRestorationTime();
+
+    /** Count outages by month for a given year */
+    @Query(value = "SELECT MONTH(o.start_time) as month, COUNT(*) as count " +
+            "FROM outages o " +
+            "WHERE YEAR(o.start_time) = :year " +
+            "GROUP BY MONTH(o.start_time) " +
+            "ORDER BY month",
+            nativeQuery = true)
+    List<Object[]> countByMonth(@Param("year") int year);
+
+    /** Find completed outages with actual end time */
+    @Query("SELECT o FROM Outage o WHERE o.status = 'COMPLETED' AND o.actualEndTime IS NOT NULL")
+    List<Outage> findCompletedOutagesWithEndTime();
+
+    /** Find completed outages with actual end time */
+    List<Outage> findByStatusAndActualEndTimeIsNotNull(OutageStatus status);
 }

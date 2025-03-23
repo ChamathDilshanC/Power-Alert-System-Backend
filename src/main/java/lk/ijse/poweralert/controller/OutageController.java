@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class OutageController {
 
     // Public endpoint to get all active outages
     @GetMapping("/public/outages/active")
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO> getAllActiveOutages() {
         try {
             List<OutageDTO> outages = outageService.getAllActiveOutages();

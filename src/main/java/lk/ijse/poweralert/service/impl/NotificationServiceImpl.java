@@ -1,8 +1,10 @@
 package lk.ijse.poweralert.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import lk.ijse.poweralert.entity.*;
 import lk.ijse.poweralert.enums.AppEnums.NotificationStatus;
 import lk.ijse.poweralert.enums.AppEnums.NotificationType;
+import lk.ijse.poweralert.repository.NotificationPreferenceRepository;
 import lk.ijse.poweralert.repository.NotificationRepository;
 import lk.ijse.poweralert.repository.UserRepository;
 import lk.ijse.poweralert.service.*;
@@ -10,17 +12,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
@@ -35,21 +36,26 @@ public class NotificationServiceImpl implements NotificationService {
     private UserRepository userRepository;
 
     @Autowired
-    private EmailService emailService;
+    private NotificationPreferenceRepository notificationPreferenceRepository;
 
     @Autowired
-    @Qualifier("vonageSmsServiceImpl")
+    private EmailService emailService;
 
+    @Autowired(required = false)
+    @Qualifier("vonageSmsServiceImpl")
     private SmsService smsService;
+
     @Autowired(required = false)
     private WhatsAppService whatsAppService;
 
     @Autowired(required = false)
     private PushNotificationService pushNotificationService;
 
-    // Optional: Add UserDeviceService for retrieving device tokens
     @Autowired(required = false)
     private UserDeviceService userDeviceService;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @Override
     @Async
@@ -57,41 +63,74 @@ public class NotificationServiceImpl implements NotificationService {
         logger.info("Sending notifications for new outage ID: {}", outage.getId());
 
         try {
-            // Get affected users based on area
-            List<User> affectedUsers = findAffectedUsers(outage);
-            logger.info("Found {} affected users for outage ID: {}", affectedUsers.size(), outage.getId());
+            // Get affected users IDs
+            List<Long> affectedUserIds = findAffectedUserIds(outage);
+            logger.info("Found {} affected users for outage ID: {}", affectedUserIds.size(), outage.getId());
 
-            // Prepare notifications
-            List<Notification> notifications = new ArrayList<>();
+            // Process each user in their own transaction
+            for (Long userId : affectedUserIds) {
+                processUserNotification(userId, outage);
+            }
+        } catch (Exception e) {
+            logger.error("Error sending outage notifications: {}", e.getMessage(), e);
+        }
+    }
 
-            for (User user : affectedUsers) {
-                // Get user's notification preferences
-                List<NotificationPreference> preferences = user.getNotificationPreferences();
+    /**
+     * Find user IDs affected by an outage
+     * @param outage The outage
+     * @return List of affected user IDs
+     */
+    private List<Long> findAffectedUserIds(Outage outage) {
+        return userRepository.findUsersInDistrict(outage.getAffectedArea().getDistrict())
+                .stream()
+                .map(User::getId)
+                .collect(java.util.stream.Collectors.toList());
+    }
 
-                // Skip if user has no preferences
-                if (preferences == null || preferences.isEmpty()) {
-                    logger.debug("User {} has no notification preferences, using defaults", user.getId());
-                    // Use default notification (email)
-                    createAndSendNotification(outage, user, NotificationType.EMAIL,
-                            generateOutageMessage(outage, user.getPreferredLanguage()));
+    /**
+     * Process notifications for a single user with proper transaction handling
+     *
+     * @param userId The ID of the user to process
+     * @param outage The outage to send notifications about
+     */
+    @Transactional(readOnly = true)
+    protected void processUserNotification(Long userId, Outage outage) {
+        try {
+            // Fetch user within this transaction
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
+            // Explicitly fetch notification preferences to avoid lazy loading issues
+            List<NotificationPreference> preferences = notificationPreferenceRepository.findByUserId(userId);
+
+            // Skip if user has no preferences
+            if (preferences == null || preferences.isEmpty()) {
+                logger.debug("User {} has no notification preferences, using defaults", userId);
+                // Use default notification (email)
+                createAndSendNotification(outage, user, NotificationType.EMAIL,
+                        generateOutageMessage(outage, user.getPreferredLanguage()));
+                return;
+            }
+
+            // Check each preference
+            for (NotificationPreference pref : preferences) {
+                // Skip if preference is not enabled or not matching outage type
+                if (!pref.isEnabled() || pref.getOutageType() != outage.getType()) {
                     continue;
                 }
 
-                // Check each preference
-                for (NotificationPreference pref : preferences) {
-                    // Skip if preference is not enabled or not matching outage type
-                    if (!pref.isEnabled() || pref.getOutageType() != outage.getType()) {
-                        continue;
-                    }
-
-                    // Create notification
-                    createAndSendNotification(outage, user, pref.getChannelType(),
-                            generateOutageMessage(outage, user.getPreferredLanguage()));
-                }
+                // Create notification
+                createAndSendNotification(outage, user, pref.getChannelType(),
+                        generateOutageMessage(outage, user.getPreferredLanguage()));
             }
 
+            logger.debug("Successfully processed notifications for user ID: {} for outage ID: {}",
+                    userId, outage.getId());
         } catch (Exception e) {
-            logger.error("Error sending outage notifications: {}", e.getMessage(), e);
+            logger.error("Error processing notification for user ID: {} for outage ID: {}: {}",
+                    userId, outage.getId(), e.getMessage(), e);
+            // Don't re-throw to allow processing other users
         }
     }
 
@@ -101,36 +140,54 @@ public class NotificationServiceImpl implements NotificationService {
         logger.info("Sending notifications for updated outage ID: {}", outage.getId());
 
         try {
-            // Get affected users based on area
-            List<User> affectedUsers = findAffectedUsers(outage);
+            // Get affected user IDs
+            List<Long> affectedUserIds = findAffectedUserIds(outage);
+            logger.info("Found {} affected users for outage update ID: {}", affectedUserIds.size(), outage.getId());
 
-            for (User user : affectedUsers) {
-                // Get user's notification preferences
-                List<NotificationPreference> preferences = user.getNotificationPreferences();
+            // Process each user separately
+            for (Long userId : affectedUserIds) {
+                processUserUpdateNotification(userId, outage);
+            }
+        } catch (Exception e) {
+            logger.error("Error sending outage update notifications: {}", e.getMessage(), e);
+        }
+    }
 
-                // Skip if user has no preferences
-                if (preferences == null || preferences.isEmpty()) {
-                    // Use default notification (email)
-                    createAndSendNotification(outage, user, NotificationType.EMAIL,
-                            generateOutageUpdateMessage(outage, user.getPreferredLanguage()));
+    @Transactional(readOnly = true)
+    protected void processUserUpdateNotification(Long userId, Outage outage) {
+        try {
+            // Fetch user within this transaction
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
+            // Explicitly fetch notification preferences
+            List<NotificationPreference> preferences = notificationPreferenceRepository.findByUserId(userId);
+
+            // Skip if user has no preferences
+            if (preferences == null || preferences.isEmpty()) {
+                // Use default notification (email)
+                createAndSendNotification(outage, user, NotificationType.EMAIL,
+                        generateOutageUpdateMessage(outage, user.getPreferredLanguage()));
+                return;
+            }
+
+            // Check each preference
+            for (NotificationPreference pref : preferences) {
+                // Skip if preference is not enabled, not matching outage type, or updates not enabled
+                if (!pref.isEnabled() || pref.getOutageType() != outage.getType() || !pref.isReceiveUpdates()) {
                     continue;
                 }
 
-                // Check each preference
-                for (NotificationPreference pref : preferences) {
-                    // Skip if preference is not enabled, not matching outage type, or updates not enabled
-                    if (!pref.isEnabled() || pref.getOutageType() != outage.getType() || !pref.isReceiveUpdates()) {
-                        continue;
-                    }
-
-                    // Create notification
-                    createAndSendNotification(outage, user, pref.getChannelType(),
-                            generateOutageUpdateMessage(outage, user.getPreferredLanguage()));
-                }
+                // Create notification
+                createAndSendNotification(outage, user, pref.getChannelType(),
+                        generateOutageUpdateMessage(outage, user.getPreferredLanguage()));
             }
 
+            logger.debug("Successfully processed update notifications for user ID: {} for outage ID: {}",
+                    userId, outage.getId());
         } catch (Exception e) {
-            logger.error("Error sending outage update notifications: {}", e.getMessage(), e);
+            logger.error("Error processing update notification for user ID: {} for outage ID: {}: {}",
+                    userId, outage.getId(), e.getMessage(), e);
         }
     }
 
@@ -140,36 +197,54 @@ public class NotificationServiceImpl implements NotificationService {
         logger.info("Sending notifications for cancelled outage ID: {}", outage.getId());
 
         try {
-            // Get affected users based on area
-            List<User> affectedUsers = findAffectedUsers(outage);
+            // Get affected user IDs
+            List<Long> affectedUserIds = findAffectedUserIds(outage);
+            logger.info("Found {} affected users for outage cancellation ID: {}", affectedUserIds.size(), outage.getId());
 
-            for (User user : affectedUsers) {
-                // Get user's notification preferences
-                List<NotificationPreference> preferences = user.getNotificationPreferences();
+            // Process each user separately
+            for (Long userId : affectedUserIds) {
+                processUserCancellationNotification(userId, outage);
+            }
+        } catch (Exception e) {
+            logger.error("Error sending outage cancellation notifications: {}", e.getMessage(), e);
+        }
+    }
 
-                // Skip if user has no preferences
-                if (preferences == null || preferences.isEmpty()) {
-                    // Use default notification (email)
-                    createAndSendNotification(outage, user, NotificationType.EMAIL,
-                            generateOutageCancellationMessage(outage, user.getPreferredLanguage()));
+    @Transactional(readOnly = true)
+    protected void processUserCancellationNotification(Long userId, Outage outage) {
+        try {
+            // Fetch user within this transaction
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
+            // Explicitly fetch notification preferences
+            List<NotificationPreference> preferences = notificationPreferenceRepository.findByUserId(userId);
+
+            // Skip if user has no preferences
+            if (preferences == null || preferences.isEmpty()) {
+                // Use default notification (email)
+                createAndSendNotification(outage, user, NotificationType.EMAIL,
+                        generateOutageCancellationMessage(outage, user.getPreferredLanguage()));
+                return;
+            }
+
+            // Check each preference
+            for (NotificationPreference pref : preferences) {
+                // Skip if preference is not enabled, not matching outage type, or updates not enabled
+                if (!pref.isEnabled() || pref.getOutageType() != outage.getType() || !pref.isReceiveUpdates()) {
                     continue;
                 }
 
-                // Check each preference
-                for (NotificationPreference pref : preferences) {
-                    // Skip if preference is not enabled, not matching outage type, or updates not enabled
-                    if (!pref.isEnabled() || pref.getOutageType() != outage.getType() || !pref.isReceiveUpdates()) {
-                        continue;
-                    }
-
-                    // Create notification
-                    createAndSendNotification(outage, user, pref.getChannelType(),
-                            generateOutageCancellationMessage(outage, user.getPreferredLanguage()));
-                }
+                // Create notification
+                createAndSendNotification(outage, user, pref.getChannelType(),
+                        generateOutageCancellationMessage(outage, user.getPreferredLanguage()));
             }
 
+            logger.debug("Successfully processed cancellation notifications for user ID: {} for outage ID: {}",
+                    userId, outage.getId());
         } catch (Exception e) {
-            logger.error("Error sending outage cancellation notifications: {}", e.getMessage(), e);
+            logger.error("Error processing cancellation notification for user ID: {} for outage ID: {}: {}",
+                    userId, outage.getId(), e.getMessage(), e);
         }
     }
 
@@ -179,36 +254,54 @@ public class NotificationServiceImpl implements NotificationService {
         logger.info("Sending notifications for restored outage ID: {}", outage.getId());
 
         try {
-            // Get affected users based on area
-            List<User> affectedUsers = findAffectedUsers(outage);
+            // Get affected user IDs
+            List<Long> affectedUserIds = findAffectedUserIds(outage);
+            logger.info("Found {} affected users for outage restoration ID: {}", affectedUserIds.size(), outage.getId());
 
-            for (User user : affectedUsers) {
-                // Get user's notification preferences
-                List<NotificationPreference> preferences = user.getNotificationPreferences();
+            // Process each user separately
+            for (Long userId : affectedUserIds) {
+                processUserRestorationNotification(userId, outage);
+            }
+        } catch (Exception e) {
+            logger.error("Error sending outage restoration notifications: {}", e.getMessage(), e);
+        }
+    }
 
-                // Skip if user has no preferences
-                if (preferences == null || preferences.isEmpty()) {
-                    // Use default notification (email)
-                    createAndSendNotification(outage, user, NotificationType.EMAIL,
-                            generateOutageRestorationMessage(outage, user.getPreferredLanguage()));
+    @Transactional(readOnly = true)
+    protected void processUserRestorationNotification(Long userId, Outage outage) {
+        try {
+            // Fetch user within this transaction
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
+            // Explicitly fetch notification preferences
+            List<NotificationPreference> preferences = notificationPreferenceRepository.findByUserId(userId);
+
+            // Skip if user has no preferences
+            if (preferences == null || preferences.isEmpty()) {
+                // Use default notification (email)
+                createAndSendNotification(outage, user, NotificationType.EMAIL,
+                        generateOutageRestorationMessage(outage, user.getPreferredLanguage()));
+                return;
+            }
+
+            // Check each preference
+            for (NotificationPreference pref : preferences) {
+                // Skip if preference is not enabled, not matching outage type, or restoration not enabled
+                if (!pref.isEnabled() || pref.getOutageType() != outage.getType() || !pref.isReceiveRestoration()) {
                     continue;
                 }
 
-                // Check each preference
-                for (NotificationPreference pref : preferences) {
-                    // Skip if preference is not enabled, not matching outage type, or restoration not enabled
-                    if (!pref.isEnabled() || pref.getOutageType() != outage.getType() || !pref.isReceiveRestoration()) {
-                        continue;
-                    }
-
-                    // Create notification
-                    createAndSendNotification(outage, user, pref.getChannelType(),
-                            generateOutageRestorationMessage(outage, user.getPreferredLanguage()));
-                }
+                // Create notification
+                createAndSendNotification(outage, user, pref.getChannelType(),
+                        generateOutageRestorationMessage(outage, user.getPreferredLanguage()));
             }
 
+            logger.debug("Successfully processed restoration notifications for user ID: {} for outage ID: {}",
+                    userId, outage.getId());
         } catch (Exception e) {
-            logger.error("Error sending outage restoration notifications: {}", e.getMessage(), e);
+            logger.error("Error processing restoration notification for user ID: {} for outage ID: {}: {}",
+                    userId, outage.getId(), e.getMessage(), e);
         }
     }
 
@@ -244,78 +337,87 @@ public class NotificationServiceImpl implements NotificationService {
     private void createAndSendNotification(Outage outage, User user, NotificationType type, String content) {
         logger.debug("Creating notification for user ID: {} via {}", user.getId(), type);
 
-        // Create notification entity
-        Notification notification = new Notification();
-        notification.setOutage(outage);
-        notification.setUser(user);
-        notification.setType(type);
-        notification.setStatus(NotificationStatus.PENDING);
-        notification.setContent(content);
-        notification.setLanguage(user.getPreferredLanguage());
-        notification.setCreatedAt(LocalDateTime.now());
-
-        // Save notification
-        notification = notificationRepository.save(notification);
-
-        // Attempt to send notification
-        boolean sent = false;
-
         try {
-            switch (type) {
-                case EMAIL:
-                    sent = emailService.sendEmail(user.getEmail(), getEmailSubject(outage, user.getPreferredLanguage()), content);
-                    break;
-                case SMS:
-                    // Uses VonageSmsServiceImpl through the SmsService interface
-                    sent = smsService.sendSms(user.getPhoneNumber(), content);
-                    break;
-                case PUSH:
-                    // Create a data map for push notification
-                    Map<String, String> data = new HashMap<>();
-                    data.put("outageId", outage.getId().toString());
-                    data.put("type", outage.getType().toString());
-                    data.put("status", outage.getStatus().toString());
+            // Create notification entity
+            Notification notification = new Notification();
+            notification.setOutage(outage);
+            notification.setUser(user);
+            notification.setType(type);
+            notification.setStatus(NotificationStatus.PENDING);
+            notification.setContent(content);
+            notification.setLanguage(user.getPreferredLanguage());
+            notification.setCreatedAt(LocalDateTime.now());
 
-                    // Get user's device token
-                    String deviceToken = getDeviceToken(user);
+            // Save notification
+            notification = notificationRepository.save(notification);
 
-                    if (pushNotificationService != null && deviceToken != null && !deviceToken.isEmpty()) {
-                        sent = pushNotificationService.sendNotification(
-                                deviceToken,
-                                getOutageTitle(outage, user.getPreferredLanguage()),
-                                content,
-                                data);
-                    } else {
-                        logger.warn("Push notification service or device token not available for user ID: {}", user.getId());
-                        sent = false;
-                    }
-                    break;
-                case WHATSAPP:
-                    if (whatsAppService != null) {
-                        sent = whatsAppService.sendWhatsAppMessage(user.getPhoneNumber(), content);
-                    } else {
-                        logger.warn("WhatsApp service not available");
-                        sent = false;
-                    }
-                    break;
-                default:
-                    logger.warn("Unknown notification type: {}", type);
-            }
+            // Attempt to send notification
+            boolean sent = false;
 
-            // Update notification status
-            if (sent) {
-                notification.setStatus(NotificationStatus.SENT);
-                notification.setSentAt(LocalDateTime.now());
-                notificationRepository.save(notification);
-            } else {
+            try {
+                switch (type) {
+                    case EMAIL:
+                        sent = emailService.sendEmail(user.getEmail(), getEmailSubject(outage, user.getPreferredLanguage()), content);
+                        break;
+                    case SMS:
+                        // Uses VonageSmsServiceImpl through the SmsService interface
+                        if (smsService != null) {
+                            sent = smsService.sendSms(user.getPhoneNumber(), content);
+                        } else {
+                            logger.warn("SMS service not available");
+                            sent = false;
+                        }
+                        break;
+                    case PUSH:
+                        // Create a data map for push notification
+                        Map<String, String> data = new HashMap<>();
+                        data.put("outageId", outage.getId().toString());
+                        data.put("type", outage.getType().toString());
+                        data.put("status", outage.getStatus().toString());
+
+                        // Get user's device token
+                        String deviceToken = getDeviceToken(user);
+
+                        if (pushNotificationService != null && deviceToken != null && !deviceToken.isEmpty()) {
+                            sent = pushNotificationService.sendNotification(
+                                    deviceToken,
+                                    getOutageTitle(outage, user.getPreferredLanguage()),
+                                    content,
+                                    data);
+                        } else {
+                            logger.warn("Push notification service or device token not available for user ID: {}", user.getId());
+                            sent = false;
+                        }
+                        break;
+                    case WHATSAPP:
+                        if (whatsAppService != null) {
+                            sent = whatsAppService.sendWhatsAppMessage(user.getPhoneNumber(), content);
+                        } else {
+                            logger.warn("WhatsApp service not available");
+                            sent = false;
+                        }
+                        break;
+                    default:
+                        logger.warn("Unknown notification type: {}", type);
+                }
+
+                // Update notification status
+                if (sent) {
+                    notification.setStatus(NotificationStatus.SENT);
+                    notification.setSentAt(LocalDateTime.now());
+                    notificationRepository.save(notification);
+                } else {
+                    notification.setStatus(NotificationStatus.FAILED);
+                    notificationRepository.save(notification);
+                }
+
+            } catch (Exception e) {
+                logger.error("Error sending notification: {}", e.getMessage(), e);
                 notification.setStatus(NotificationStatus.FAILED);
                 notificationRepository.save(notification);
             }
-
         } catch (Exception e) {
-            logger.error("Error sending notification: {}", e.getMessage(), e);
-            notification.setStatus(NotificationStatus.FAILED);
-            notificationRepository.save(notification);
+            logger.error("Error creating notification: {}", e.getMessage(), e);
         }
     }
 
@@ -339,100 +441,168 @@ public class NotificationServiceImpl implements NotificationService {
 
     // Helper method to get email subject
     private String getEmailSubject(Outage outage, String language) {
-        ResourceBundle bundle = getResourceBundle(language);
+        try {
+            Locale locale = getLocale(language);
+            String outageType = outage.getType().toString();
+            String areaName = outage.getAffectedArea().getName();
 
-        String outageType = outage.getType().toString();
-        String areaName = outage.getAffectedArea().getName();
-
-        return String.format(bundle.getString("outage.email.subject"), outageType, areaName);
+            // Try to get message from MessageSource first
+            try {
+                return messageSource.getMessage("outage.email.subject",
+                        new Object[]{outageType, areaName}, locale);
+            } catch (NoSuchMessageException e) {
+                // Fallback to ResourceBundle if MessageSource fails
+                ResourceBundle bundle = getResourceBundle(language);
+                return String.format(bundle.getString("outage.email.subject"), outageType, areaName);
+            }
+        } catch (Exception e) {
+            logger.warn("Could not get email subject from resource bundle, using fallback: {}", e.getMessage());
+            // Fallback subject if all resource lookups fail
+            String outageType = outage.getType().toString();
+            String areaName = outage.getAffectedArea().getName();
+            return outageType + " Outage Alert - " + areaName;
+        }
     }
 
     // Helper method to get outage title for push notifications
     private String getOutageTitle(Outage outage, String language) {
-        ResourceBundle bundle = getResourceBundle(language);
+        try {
+            Locale locale = getLocale(language);
+            String outageType = outage.getType().toString();
 
-        String outageType = outage.getType().toString();
-
-        return String.format(bundle.getString("outage.push.title"), outageType);
+            // Try to get message from MessageSource first
+            try {
+                return messageSource.getMessage("outage.push.title",
+                        new Object[]{outageType}, locale);
+            } catch (NoSuchMessageException e) {
+                // Fallback to ResourceBundle if MessageSource fails
+                ResourceBundle bundle = getResourceBundle(language);
+                return String.format(bundle.getString("outage.push.title"), outageType);
+            }
+        } catch (Exception e) {
+            logger.warn("Could not get push title from resource bundle, using fallback: {}", e.getMessage());
+            // Fallback title if all resource lookups fail
+            String outageType = outage.getType().toString();
+            return outageType + " Outage Alert";
+        }
     }
 
-    // Helper methods to generate notification messages
     private String generateOutageMessage(Outage outage, String language) {
-        ResourceBundle bundle = getResourceBundle(language);
+        StringBuilder sb = new StringBuilder();
+        sb.append("<!DOCTYPE html><html><body>");
+        sb.append("<h2>Utility Outage Notification</h2>");
+        sb.append("<p>There is a ").append(outage.getType()).append(" outage scheduled in ").append(outage.getAffectedArea().getName()).append("</p>");
+        sb.append("<p><strong>Start Time:</strong> ").append(outage.getStartTime().format(DATE_FORMATTER)).append("</p>");
 
-        String areaName = outage.getAffectedArea().getName();
-        String startTime = outage.getStartTime().format(DATE_FORMATTER);
-        String endTime = outage.getEstimatedEndTime() != null
-                ? outage.getEstimatedEndTime().format(DATE_FORMATTER)
-                : bundle.getString("unknown");
+        if(outage.getEstimatedEndTime() != null) {
+            sb.append("<p><strong>Estimated End Time:</strong> ").append(outage.getEstimatedEndTime().format(DATE_FORMATTER)).append("</p>");
+        }
 
-        return String.format(
-                bundle.getString("outage.new"),
-                outage.getType(),
-                areaName,
-                startTime,
-                endTime,
-                outage.getReason() != null ? outage.getReason() : bundle.getString("reason.unknown")
-        );
+        sb.append("<p><strong>Reason:</strong> ").append(outage.getReason() != null ? outage.getReason() : "Scheduled maintenance").append("</p>");
+        sb.append("<p>Please plan accordingly.</p>");
+        sb.append("</body></html>");
+
+        return sb.toString();
     }
 
     private String generateOutageUpdateMessage(Outage outage, String language) {
-        ResourceBundle bundle = getResourceBundle(language);
+        try {
+            ResourceBundle bundle = getResourceBundle(language);
 
-        String areaName = outage.getAffectedArea().getName();
-        String endTime = outage.getEstimatedEndTime() != null
-                ? outage.getEstimatedEndTime().format(DATE_FORMATTER)
-                : bundle.getString("unknown");
+            String areaName = outage.getAffectedArea().getName();
+            String endTime = outage.getEstimatedEndTime() != null
+                    ? outage.getEstimatedEndTime().format(DATE_FORMATTER)
+                    : bundle.getString("unknown");
 
-        return String.format(
-                bundle.getString("outage.update"),
-                outage.getType(),
-                areaName,
-                outage.getStatus(),
-                endTime
-        );
+            return String.format(
+                    bundle.getString("outage.update"),
+                    outage.getType(),
+                    areaName,
+                    outage.getStatus(),
+                    endTime
+            );
+        } catch (Exception e) {
+            logger.warn("Could not get update message from resource bundle, using fallback: {}", e.getMessage());
+
+            String areaName = outage.getAffectedArea().getName();
+            String endTime = outage.getEstimatedEndTime() != null
+                    ? outage.getEstimatedEndTime().format(DATE_FORMATTER)
+                    : "Unknown";
+
+            return outage.getType() + " outage in " + areaName +
+                    " status updated to " + outage.getStatus() +
+                    ". Estimated end time: " + endTime;
+        }
     }
 
     private String generateOutageCancellationMessage(Outage outage, String language) {
-        ResourceBundle bundle = getResourceBundle(language);
+        try {
+            ResourceBundle bundle = getResourceBundle(language);
 
-        String areaName = outage.getAffectedArea().getName();
+            String areaName = outage.getAffectedArea().getName();
 
-        return String.format(
-                bundle.getString("outage.cancelled"),
-                outage.getType(),
-                areaName,
-                outage.getStartTime().format(DATE_FORMATTER)
-        );
+            return String.format(
+                    bundle.getString("outage.cancelled"),
+                    outage.getType(),
+                    areaName,
+                    outage.getStartTime().format(DATE_FORMATTER)
+            );
+        } catch (Exception e) {
+            logger.warn("Could not get cancellation message from resource bundle, using fallback: {}", e.getMessage());
+
+            String areaName = outage.getAffectedArea().getName();
+            String startTime = outage.getStartTime().format(DATE_FORMATTER);
+
+            return outage.getType() + " outage in " + areaName +
+                    " scheduled for " + startTime + " has been cancelled";
+        }
     }
 
     private String generateOutageRestorationMessage(Outage outage, String language) {
-        ResourceBundle bundle = getResourceBundle(language);
+        try {
+            ResourceBundle bundle = getResourceBundle(language);
 
-        String areaName = outage.getAffectedArea().getName();
+            String areaName = outage.getAffectedArea().getName();
 
-        return String.format(
-                bundle.getString("outage.restored"),
-                outage.getType(),
-                areaName
-        );
+            return String.format(
+                    bundle.getString("outage.restored"),
+                    outage.getType(),
+                    areaName
+            );
+        } catch (Exception e) {
+            logger.warn("Could not get restoration message from resource bundle, using fallback: {}", e.getMessage());
+
+            String areaName = outage.getAffectedArea().getName();
+
+            return outage.getType() + " services in " + areaName + " have been restored";
+        }
     }
 
     // Helper method to get resource bundle for a language
     private ResourceBundle getResourceBundle(String language) {
-        Locale locale;
+        Locale locale = getLocale(language);
+
+        try {
+            return ResourceBundle.getBundle("messages", locale);
+        } catch (MissingResourceException e) {
+            logger.warn("Could not find resource bundle for locale {}, trying default", locale);
+            return ResourceBundle.getBundle("messages", Locale.ENGLISH);
+        }
+    }
+
+    // Helper method to get locale from language code
+    private Locale getLocale(String language) {
+        if (language == null) {
+            return Locale.ENGLISH;
+        }
 
         switch (language.toLowerCase()) {
             case "si":
-                locale = new Locale("si", "LK");
-                break;
+                return new Locale("si", "LK");
             case "ta":
-                locale = new Locale("ta", "LK");
-                break;
+                return new Locale("ta", "LK");
             default:
-                locale = Locale.ENGLISH;
+                return Locale.ENGLISH;
         }
-
-        return ResourceBundle.getBundle("messages", locale);
     }
 }

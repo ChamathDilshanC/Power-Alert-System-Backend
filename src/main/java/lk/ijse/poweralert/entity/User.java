@@ -49,8 +49,7 @@ public class User {
     @JoinColumn(name = "utility_provider_id")
     private UtilityProvider utilityProvider;
 
-    // Change fetch type to LAZY
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<NotificationPreference> notificationPreferences = new ArrayList<>();
 
     @Column(name = "is_active", nullable = false)

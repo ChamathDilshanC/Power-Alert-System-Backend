@@ -135,6 +135,10 @@ public class OutageHistoryServiceImpl implements OutageHistoryService {
         }
         statistics.put("outagesByType", outagesByType);
 
+        // 3.5 Get average restoration time
+        Double avgRestorationTime = getAverageRestorationTime();
+        statistics.put("averageRestorationTime", avgRestorationTime);
+
         // 4. Recent monthly statistics (last 6 months)
         List<Map<String, Object>> monthlyStats = new ArrayList<>();
 
@@ -152,7 +156,7 @@ public class OutageHistoryServiceImpl implements OutageHistoryService {
             // Calculate totals across all areas
             int totalCount = 0;
             double totalHours = 0;
-            double avgRestorationTime = 0;
+            double monthAvgRestorationTime = 0;
 
             for (OutageHistory history : monthHistory) {
                 totalCount += history.getOutageCount();
@@ -160,12 +164,12 @@ public class OutageHistoryServiceImpl implements OutageHistoryService {
             }
 
             if (totalCount > 0) {
-                avgRestorationTime = totalHours / totalCount;
+                monthAvgRestorationTime = totalHours / totalCount;
             }
 
             monthData.put("outageCount", totalCount);
             monthData.put("totalOutageHours", totalHours);
-            monthData.put("avgRestorationTime", avgRestorationTime);
+            monthData.put("avgRestorationTime", monthAvgRestorationTime);
 
             monthlyStats.add(monthData);
         }
@@ -189,20 +193,9 @@ public class OutageHistoryServiceImpl implements OutageHistoryService {
             Outage outage = outageRepository.findById(outageId)
                     .orElseThrow(() -> new EntityNotFoundException("Outage not found with ID: " + outageId));
 
-            // Only update history if outage is completed
-            if (outage.getStatus() != OutageStatus.COMPLETED) {
-                logger.info("Outage is not completed yet, skipping history update");
-                return;
-            }
-
-            // Calculate outage duration
-            LocalDateTime startTime = outage.getStartTime();
-            LocalDateTime endTime = outage.getActualEndTime() != null ?
-                    outage.getActualEndTime() : LocalDateTime.now();
-
             // Get month and year from start time
-            int year = startTime.getYear();
-            int month = startTime.getMonthValue();
+            int year = outage.getStartTime().getYear();
+            int month = outage.getStartTime().getMonthValue();
             Area area = outage.getAffectedArea();
             OutageType type = outage.getType();
 
@@ -224,17 +217,56 @@ public class OutageHistoryServiceImpl implements OutageHistoryService {
                 history.setAverageRestorationTime(0);
             }
 
-            // Calculate duration in hours
-            double hours = calculateHoursBetween(startTime, endTime);
+            // Update the history based on outage status
+            switch (outage.getStatus()) {
+                case SCHEDULED:
+                    // For new scheduled outages, increment count but don't add hours yet
+                    if (history.getOutageCount() == 0) { // New record
+                        history.setOutageCount(1);
+                        logger.info("Recording new scheduled outage in history");
+                    }
+                    break;
 
-            // Update the history record
-            history.setOutageCount(history.getOutageCount() + 1);
-            history.setTotalOutageHours(history.getTotalOutageHours() + hours);
+                case ONGOING:
+                    // For ongoing outages, make sure they're counted
+                    if (history.getOutageCount() == 0) { // New record
+                        history.setOutageCount(1);
+                        logger.info("Recording new ongoing outage in history");
+                    }
+                    break;
 
-            // Calculate average restoration time
-            if (history.getOutageCount() > 0) {
-                history.setAverageRestorationTime(
-                        history.getTotalOutageHours() / history.getOutageCount());
+                case COMPLETED:
+                    // Calculate duration for completed outages
+                    if (outage.getActualEndTime() != null) {
+                        double hours = calculateHoursBetween(outage.getStartTime(), outage.getActualEndTime());
+
+                        // Increment count if not already counted
+                        if (history.getOutageCount() == 0) {
+                            history.setOutageCount(1);
+                        }
+
+                        // Add hours to total
+                        history.setTotalOutageHours(history.getTotalOutageHours() + hours);
+
+                        // Recalculate average
+                        history.setAverageRestorationTime(history.getTotalOutageHours() / history.getOutageCount());
+
+                        logger.info("Recorded completed outage with {} hours in history", hours);
+                    }
+                    break;
+
+                case CANCELLED:
+                    // For cancelled outages, we might want to count them separately
+                    // Here we're just ensuring they appear in the history
+                    if (history.getOutageCount() == 0) { // New record
+                        history.setOutageCount(1);
+                        logger.info("Recording cancelled outage in history");
+                    }
+                    break;
+
+                default:
+                    logger.warn("Unknown outage status: {}", outage.getStatus());
+                    break;
             }
 
             // Save the history record
@@ -244,7 +276,7 @@ public class OutageHistoryServiceImpl implements OutageHistoryService {
 
         } catch (Exception e) {
             logger.error("Error updating outage history: {}", e.getMessage(), e);
-            throw e;
+            throw e; // Re-throw to propagate the error
         }
     }
 
@@ -263,5 +295,34 @@ public class OutageHistoryServiceImpl implements OutageHistoryService {
         OutageHistoryDTO dto = modelMapper.map(history, OutageHistoryDTO.class);
         dto.setAreaId(history.getArea().getId());
         return dto;
+    }
+
+    /**
+     * Calculate the average restoration time in hours
+     * @return Average time in hours
+     */
+    private Double getAverageRestorationTime() {
+        logger.info("Calculating average outage restoration time");
+
+        // Find all completed outages with actual end time
+        List<Outage> outages = outageRepository.findByStatusAndActualEndTimeIsNotNull(
+                OutageStatus.COMPLETED);
+
+        if (outages.isEmpty()) {
+            logger.info("No completed outages found with actual end time");
+            return 0.0;
+        }
+
+        double totalHours = 0.0;
+        for (Outage outage : outages) {
+            Duration duration = Duration.between(outage.getStartTime(), outage.getActualEndTime());
+            totalHours += duration.toSeconds() / 3600.0;
+        }
+
+        double average = totalHours / outages.size();
+        logger.info("Calculated average restoration time: {} hours from {} outages",
+                average, outages.size());
+
+        return average;
     }
 }

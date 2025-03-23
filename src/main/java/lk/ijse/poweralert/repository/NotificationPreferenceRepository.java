@@ -11,24 +11,18 @@ import java.util.List;
 public interface NotificationPreferenceRepository extends JpaRepository<NotificationPreference, Long> {
 
     /**
-     * Find notification preferences by user
+     * Find all notification preferences for a specific user
+     *
      * @param user the user
      * @return list of notification preferences
      */
     List<NotificationPreference> findByUser(User user);
 
     /**
-     * Find notification preferences by user ID
+     * Find all notification preferences for a user by user ID
+     *
      * @param userId the user ID
      * @return list of notification preferences
      */
     List<NotificationPreference> findByUserId(Long userId);
-
-    /**
-     * Check if a notification preference exists for the given user and ID
-     * @param id the notification preference ID
-     * @param userId the user ID
-     * @return true if the notification preference exists for the user
-     */
-    boolean existsByIdAndUserId(Long id, Long userId);
 }

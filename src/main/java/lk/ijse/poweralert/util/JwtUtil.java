@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,16 +35,11 @@ public class JwtUtil {
 
     @PostConstruct
     public void init() {
-        try {
-            // Initialize the key once when the bean is created
-            this.key = Keys.hmacShaKeyFor(secretKeyString.getBytes());
-            logger.info("JWT signing key initialized successfully");
-        } catch (Exception e) {
-            logger.error("Error initializing JWT signing key: {}", e.getMessage(), e);
-            // Create a fallback key if there's an issue with the configured one
-            this.key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-            logger.info("Fallback JWT signing key created");
-        }
+        SecureRandom random = new SecureRandom();
+        byte[] keyBytes = new byte[64]; // 512 bits
+        random.nextBytes(keyBytes);
+        this.key = Keys.hmacShaKeyFor(keyBytes);
+        logger.info("JWT signing key initialized with new random key");
     }
 
     // Retrieve username from JWT token

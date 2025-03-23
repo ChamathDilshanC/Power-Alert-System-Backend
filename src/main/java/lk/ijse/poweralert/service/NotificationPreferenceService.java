@@ -4,16 +4,21 @@ import lk.ijse.poweralert.dto.NotificationPreferenceDTO;
 
 import java.util.List;
 
+/**
+ * Service interface for managing notification preferences
+ */
 public interface NotificationPreferenceService {
 
     /**
-     * Get all notification preferences for the current user
+     * Get all notification preferences for the current authenticated user
+     *
      * @return list of notification preferences
      */
     List<NotificationPreferenceDTO> getCurrentUserPreferences();
 
     /**
      * Add a new notification preference for the current user
+     *
      * @param preferenceDTO the notification preference to add
      * @return the saved notification preference
      */
@@ -21,6 +26,7 @@ public interface NotificationPreferenceService {
 
     /**
      * Update an existing notification preference
+     *
      * @param preferenceDTO the notification preference to update
      * @return the updated notification preference
      */
@@ -28,13 +34,15 @@ public interface NotificationPreferenceService {
 
     /**
      * Delete a notification preference
+     *
      * @param id the ID of the notification preference to delete
-     * @return true if deletion was successful
+     * @return true if deleted successfully
      */
     boolean deletePreference(Long id);
 
     /**
-     * Get notification preference by ID
+     * Get a notification preference by ID
+     *
      * @param id the ID of the notification preference
      * @return the notification preference
      */

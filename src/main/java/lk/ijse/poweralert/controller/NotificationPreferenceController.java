@@ -13,8 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 
+/**
+ * Controller for managing notification preferences
+ */
 @RestController
 @RequestMapping("/api/user/notification-preferences")
 @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
@@ -34,7 +38,7 @@ public class NotificationPreferenceController {
     @GetMapping
     public ResponseEntity<ResponseDTO> getCurrentUserPreferences() {
         try {
-            logger.debug("Fetching notification preferences for current user");
+            logger.info("Fetching notification preferences for current user");
 
             List<NotificationPreferenceDTO> preferences = notificationPreferenceService.getCurrentUserPreferences();
 
@@ -54,12 +58,44 @@ public class NotificationPreferenceController {
     }
 
     /**
-     * Add a new notification preference for current user
+     * Get notification preference by ID
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseDTO> getPreferenceById(@PathVariable Long id) {
+        try {
+            logger.info("Fetching notification preference with ID: {}", id);
+
+            NotificationPreferenceDTO preference = notificationPreferenceService.getPreferenceById(id);
+
+            responseDTO.setCode(VarList.OK);
+            responseDTO.setMessage("Notification preference retrieved successfully");
+            responseDTO.setData(preference);
+
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            logger.error("Notification preference not found: {}", e.getMessage());
+
+            responseDTO.setCode(VarList.Not_Found);
+            responseDTO.setMessage(e.getMessage());
+            responseDTO.setData(null);
+            return new ResponseEntity<>(responseDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            logger.error("Error retrieving notification preference: {}", e.getMessage(), e);
+
+            responseDTO.setCode(VarList.Internal_Server_Error);
+            responseDTO.setMessage("Error: " + e.getMessage());
+            responseDTO.setData(null);
+            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Add a new notification preference
      */
     @PostMapping
     public ResponseEntity<ResponseDTO> addPreference(@Valid @RequestBody NotificationPreferenceDTO preferenceDTO) {
         try {
-            logger.debug("Adding new notification preference for current user");
+            logger.info("Adding new notification preference");
 
             NotificationPreferenceDTO savedPreference = notificationPreferenceService.addPreference(preferenceDTO);
 
@@ -86,9 +122,9 @@ public class NotificationPreferenceController {
             @PathVariable Long id,
             @Valid @RequestBody NotificationPreferenceDTO preferenceDTO) {
         try {
-            logger.debug("Updating notification preference with ID: {}", id);
+            logger.info("Updating notification preference with ID: {}", id);
 
-            // Ensure the ID in the path matches the DTO
+            // Set ID from path
             preferenceDTO.setId(id);
 
             NotificationPreferenceDTO updatedPreference = notificationPreferenceService.updatePreference(preferenceDTO);
@@ -98,8 +134,15 @@ public class NotificationPreferenceController {
             responseDTO.setData(updatedPreference);
 
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            logger.error("Notification preference not found: {}", e.getMessage());
+
+            responseDTO.setCode(VarList.Not_Found);
+            responseDTO.setMessage(e.getMessage());
+            responseDTO.setData(null);
+            return new ResponseEntity<>(responseDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            logger.error("Error updating notification preference with ID {}: {}", id, e.getMessage(), e);
+            logger.error("Error updating notification preference: {}", e.getMessage(), e);
 
             responseDTO.setCode(VarList.Internal_Server_Error);
             responseDTO.setMessage("Error: " + e.getMessage());
@@ -114,7 +157,7 @@ public class NotificationPreferenceController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseDTO> deletePreference(@PathVariable Long id) {
         try {
-            logger.debug("Deleting notification preference with ID: {}", id);
+            logger.info("Deleting notification preference with ID: {}", id);
 
             boolean deleted = notificationPreferenceService.deletePreference(id);
 
@@ -123,8 +166,15 @@ public class NotificationPreferenceController {
             responseDTO.setData(null);
 
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            logger.error("Notification preference not found: {}", e.getMessage());
+
+            responseDTO.setCode(VarList.Not_Found);
+            responseDTO.setMessage(e.getMessage());
+            responseDTO.setData(null);
+            return new ResponseEntity<>(responseDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            logger.error("Error deleting notification preference with ID {}: {}", id, e.getMessage(), e);
+            logger.error("Error deleting notification preference: {}", e.getMessage(), e);
 
             responseDTO.setCode(VarList.Internal_Server_Error);
             responseDTO.setMessage("Error: " + e.getMessage());

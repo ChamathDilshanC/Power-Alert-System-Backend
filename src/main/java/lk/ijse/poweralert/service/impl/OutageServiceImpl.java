@@ -1,31 +1,27 @@
 package lk.ijse.poweralert.service.impl;
 
-import jakarta.mail.internet.MimeMessage;
 import lk.ijse.poweralert.dto.OutageCreateDTO;
 import lk.ijse.poweralert.dto.OutageDTO;
 import lk.ijse.poweralert.dto.OutageUpdateDTO;
 import lk.ijse.poweralert.entity.*;
 import lk.ijse.poweralert.enums.AppEnums.OutageStatus;
+import lk.ijse.poweralert.event.NotificationEventPublisher;
 import lk.ijse.poweralert.repository.*;
-import lk.ijse.poweralert.service.EmailService;
-import lk.ijse.poweralert.service.NotificationService;
-import lk.ijse.poweralert.service.OutageService;
-import lk.ijse.poweralert.service.UserService;
+import lk.ijse.poweralert.service.*;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,6 +44,12 @@ public class OutageServiceImpl implements OutageService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private OutageHistoryService outageHistoryService;
+
+    @Autowired
+    private NotificationEventPublisher eventPublisher;
 
     @Autowired
     public OutageServiceImpl(
@@ -111,150 +113,40 @@ public class OutageServiceImpl implements OutageService {
         outageUpdateRepository.save(initialUpdate);
         logger.info("Initial outage update recorded");
 
-        // Send notifications to affected users
-        sendOutageNotificationsToAffectedUsers(savedOutage);
+        // Update outage history for the new outage
+        outageHistoryService.updateOutageHistory(savedOutage.getId());
+        logger.info("Outage history updated for new outage ID: {}", savedOutage.getId());
+
+        // Fetch and detach a fresh copy of the outage to prevent lazy loading issues
+        Long outageId = savedOutage.getId();
+
+        // Send notifications asynchronously in a separate transaction
+        sendNotificationsAsync(outageId);
 
         // Map to DTO and return
         return convertToDTO(savedOutage);
     }
 
-    /**
-     * Send notifications to users affected by an outage
-     */
-    private void sendOutageNotificationsToAffectedUsers(Outage outage) {
+    @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void sendNotificationsAsync(Long outageId) {
         try {
-            // Verify email server connection first (optional)
-            boolean emailServerConnected = emailService.testEmailConnection();
-            if (!emailServerConnected) {
-                logger.warn("Email server connection test failed, but will attempt to send emails anyway");
-            }
+            logger.info("Sending notifications asynchronously for outage ID: {}", outageId);
 
-            // Get affected users in the area
-            List<User> affectedUsers = userRepository.findUsersByAreaId(outage.getAffectedArea().getId());
-            logger.info("Found {} affected users for outage ID: {}", affectedUsers.size(), outage.getId());
+            // Fetch a fresh instance of the outage in this new transaction
+            Outage outage = outageRepository.findById(outageId)
+                    .orElseThrow(() -> new EntityNotFoundException("Outage not found with ID: " + outageId));
 
-            if (affectedUsers.isEmpty()) {
-                logger.warn("No affected users found for outage in area ID: {}", outage.getAffectedArea().getId());
-                return;
-            }
-
-            int emailsSent = 0;
-            int emailsFailed = 0;
-
-            // Send notification emails using template
-            for (User user : affectedUsers) {
-                try {
-                    if (user == null || user.getEmail() == null || user.getEmail().isEmpty()) {
-                        logger.warn("Skipping notification for user with null or empty email");
-                        continue;
-                    }
-
-                    logger.info("Sending outage notification to user: {} ({})", user.getUsername(), user.getEmail());
-
-                    // Use the FreeMarker template to send email
-                    boolean sent = emailService.sendOutageNotificationEmail(user, outage,
-                            user.getPreferredLanguage() != null ? user.getPreferredLanguage() : "en");
-
-                    if (sent) {
-                        logger.info("Outage notification email sent successfully to: {}", user.getEmail());
-                        emailsSent++;
-                    } else {
-                        logger.warn("Failed to send notification email to: {}", user.getEmail());
-                        emailsFailed++;
-                    }
-                } catch (Exception e) {
-                    emailsFailed++;
-                    logger.error("Error sending notification email to user {}: {}",
-                            user != null ? user.getEmail() : "null", e.getMessage(), e);
-                }
-            }
-
-            logger.info("Email sending summary: {} sent successfully, {} failed", emailsSent, emailsFailed);
-
-            // Also notify through other channels (SMS, push notifications, etc.)
-            try {
-                notificationService.sendOutageNotifications(outage);
-                logger.info("Notification service completed successfully for outage ID: {}", outage.getId());
-            } catch (Exception e) {
-                logger.error("Error in notification service for outage ID {}: {}", outage.getId(), e.getMessage(), e);
-            }
+            notificationService.sendOutageNotifications(outage);
+            logger.info("Notifications sent successfully for outage ID: {}", outageId);
         } catch (Exception e) {
-            logger.error("Error in main notification process: {}", e.getMessage(), e);
-            // Continue even if notifications fail - we don't want to roll back the outage creation
+            logger.error("Error sending notifications for outage ID {}: {}", outageId, e.getMessage(), e);
+            // Don't propagate the exception to prevent transaction rollback
         }
-    }
-
-    /**
-     * Create simple email content for outage notification
-     */
-    private String createSimpleEmailContent(User user, Outage outage) {
-        StringBuilder content = new StringBuilder();
-        content.append("<!DOCTYPE html><html><body>");
-        content.append("<h2 style='color:#0066cc;'>Outage Notification</h2>");
-        content.append("<p>Dear ").append(user.getUsername()).append(",</p>");
-        content.append("<p>We are writing to inform you about a <strong>").append(outage.getType())
-                .append("</strong> outage in ").append(outage.getAffectedArea().getName()).append(".</p>");
-
-        content.append("<div style='background-color:#f8f8f8; border-left:4px solid #0066cc; padding:15px; margin:15px 0;'>");
-        content.append("<p><strong>Start Time:</strong> ").append(outage.getStartTime().format(DATE_FORMATTER)).append("</p>");
-
-        if (outage.getEstimatedEndTime() != null) {
-            content.append("<p><strong>Estimated End Time:</strong> ")
-                    .append(outage.getEstimatedEndTime().format(DATE_FORMATTER)).append("</p>");
-        }
-
-        if (outage.getReason() != null && !outage.getReason().isEmpty()) {
-            content.append("<p><strong>Reason:</strong> ").append(outage.getReason()).append("</p>");
-        }
-        content.append("</div>");
-
-        content.append("<p>Thank you for your understanding.</p>");
-        content.append("<p>PowerAlert Team</p>");
-        content.append("</body></html>");
-
-        return content.toString();
-    }
-
-    /**
-     * Send email with retry mechanism
-     */
-    private boolean sendEmailWithRetry(String to, String subject, String content, int maxRetries) {
-        int retries = 0;
-        boolean sent = false;
-        Exception lastException = null;
-
-        while (!sent && retries < maxRetries) {
-            try {
-                sent = emailService.sendEmail(to, subject, content);
-                if (sent) {
-                    return true;
-                }
-                retries++;
-                if (retries < maxRetries) {
-                    logger.info("Retrying email send to {} (attempt {}/{})", to, retries + 1, maxRetries);
-                    Thread.sleep(1000); // Wait 1 second before retry
-                }
-            } catch (Exception e) {
-                lastException = e;
-                retries++;
-                logger.warn("Email send attempt {} failed: {}", retries, e.getMessage());
-                try {
-                    Thread.sleep(1000); // Wait 1 second before retry
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    break;
-                }
-            }
-        }
-
-        if (lastException != null) {
-            logger.error("All email send attempts failed to {}: {}", to, lastException.getMessage(), lastException);
-        }
-
-        return sent;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OutageDTO> getAllActiveOutages() {
         logger.info("Fetching all active outages");
         List<Outage> activeOutages = outageRepository.findByStatusIn(
@@ -266,6 +158,7 @@ public class OutageServiceImpl implements OutageService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OutageDTO getOutageById(Long id) {
         logger.info("Fetching outage with ID: {}", id);
         Outage outage = outageRepository.findById(id)
@@ -275,6 +168,7 @@ public class OutageServiceImpl implements OutageService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OutageDTO> getOutagesByArea(Long areaId) {
         logger.info("Fetching outages for area with ID: {}", areaId);
 
@@ -344,10 +238,9 @@ public class OutageServiceImpl implements OutageService {
 
             if (statusChanged) {
                 update.setNewStatus(outageCreateDTO.getStatus());
-                // If status changed to COMPLETED, set actual end time and update history
+                // If status changed to COMPLETED, set actual end time
                 if (outageCreateDTO.getStatus() == OutageStatus.COMPLETED) {
                     outage.setActualEndTime(LocalDateTime.now());
-                    updateOutageHistory(outage);
                 }
             }
 
@@ -368,38 +261,36 @@ public class OutageServiceImpl implements OutageService {
         Outage updatedOutage = outageRepository.save(outage);
         logger.info("Outage updated with ID: {}", updatedOutage.getId());
 
-        // Send notifications about the update
-        try {
-            notificationService.sendOutageUpdateNotifications(updatedOutage);
+        // Update outage history
+        outageHistoryService.updateOutageHistory(updatedOutage.getId());
+        logger.info("Outage history updated for outage ID: {}", updatedOutage.getId());
 
-            // Send individual email updates to affected users
-            List<User> affectedUsers = userRepository.findUsersByAreaId(updatedOutage.getAffectedArea().getId());
-            for (User user : affectedUsers) {
-                try {
-                    if (user != null && user.getEmail() != null) {
-                        // Create update email subject and content
-                        String subject = "Power Alert: Outage Update for " + updatedOutage.getAffectedArea().getName();
-                        String content = createUpdateEmailContent(updatedOutage, user);
+        // Get ID for notification
+        Long outageId = updatedOutage.getId();
 
-                        // Send direct email update using SendGrid
-                        boolean emailSent = emailService.sendEmail(user.getEmail(), subject, content);
-                        if (emailSent) {
-                            logger.info("Outage update email sent successfully to user: {}", user.getEmail());
-                        } else {
-                            logger.warn("Failed to send outage update email to user: {}", user.getEmail());
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.error("Error sending outage update email to user {}: {}", user.getEmail(), e.getMessage(), e);
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Error sending outage update notifications: {}", e.getMessage(), e);
-            // We continue even if notifications fail
-        }
+        // Send notifications about the update asynchronously
+        sendUpdateNotificationsAsync(outageId);
 
         // Map to DTO and return
         return convertToDTO(updatedOutage);
+    }
+
+    @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void sendUpdateNotificationsAsync(Long outageId) {
+        try {
+            logger.info("Sending update notifications asynchronously for outage ID: {}", outageId);
+
+            // Fetch a fresh instance of the outage in this new transaction
+            Outage outage = outageRepository.findById(outageId)
+                    .orElseThrow(() -> new EntityNotFoundException("Outage not found with ID: " + outageId));
+
+            notificationService.sendOutageUpdateNotifications(outage);
+            logger.info("Update notifications sent successfully for outage ID: {}", outageId);
+        } catch (Exception e) {
+            logger.error("Error sending update notifications for outage ID {}: {}", outageId, e.getMessage(), e);
+            // Don't propagate the exception to prevent transaction rollback
+        }
     }
 
     @Override
@@ -441,10 +332,9 @@ public class OutageServiceImpl implements OutageService {
             OutageStatus oldStatus = outage.getStatus();
             outage.setStatus(update.getNewStatus());
 
-            // If status changed to COMPLETED, set actual end time and update history
+            // If status changed to COMPLETED, set actual end time
             if (oldStatus != OutageStatus.COMPLETED && update.getNewStatus() == OutageStatus.COMPLETED) {
                 outage.setActualEndTime(LocalDateTime.now());
-                updateOutageHistory(outage);
             }
 
             outageUpdated = true;
@@ -455,49 +345,15 @@ public class OutageServiceImpl implements OutageService {
             outage = outageRepository.save(outage);
         }
 
-        // Trigger update notifications to affected users
-        try {
-            notificationService.sendOutageUpdateNotifications(outage);
+        // Update outage history
+        outageHistoryService.updateOutageHistory(outage.getId());
+        logger.info("Outage history updated for outage ID: {}", outage.getId());
 
-            // Send direct notification emails about the update
-            List<User> affectedUsers = userRepository.findUsersByAreaId(outage.getAffectedArea().getId());
-            for (User user : affectedUsers) {
-                if (user != null && user.getEmail() != null) {
-                    // Create update email content
-                    String subject = "Power Alert: Important Update for " + outage.getType() + " Outage";
-                    String content = "<html><body>";
-                    content += "<h2>Outage Update</h2>";
-                    content += "<p>Dear " + user.getUsername() + ",</p>";
-                    content += "<p>There has been an update to the " + outage.getType() + " outage in " + outage.getAffectedArea().getName() + ".</p>";
-                    content += "<p><strong>Update:</strong> " + update.getUpdateInfo() + "</p>";
+        // Get ID for notification
+        Long outageId = outage.getId();
 
-                    if (update.getNewStatus() != null) {
-                        content += "<p><strong>New Status:</strong> " + update.getNewStatus() + "</p>";
-                    }
-
-                    if (update.getUpdatedEstimatedEndTime() != null) {
-                        content += "<p><strong>Updated Estimated End Time:</strong> " +
-                                update.getUpdatedEstimatedEndTime().format(DATE_FORMATTER) + "</p>";
-                    }
-
-                    if (update.getReason() != null && !update.getReason().isEmpty()) {
-                        content += "<p><strong>Reason:</strong> " + update.getReason() + "</p>";
-                    }
-
-                    content += "<p>For more details, please visit our portal at <a href='https://poweralert.lk/outages/" +
-                            outage.getId() + "'>PowerAlert</a>.</p>";
-                    content += "<p>Thank you for your patience.</p>";
-                    content += "<p>PowerAlert Team</p>";
-                    content += "</body></html>";
-
-                    // Send email using SendGrid
-                    emailService.sendEmail(user.getEmail(), subject, content);
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Error sending outage update notifications: {}", e.getMessage(), e);
-            // We continue even if notifications fail
-        }
+        // Trigger update notifications to affected users asynchronously
+        sendUpdateNotificationsAsync(outageId);
 
         // Map to DTO and return
         return convertToDTO(outage);
@@ -534,43 +390,36 @@ public class OutageServiceImpl implements OutageService {
         outageUpdateRepository.save(update);
         logger.info("Cancellation record created for outage ID: {}", outage.getId());
 
-        // Send notifications about cancellation
-        try {
-            notificationService.sendOutageCancellationNotifications(cancelledOutage);
+        // Update outage history for the cancelled outage
+        outageHistoryService.updateOutageHistory(cancelledOutage.getId());
+        logger.info("Outage history updated for cancelled outage ID: {}", cancelledOutage.getId());
 
-            // Send individual cancellation emails to affected users
-            List<User> affectedUsers = userRepository.findUsersByAreaId(cancelledOutage.getAffectedArea().getId());
-            for (User user : affectedUsers) {
-                try {
-                    if (user != null && user.getEmail() != null) {
-                        // Create cancellation email content
-                        String subject = "Power Alert: Outage Cancellation Notice";
-                        String content = "<html><body>";
-                        content += "<h2>Outage Cancellation Notice</h2>";
-                        content += "<p>Dear " + user.getUsername() + ",</p>";
-                        content += "<p>We are pleased to inform you that the scheduled " + cancelledOutage.getType() +
-                                " outage in " + cancelledOutage.getAffectedArea().getName() + " has been <strong>cancelled</strong>.</p>";
-                        content += "<p>The outage that was scheduled for " +
-                                cancelledOutage.getStartTime().format(DATE_FORMATTER) + " will no longer take place.</p>";
-                        content += "<p>We apologize for any inconvenience this may have caused.</p>";
-                        content += "<p>Thank you for your understanding.</p>";
-                        content += "<p>PowerAlert Team</p>";
-                        content += "</body></html>";
+        // Get ID for notification
+        Long outageId = cancelledOutage.getId();
 
-                        // Send email using SendGrid
-                        emailService.sendEmail(user.getEmail(), subject, content);
-                    }
-                } catch (Exception e) {
-                    logger.error("Error sending cancellation email to user {}: {}", user.getEmail(), e.getMessage(), e);
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Error sending outage cancellation notifications: {}", e.getMessage(), e);
-            // We continue even if notifications fail
-        }
+        // Send notifications about cancellation asynchronously
+        sendCancellationNotificationsAsync(outageId);
 
         // Map to DTO and return
         return convertToDTO(cancelledOutage);
+    }
+
+    @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void sendCancellationNotificationsAsync(Long outageId) {
+        try {
+            logger.info("Sending cancellation notifications asynchronously for outage ID: {}", outageId);
+
+            // Fetch a fresh instance of the outage in this new transaction
+            Outage outage = outageRepository.findById(outageId)
+                    .orElseThrow(() -> new EntityNotFoundException("Outage not found with ID: " + outageId));
+
+            notificationService.sendOutageCancellationNotifications(outage);
+            logger.info("Cancellation notifications sent successfully for outage ID: {}", outageId);
+        } catch (Exception e) {
+            logger.error("Error sending cancellation notifications for outage ID {}: {}", outageId, e.getMessage(), e);
+            // Don't propagate the exception to prevent transaction rollback
+        }
     }
 
     @Override
@@ -599,111 +448,6 @@ public class OutageServiceImpl implements OutageService {
         return outages.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * Helper method to create update email content
-     */
-    private String createUpdateEmailContent(Outage outage, User user) {
-        StringBuilder content = new StringBuilder();
-        content.append("<!DOCTYPE html><html><body>");
-        content.append("<h2>Outage Update</h2>");
-        content.append("<p>Dear ").append(user.getUsername()).append(",</p>");
-        content.append("<p>There has been an update to the ").append(outage.getType())
-                .append(" outage in ").append(outage.getAffectedArea().getName()).append(".</p>");
-
-        content.append("<p><strong>Current Status:</strong> ").append(outage.getStatus()).append("</p>");
-        content.append("<p><strong>Start Time:</strong> ").append(outage.getStartTime().format(DATE_FORMATTER)).append("</p>");
-
-        if (outage.getEstimatedEndTime() != null) {
-            content.append("<p><strong>Estimated End Time:</strong> ")
-                    .append(outage.getEstimatedEndTime().format(DATE_FORMATTER)).append("</p>");
-        }
-
-        if (outage.getReason() != null && !outage.getReason().isEmpty()) {
-            content.append("<p><strong>Reason:</strong> ").append(outage.getReason()).append("</p>");
-        }
-
-        content.append("<p>For more details, please visit our portal at <a href='https://poweralert.lk/outages/")
-                .append(outage.getId()).append("'>PowerAlert</a>.</p>");
-        content.append("<p>Thank you for your patience.</p>");
-        content.append("<p>PowerAlert Team</p>");
-        content.append("</body></html>");
-
-        return content.toString();
-    }
-
-    /**
-     * Update the OutageHistory records when an outage is completed
-     * @param outage the completed outage
-     */
-    private void updateOutageHistory(Outage outage) {
-        logger.info("Updating outage history for completed outage ID: {}", outage.getId());
-        try {
-            // Calculate outage duration
-            LocalDateTime startTime = outage.getStartTime();
-            LocalDateTime endTime = outage.getActualEndTime() != null ?
-                    outage.getActualEndTime() : LocalDateTime.now();
-
-            // Get month and year from start time
-            int year = startTime.getYear();
-            int month = startTime.getMonthValue();
-
-            // Find existing history record or create new one
-            Optional<OutageHistory> historyOptional = outageHistoryRepository
-                    .findByAreaIdAndTypeAndYearAndMonth(
-                            outage.getAffectedArea().getId(),
-                            outage.getType(),
-                            year,
-                            month);
-
-            OutageHistory history;
-            if (historyOptional.isPresent()) {
-                history = historyOptional.get();
-            } else {
-                history = new OutageHistory();
-                history.setArea(outage.getAffectedArea());
-                history.setType(outage.getType());
-                history.setYear(year);
-                history.setMonth(month);
-                history.setOutageCount(0);
-                history.setTotalOutageHours(0);
-                history.setAverageRestorationTime(0);
-            }
-
-            // Calculate duration in hours
-            double hours = calculateHoursBetween(startTime, endTime);
-
-            // Update the history record
-            history.setOutageCount(history.getOutageCount() + 1);
-            history.setTotalOutageHours(history.getTotalOutageHours() + hours);
-
-            // Calculate average restoration time
-            if (history.getOutageCount() > 0) {
-                history.setAverageRestorationTime(
-                        history.getTotalOutageHours() / history.getOutageCount());
-            }
-
-            // Save the history record
-            outageHistoryRepository.save(history);
-            logger.info("Updated outage history for area: {}, month: {}, year: {}",
-                    outage.getAffectedArea().getName(), month, year);
-
-        } catch (Exception e) {
-            logger.error("Error updating outage history: {}", e.getMessage(), e);
-            // Continue even if history update fails
-        }
-    }
-
-    /**
-     * Calculate hours between two LocalDateTime objects
-     * @param start the start time
-     * @param end the end time
-     * @return the duration in hours
-     */
-    private double calculateHoursBetween(LocalDateTime start, LocalDateTime end) {
-        Duration duration = Duration.between(start, end);
-        return duration.toSeconds() / 3600.0; // Convert seconds to hours
     }
 
     /**

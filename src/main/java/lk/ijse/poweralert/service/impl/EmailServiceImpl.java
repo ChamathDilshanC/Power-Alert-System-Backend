@@ -1,5 +1,6 @@
 package lk.ijse.poweralert.service.impl;
 
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lk.ijse.poweralert.entity.Outage;
 import lk.ijse.poweralert.entity.User;
@@ -9,14 +10,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
@@ -27,12 +34,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class EmailServiceImpl implements EmailService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailServiceImpl.class);
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private Configuration freemarkerConfig;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -128,33 +139,74 @@ public class EmailServiceImpl implements EmailService {
         try {
             logger.info("Sending template email to: {}, subject: {}, template: {}", to, subject, templateName);
 
-            // For this implementation, we'll convert the model to a simple content
-            String content = convertModelToContent(model);
+            // Ensure the model is a map (if not already)
+            Map<String, Object> templateModel = convertToMap(model);
+
+            // Add default values for common template variables if not present
+            ensureDefaultTemplateValues(templateModel);
+
+            // Try to get the template
+            Template template;
+            try {
+                template = freemarkerConfig.getTemplate(templateName);
+            } catch (IOException e) {
+                logger.error("Failed to load template '{}': {}", templateName, e.getMessage(), e);
+                // Try with .ftl extension if not already included
+                if (!templateName.endsWith(".ftl")) {
+                    try {
+                        template = freemarkerConfig.getTemplate(templateName + ".ftl");
+                    } catch (IOException e2) {
+                        logger.error("Failed to load template with .ftl extension: {}", e2.getMessage());
+                        return sendEmail(to, subject, createHtmlEmailContent(templateModel));
+                    }
+                } else {
+                    return sendEmail(to, subject, createHtmlEmailContent(templateModel));
+                }
+            }
+
+            // Process the template
+            String content;
+            try {
+                content = FreeMarkerTemplateUtils.processTemplateIntoString(template, templateModel);
+            } catch (TemplateException e) {
+                logger.error("Error processing template '{}': {}", templateName, e.getMessage(), e);
+                return sendEmail(to, subject, createHtmlEmailContent(templateModel));
+            }
+
+            // Check if content was generated successfully
+            if (content == null || content.trim().isEmpty()) {
+                logger.warn("Template processing resulted in empty content, using fallback HTML");
+                content = createHtmlEmailContent(templateModel);
+            }
 
             return sendEmail(to, subject, content);
         } catch (Exception e) {
-            logger.error("Failed to send template email to: {}", to, e);
+            logger.error("Failed to send template email to: {}: {}", to, e.getMessage(), e);
             return false;
         }
     }
 
-    private String convertModelToContent(Object model) {
-        // This is a simplified conversion. In a real implementation,
-        // you might want to use a proper template engine
-        if (model instanceof Map) {
-            Map<?, ?> map = (Map<?, ?>) model;
-            StringBuilder content = new StringBuilder("<html><body>");
-
-            for (Map.Entry<?, ?> entry : map.entrySet()) {
-                content.append("<p><strong>").append(entry.getKey()).append(":</strong> ")
-                        .append(entry.getValue()).append("</p>");
-            }
-
-            content.append("</body></html>");
-            return content.toString();
+    private void ensureDefaultTemplateValues(Map<String, Object> model) {
+        if (!model.containsKey("year")) {
+            model.put("year", Year.now().toString());
         }
+        if (!model.containsKey("title") && model.containsKey("subject")) {
+            model.put("title", model.get("subject"));
+        }
+    }
 
-        return model.toString();
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> convertToMap(Object model) {
+        if (model instanceof Map) {
+            return (Map<String, Object>) model;
+        } else {
+            // Create a new map and copy properties from the object
+            Map<String, Object> map = new HashMap<>();
+            // This is a simplified approach - in a real implementation,
+            // you might use reflection to extract properties
+            map.put("data", model);
+            return map;
+        }
     }
 
     @Override
@@ -177,14 +229,24 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(content, true);
             helper.setFrom(fromEmail);
 
-            FileSystemResource file = new FileSystemResource(new File(attachmentFilePath));
-            helper.addAttachment(attachmentFileName, file);
+            // Verify that the attachment file exists
+            File file = new File(attachmentFilePath);
+            if (!file.exists() || !file.isFile()) {
+                logger.error("Attachment file not found or is not a file: {}", attachmentFilePath);
+                return false;
+            }
+
+            FileSystemResource fileResource = new FileSystemResource(file);
+            helper.addAttachment(attachmentFileName, fileResource);
 
             mailSender.send(message);
             logger.info("Email with attachment sent successfully to: {}", to);
             return true;
+        } catch (MessagingException e) {
+            logger.error("Messaging exception when sending email with attachment: {}", e.getMessage(), e);
+            return false;
         } catch (Exception e) {
-            logger.error("Failed to send email with attachment to: {}", to, e);
+            logger.error("Failed to send email with attachment to: {}: {}", to, e.getMessage(), e);
             return false;
         }
     }
@@ -195,121 +257,253 @@ public class EmailServiceImpl implements EmailService {
         try {
             logger.info("Preparing outage notification email for user: {}", user.getEmail());
 
-            // Get the appropriate resource bundle for localization
-            ResourceBundle bundle = getResourceBundle(language);
-
-            // Create the model with all the data needed for the template
+            // Create a simple model with direct values
             Map<String, Object> model = new HashMap<>();
-            model.put("title", bundle.getString("email.outage.title"));
-            model.put("greeting", bundle.getString("email.greeting") + " " + user.getUsername());
-            model.put("message", String.format(bundle.getString("email.outage.message"), outage.getType()));
-
-            // Outage details
-            model.put("outageTypeLabel", bundle.getString("outage.type"));
+            model.put("username", user.getUsername());
             model.put("outageType", outage.getType().toString());
-            model.put("areaLabel", bundle.getString("outage.area"));
-            model.put("area", outage.getAffectedArea().getName());
-            model.put("statusLabel", bundle.getString("outage.status"));
+            model.put("areaName", outage.getAffectedArea().getName());
             model.put("status", outage.getStatus().toString());
-
-            // Status labels
-            model.put("scheduledLabel", bundle.getString("outage.status.scheduled"));
-            model.put("ongoingLabel", bundle.getString("outage.status.ongoing"));
-            model.put("completedLabel", bundle.getString("outage.status.completed"));
-            model.put("cancelledLabel", bundle.getString("outage.status.cancelled"));
-
-            // Time information
-            model.put("startTimeLabel", bundle.getString("outage.startTime"));
             model.put("startTime", outage.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
 
             if (outage.getEstimatedEndTime() != null) {
-                model.put("endTimeLabel", bundle.getString("outage.estimatedEndTime"));
                 model.put("endTime", outage.getEstimatedEndTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
             }
 
             if (outage.getReason() != null && !outage.getReason().isEmpty()) {
-                model.put("reasonLabel", bundle.getString("outage.reason"));
+                model.put("reason", outage.getReason());
+            }
+
+            model.put("year", Year.now().toString());
+
+            // Simple subject
+            String subject = outage.getType() + " Outage Alert - " + outage.getAffectedArea().getName();
+
+            // Process template manually
+            try {
+                // Try to get template
+                Template template = freemarkerConfig.getTemplate("outage-notification.ftl");
+                String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+                return sendEmail(user.getEmail(), subject, content);
+            } catch (Exception e) {
+                logger.error("Failed to process template: {}", e.getMessage(), e);
+                // Send fallback email
+                return sendEmail(user.getEmail(), subject, createSimpleFallbackEmail(user, outage));
+            }
+        } catch (Exception e) {
+            logger.error("Error sending outage notification email to {}: {}", user.getEmail(), e.getMessage(), e);
+            return false;
+        }
+    }
+
+    private String createSimpleFallbackEmail(User user, Outage outage) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<!DOCTYPE html><html><body>");
+        sb.append("<h2>").append(outage.getType()).append(" Outage Alert</h2>");
+        sb.append("<p>Hello ").append(user.getUsername()).append(",</p>");
+        sb.append("<p>There is a ").append(outage.getType())
+                .append(" outage affecting your area: ").append(outage.getAffectedArea().getName()).append("</p>");
+
+        sb.append("<p><strong>Start Time:</strong> ")
+                .append(outage.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))).append("</p>");
+
+        if (outage.getEstimatedEndTime() != null) {
+            sb.append("<p><strong>Estimated End Time:</strong> ")
+                    .append(outage.getEstimatedEndTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))).append("</p>");
+        }
+
+        sb.append("<p><strong>Status:</strong> ").append(outage.getStatus()).append("</p>");
+
+        if (outage.getReason() != null && !outage.getReason().isEmpty()) {
+            sb.append("<p><strong>Reason:</strong> ").append(outage.getReason()).append("</p>");
+        }
+
+        sb.append("<p>Please plan accordingly. We apologize for any inconvenience.</p>");
+        sb.append("<p>Power Alert System</p>");
+        sb.append("</body></html>");
+
+        return sb.toString();
+    }
+
+    private void populateTemplateModel(Map<String, Object> model, User user, Outage outage, ResourceBundle bundle) {
+        try {
+            model.put("title", getLocalizedMessage(bundle, "email.outage.title", "Utility Outage Notification"));
+            model.put("greeting", getLocalizedMessage(bundle, "email.greeting", "Hello") + " " + user.getUsername());
+            model.put("message", String.format(
+                    getLocalizedMessage(bundle, "email.outage.message",
+                            "We are writing to inform you about a %s outage that affects your registered address."),
+                    outage.getType()));
+
+            // Outage details
+            model.put("outageTypeLabel", getLocalizedMessage(bundle, "outage.type", "Type"));
+            model.put("outageType", outage.getType().toString());
+            model.put("areaLabel", getLocalizedMessage(bundle, "outage.area", "Affected Area"));
+            model.put("area", outage.getAffectedArea().getName());
+            model.put("statusLabel", getLocalizedMessage(bundle, "outage.status", "Status"));
+            model.put("status", outage.getStatus().toString());
+
+            // Status labels
+            model.put("scheduledLabel", getLocalizedMessage(bundle, "outage.status.scheduled", "Scheduled"));
+            model.put("ongoingLabel", getLocalizedMessage(bundle, "outage.status.ongoing", "Ongoing"));
+            model.put("completedLabel", getLocalizedMessage(bundle, "outage.status.completed", "Completed"));
+            model.put("cancelledLabel", getLocalizedMessage(bundle, "outage.status.cancelled", "Cancelled"));
+
+            // Time information
+            model.put("startTimeLabel", getLocalizedMessage(bundle, "outage.startTime", "Start Time"));
+            model.put("startTime", outage.getStartTime().format(DATE_FORMATTER));
+
+            if (outage.getEstimatedEndTime() != null) {
+                model.put("endTimeLabel", getLocalizedMessage(bundle, "outage.estimatedEndTime", "Estimated End Time"));
+                model.put("endTime", outage.getEstimatedEndTime().format(DATE_FORMATTER));
+            }
+
+            if (outage.getReason() != null && !outage.getReason().isEmpty()) {
+                model.put("reasonLabel", getLocalizedMessage(bundle, "outage.reason", "Reason"));
                 model.put("reason", outage.getReason());
             }
 
             // Additional information
-            model.put("additionalInfo", bundle.getString("email.outage.additionalInfo"));
+            model.put("additionalInfo", getLocalizedMessage(bundle, "email.outage.additionalInfo",
+                    "Please plan accordingly. We apologize for any inconvenience this may cause."));
 
             // Button and links
             model.put("portalUrl", "https://poweralert.lk/outages/" + outage.getId());
-            model.put("viewDetailsLabel", bundle.getString("email.viewDetails"));
+            model.put("viewDetailsLabel", getLocalizedMessage(bundle, "email.viewDetails", "View Details"));
 
             // Footer information
-            model.put("footerText", bundle.getString("email.footer"));
-            model.put("unsubscribeText", bundle.getString("email.unsubscribe"));
+            model.put("footerText", getLocalizedMessage(bundle, "email.footer",
+                    "This is an automated message from Power Alert. Please do not reply to this email."));
+            model.put("unsubscribeText", getLocalizedMessage(bundle, "email.unsubscribe",
+                    "To update your notification preferences"));
             model.put("unsubscribeUrl", "https://poweralert.lk/preferences/notifications?userId=" + user.getId() + "&token=UNSUBSCRIBE_TOKEN");
-            model.put("unsubscribeHereLabel", bundle.getString("email.unsubscribeHere"));
+            model.put("unsubscribeHereLabel", getLocalizedMessage(bundle, "email.unsubscribeHere", "click here"));
             model.put("year", Year.now().toString());
 
-            // Use the template to send the email
-            String subject = String.format(bundle.getString("email.outage.subject"),
-                    outage.getType(),
-                    outage.getAffectedArea().getName());
-
-            // Send using the template (FreeMarker will use outage-notification.ftl)
-            return sendTemplateEmail(user.getEmail(), subject, "outage-notification", model);
         } catch (Exception e) {
-            logger.error("Error sending outage notification email to {}", user.getEmail(), e);
-            return false;
+            logger.warn("Error populating template model: {}", e.getMessage());
+            // If there's an error, fall back to default values
+            setFallbackModelValues(model, user, outage);
         }
     }
+
+    private String getLocalizedMessage(ResourceBundle bundle, String key, String defaultValue) {
+        try {
+            return bundle.getString(key);
+        } catch (MissingResourceException e) {
+            return defaultValue;
+        }
+    }
+
+    private void setFallbackModelValues(Map<String, Object> model, User user, Outage outage) {
+        // Populate model with hardcoded values as fallback
+        model.put("title", "Utility Outage Notification");
+        model.put("greeting", "Hello " + user.getUsername());
+        model.put("message", "We are writing to inform you about a " + outage.getType() + " outage that affects your registered address.");
+
+        // Outage details
+        model.put("outageTypeLabel", "Type");
+        model.put("outageType", outage.getType().toString());
+        model.put("areaLabel", "Affected Area");
+        model.put("area", outage.getAffectedArea().getName());
+        model.put("statusLabel", "Status");
+        model.put("status", outage.getStatus().toString());
+
+        // Status labels
+        model.put("scheduledLabel", "Scheduled");
+        model.put("ongoingLabel", "Ongoing");
+        model.put("completedLabel", "Completed");
+        model.put("cancelledLabel", "Cancelled");
+
+        // Time information
+        model.put("startTimeLabel", "Start Time");
+        model.put("startTime", outage.getStartTime().format(DATE_FORMATTER));
+
+        if (outage.getEstimatedEndTime() != null) {
+            model.put("endTimeLabel", "Estimated End Time");
+            model.put("endTime", outage.getEstimatedEndTime().format(DATE_FORMATTER));
+        }
+
+        if (outage.getReason() != null && !outage.getReason().isEmpty()) {
+            model.put("reasonLabel", "Reason");
+            model.put("reason", outage.getReason());
+        }
+
+        // Additional information
+        model.put("additionalInfo", "Please plan accordingly. We apologize for any inconvenience this may cause.");
+
+        // Button and links
+        model.put("portalUrl", "https://poweralert.lk/outages/" + outage.getId());
+        model.put("viewDetailsLabel", "View Details");
+
+        // Footer information
+        model.put("footerText", "This is an automated message from Power Alert. Please do not reply to this email.");
+        model.put("unsubscribeText", "To update your notification preferences");
+        model.put("unsubscribeUrl", "https://poweralert.lk/preferences/notifications?userId=" + user.getId() + "&token=UNSUBSCRIBE_TOKEN");
+        model.put("unsubscribeHereLabel", "click here");
+        model.put("year", Year.now().toString());
+    }
+
     private String createHtmlEmailContent(Map<String, Object> model) {
         // This is a simplified HTML generation
         StringBuilder content = new StringBuilder();
-        content.append("<!DOCTYPE html><html><head><style>");
+        content.append("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><style>");
         content.append("body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }");
         content.append(".container { max-width: 600px; margin: 0 auto; padding: 20px; }");
-        content.append(".header { background-color: #2196F3; color: white; padding: 10px; text-align: center; }");
+        content.append(".header { background-color: #0066cc; color: white; padding: 10px; text-align: center; }");
         content.append(".content { padding: 20px; background-color: #f9f9f9; }");
         content.append(".footer { font-size: 12px; color: #777; text-align: center; margin-top: 20px; }");
-        content.append(".button { background-color: #2196F3; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px; }");
+        content.append(".button { display: inline-block; background-color: #0066cc; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px; }");
         content.append("</style></head><body><div class='container'>");
 
         // Header
-        content.append("<div class='header'><h2>").append(model.get("title")).append("</h2></div>");
+        content.append("<div class='header'><h2>").append(model.getOrDefault("title", "Utility Outage Notification")).append("</h2></div>");
 
         // Content
         content.append("<div class='content'>");
-        content.append("<p>").append(model.get("greeting")).append("</p>");
-        content.append("<p>").append(model.get("message")).append("</p>");
+        content.append("<p>").append(model.getOrDefault("greeting", "Hello")).append("</p>");
+        content.append("<p>").append(model.getOrDefault("message", "There is an outage that affects your area.")).append("</p>");
 
         // Outage details
-        content.append("<div style='margin: 20px 0;'>");
-        content.append("<p><strong>").append(model.get("outageTypeLabel")).append(":</strong> ").append(model.get("outageType")).append("</p>");
-        content.append("<p><strong>").append(model.get("areaLabel")).append(":</strong> ").append(model.get("area")).append("</p>");
-        content.append("<p><strong>").append(model.get("statusLabel")).append(":</strong> ").append(model.get("status")).append("</p>");
-        content.append("<p><strong>").append(model.get("startTimeLabel")).append(":</strong> ").append(model.get("startTime")).append("</p>");
+        content.append("<div style='margin: 20px 0; background-color: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 5px;'>");
+        content.append("<p><strong>").append(model.getOrDefault("outageTypeLabel", "Type")).append(":</strong> ");
+        content.append("<span style='font-weight: bold; color: #cc0000;'>").append(model.getOrDefault("outageType", "Unknown")).append("</span></p>");
+
+        content.append("<p><strong>").append(model.getOrDefault("areaLabel", "Area")).append(":</strong> ").append(model.getOrDefault("area", "Unknown")).append("</p>");
+        content.append("<p><strong>").append(model.getOrDefault("statusLabel", "Status")).append(":</strong> ").append(model.getOrDefault("status", "Unknown")).append("</p>");
+        content.append("<p><strong>").append(model.getOrDefault("startTimeLabel", "Start Time")).append(":</strong> ").append(model.getOrDefault("startTime", "Unknown")).append("</p>");
 
         if (model.containsKey("endTime")) {
-            content.append("<p><strong>").append(model.get("endTimeLabel")).append(":</strong> ").append(model.get("endTime")).append("</p>");
+            content.append("<p><strong>").append(model.getOrDefault("endTimeLabel", "End Time")).append(":</strong> ").append(model.get("endTime")).append("</p>");
         }
 
         if (model.containsKey("reason")) {
-            content.append("<p><strong>").append(model.get("reasonLabel")).append(":</strong> ").append(model.get("reason")).append("</p>");
+            content.append("<p><strong>").append(model.getOrDefault("reasonLabel", "Reason")).append(":</strong> ").append(model.get("reason")).append("</p>");
         }
         content.append("</div>");
 
-        // Button
-        content.append("<div style='text-align: center; margin: 30px 0;'>");
-        content.append("<a href='").append(model.get("portalUrl")).append("' class='button'>");
-        content.append(model.get("viewDetailsLabel")).append("</a>");
-        content.append("</div>");
+        // Additional info
+        content.append("<p>").append(model.getOrDefault("additionalInfo", "Please plan accordingly.")).append("</p>");
 
-        content.append("<p>").append(model.get("additionalInfo")).append("</p>");
+        // Button
+        if (model.containsKey("portalUrl")) {
+            content.append("<div style='text-align: center; margin: 30px 0;'>");
+            content.append("<a href='").append(model.get("portalUrl")).append("' class='button' style='color: white;'>");
+            content.append(model.getOrDefault("viewDetailsLabel", "View Details")).append("</a>");
+            content.append("</div>");
+        }
+
         content.append("</div>");
 
         // Footer
         content.append("<div class='footer'>");
-        content.append("<p>").append(model.get("footerText")).append("</p>");
-        content.append("<p>").append(model.get("unsubscribeText")).append(" ");
-        content.append("<a href='").append(model.get("unsubscribeUrl")).append("'>");
-        content.append(model.get("unsubscribeHereLabel")).append("</a></p>");
-        content.append("<p>&copy; ").append(model.get("year")).append(" PowerAlert</p>");
+        content.append("<p>").append(model.getOrDefault("footerText", "This is an automated message.")).append("</p>");
+
+        if (model.containsKey("unsubscribeUrl")) {
+            content.append("<p>").append(model.getOrDefault("unsubscribeText", "To update your preferences")).append(" ");
+            content.append("<a href='").append(model.get("unsubscribeUrl")).append("'>");
+            content.append(model.getOrDefault("unsubscribeHereLabel", "click here")).append("</a></p>");
+        }
+
+        content.append("<p>&copy; ").append(model.getOrDefault("year", Year.now().toString())).append(" PowerAlert</p>");
         content.append("</div>");
 
         content.append("</div></body></html>");
@@ -360,23 +554,52 @@ public class EmailServiceImpl implements EmailService {
         return successCount.get();
     }
 
-    /**
-     * Helper method to get resource bundle for a language
-     */
-    private ResourceBundle getResourceBundle(String language) {
-        Locale locale;
+    /** Helper method to get email subject with robust error handling */
+    private String getEmailSubject(Outage outage, String language) {
+        try {
+            Locale locale = getLocale(language);
+            String outageType = outage.getType().toString();
+            String areaName = outage.getAffectedArea().getName();
+
+            ResourceBundle bundle = loadResourceBundle(language);
+            try {
+                String template = bundle.getString("email.outage.subject");
+                return String.format(template, outageType, areaName);
+            } catch (MissingResourceException e) {
+                // Fallback to default subject
+                return outageType + " Outage Alert - " + areaName;
+            }
+        } catch (Exception e) {
+            logger.warn("Error generating email subject: {}", e.getMessage());
+            // Fallback subject if all lookups fail
+            String outageType = outage.getType().toString();
+            String areaName = outage.getAffectedArea().getName();
+            return outageType + " Outage Alert - " + areaName;
+        }
+    }
+
+    /** Helper method to get locale from language code */
+    private Locale getLocale(String language) {
+        if (language == null) {
+            return Locale.ENGLISH;
+        }
 
         switch (language.toLowerCase()) {
             case "si":
-                locale = new Locale("si", "LK");
-                break;
+                return new Locale("si", "LK");
             case "ta":
-                locale = new Locale("ta", "LK");
-                break;
+                return new Locale("ta", "LK");
             default:
-                locale = Locale.ENGLISH;
+                return Locale.ENGLISH;
         }
+    }
 
+    /**
+     * Helper method to load resource bundle with robust error handling
+     * @return ResourceBundle or throws MissingResourceException if not found
+     */
+    private ResourceBundle loadResourceBundle(String language) throws MissingResourceException {
+        Locale locale = getLocale(language);
         return ResourceBundle.getBundle("messages", locale);
     }
 }
