@@ -22,8 +22,10 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -211,22 +213,29 @@ public class NotificationController {
                 throw new EntityNotFoundException("User not found with username: " + request.getUsername());
             }
 
-            // Send test notification
-            boolean sent = notificationService.sendTestNotification(user, request.getMessage());
+            // Send test notification - this method returns CompletableFuture<Boolean>
+            CompletableFuture<Boolean> future = notificationService.sendTestNotification(user, request.getMessage());
 
-            if (sent) {
-                responseDTO.setCode(VarList.OK);
-                responseDTO.setMessage("Test notification sent successfully");
-                responseDTO.setData(Map.of("sent", true, "userId", user.getId()));
+            // Create an intermediate response
+            responseDTO.setCode(VarList.Accepted);
+            responseDTO.setMessage("Test notification request submitted");
+            Map<String, Object> data = new HashMap<>();
+            data.put("status", "PROCESSING");
+            data.put("userId", user.getId());
+            responseDTO.setData(data);
 
-                return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-            } else {
-                responseDTO.setCode(VarList.Internal_Server_Error);
-                responseDTO.setMessage("Failed to send test notification");
-                responseDTO.setData(Map.of("sent", false));
+            // Add a completion handler to log the result
+            future.whenComplete((sent, exception) -> {
+                if (exception != null) {
+                    logger.error("Error sending test notification: {}", exception.getMessage(), exception);
+                } else if (sent) {
+                    logger.info("Test notification sent successfully to user ID: {}", user.getId());
+                } else {
+                    logger.warn("Failed to send test notification to user ID: {}", user.getId());
+                }
+            });
 
-                return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+            return new ResponseEntity<>(responseDTO, HttpStatus.ACCEPTED);
         } catch (EntityNotFoundException e) {
             logger.error("User not found: {}", e.getMessage());
 

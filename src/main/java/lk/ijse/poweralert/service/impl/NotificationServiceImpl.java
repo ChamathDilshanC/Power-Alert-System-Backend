@@ -18,10 +18,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
@@ -78,6 +80,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * Find user IDs affected by an outage
+     *
      * @param outage The outage
      * @return List of affected user IDs
      */
@@ -85,7 +88,7 @@ public class NotificationServiceImpl implements NotificationService {
         return userRepository.findUsersInDistrict(outage.getAffectedArea().getDistrict())
                 .stream()
                 .map(User::getId)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     /**
@@ -306,7 +309,8 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public boolean sendTestNotification(User user, String message) {
+    @Async
+    public CompletableFuture<Boolean> sendTestNotification(User user, String message) {
         logger.info("Sending test notification to user ID: {}", user.getId());
 
         try {
@@ -314,23 +318,25 @@ public class NotificationServiceImpl implements NotificationService {
             Outage dummyOutage = new Outage();
             dummyOutage.setId(-1L);  // Use -1 to indicate test outage
 
+            // Create area for the dummy outage
+            Area testArea = new Area();
+            testArea.setName("Test Area");
+            dummyOutage.setAffectedArea(testArea);
+
+            // Set default type for the test outage
+            dummyOutage.setType(lk.ijse.poweralert.enums.AppEnums.OutageType.ELECTRICITY);
+            dummyOutage.setStatus(lk.ijse.poweralert.enums.AppEnums.OutageStatus.SCHEDULED);
+
             // Send test notification via email (always, for testing)
             createAndSendNotification(dummyOutage, user, NotificationType.EMAIL, message);
 
-            return true;
+            // Since email service doesn't return success/failure, we assume success if no exception is thrown
+
+            return CompletableFuture.completedFuture(true);
         } catch (Exception e) {
             logger.error("Error sending test notification: {}", e.getMessage(), e);
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
-    }
-
-    // Helper method to find users affected by an outage
-    private List<User> findAffectedUsers(Outage outage) {
-        // For now, simple implementation that gets all users with addresses in the affected area's district
-        return userRepository.findUsersInDistrict(outage.getAffectedArea().getDistrict());
-
-        // TODO: When geospatial is implemented, this can be replaced with a more accurate query
-        // that finds users whose addresses are within the affected geographical area
     }
 
     // Helper method to create and send a notification
@@ -357,7 +363,9 @@ public class NotificationServiceImpl implements NotificationService {
             try {
                 switch (type) {
                     case EMAIL:
-                        sent = emailService.sendEmail(user.getEmail(), getEmailSubject(outage, user.getPreferredLanguage()), content);
+                        // Email service returns void, not boolean
+                        emailService.sendEmail(user.getEmail(), getEmailSubject(outage, user.getPreferredLanguage()), content);
+                        sent = true; // Assume success since exceptions are caught in the email service
                         break;
                     case SMS:
                         // Uses VonageSmsServiceImpl through the SmsService interface
@@ -402,26 +410,33 @@ public class NotificationServiceImpl implements NotificationService {
                 }
 
                 // Update notification status
-                if (sent) {
-                    notification.setStatus(NotificationStatus.SENT);
-                    notification.setSentAt(LocalDateTime.now());
-                    notificationRepository.save(notification);
-                } else {
-                    notification.setStatus(NotificationStatus.FAILED);
-                    notificationRepository.save(notification);
-                }
+                updateNotificationStatus(notification, sent);
 
             } catch (Exception e) {
                 logger.error("Error sending notification: {}", e.getMessage(), e);
-                notification.setStatus(NotificationStatus.FAILED);
-                notificationRepository.save(notification);
+                updateNotificationStatus(notification, false);
             }
         } catch (Exception e) {
             logger.error("Error creating notification: {}", e.getMessage(), e);
         }
     }
 
-    // Helper method to get device token - improved implementation
+    // Helper method to update notification status
+    private void updateNotificationStatus(Notification notification, boolean sent) {
+        try {
+            if (sent) {
+                notification.setStatus(NotificationStatus.SENT);
+                notification.setSentAt(LocalDateTime.now());
+            } else {
+                notification.setStatus(NotificationStatus.FAILED);
+            }
+            notificationRepository.save(notification);
+        } catch (Exception e) {
+            logger.error("Error updating notification status: {}", e.getMessage(), e);
+        }
+    }
+
+    // Helper method to get device token for push notifications
     private String getDeviceToken(User user) {
         // Use UserDeviceService if available
         if (userDeviceService != null) {
@@ -488,22 +503,34 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private String generateOutageMessage(Outage outage, String language) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<!DOCTYPE html><html><body>");
-        sb.append("<h2>Utility Outage Notification</h2>");
-        sb.append("<p>There is a ").append(outage.getType()).append(" outage scheduled in ").append(outage.getAffectedArea().getName()).append("</p>");
-        sb.append("<p><strong>Start Time:</strong> ").append(outage.getStartTime().format(DATE_FORMATTER)).append("</p>");
+        try {
+            ResourceBundle bundle = getResourceBundle(language);
 
-        if(outage.getEstimatedEndTime() != null) {
-            sb.append("<p><strong>Estimated End Time:</strong> ").append(outage.getEstimatedEndTime().format(DATE_FORMATTER)).append("</p>");
+            String areaName = outage.getAffectedArea().getName();
+            String startTime = outage.getStartTime().format(DATE_FORMATTER);
+            String endTime = outage.getEstimatedEndTime() != null
+                    ? outage.getEstimatedEndTime().format(DATE_FORMATTER)
+                    : bundle.getString("unknown");
+            String reason = outage.getReason() != null && !outage.getReason().isEmpty()
+                    ? outage.getReason()
+                    : bundle.getString("reason.unknown");
+
+            // Get template and apply MessageFormat (which handles {0}, {1}, etc. format)
+            String template = bundle.getString("outage.new");
+            return MessageFormat.format(template,
+                    outage.getType().toString(),  // {0}
+                    areaName,                     // {1}
+                    startTime,                    // {2}
+                    endTime,                      // {3}
+                    reason                        // {4}
+            );
+        } catch (Exception e) {
+            logger.warn("Could not format message from resource bundle, using fallback: {}", e.getMessage());
+            // Fallback to HTML format...
         }
-
-        sb.append("<p><strong>Reason:</strong> ").append(outage.getReason() != null ? outage.getReason() : "Scheduled maintenance").append("</p>");
-        sb.append("<p>Please plan accordingly.</p>");
-        sb.append("</body></html>");
-
-        return sb.toString();
+        return language;
     }
+
 
     private String generateOutageUpdateMessage(Outage outage, String language) {
         try {

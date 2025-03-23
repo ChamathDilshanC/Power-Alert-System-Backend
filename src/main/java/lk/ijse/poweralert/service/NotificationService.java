@@ -2,6 +2,7 @@ package lk.ijse.poweralert.service;
 
 import lk.ijse.poweralert.entity.Outage;
 import lk.ijse.poweralert.entity.User;
+import java.util.concurrent.CompletableFuture;
 
 public interface NotificationService {
 
@@ -18,5 +19,5 @@ public interface NotificationService {
     void sendOutageRestorationNotifications(Outage outage);
 
     /** Send a test notification to a specific user */
-    boolean sendTestNotification(User user, String message);
+    CompletableFuture<Boolean> sendTestNotification(User user, String message);
 }

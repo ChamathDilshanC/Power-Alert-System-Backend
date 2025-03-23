@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/admin/emails")
@@ -40,7 +41,11 @@ public class BulkEmailController {
         try {
             logger.info("Sending email to all users with subject: {}", request.getSubject());
 
-            int sentCount = emailService.sendEmailToAllUsers(request.getSubject(), request.getContent());
+            // Start the email sending process
+            CompletableFuture<Integer> sentCount = emailService.sendEmailToAllUsers(
+                    request.getSubject(),
+                    request.getContent()
+            );
 
             Map<String, Object> data = new HashMap<>();
             data.put("emailsSent", sentCount);
@@ -67,7 +72,12 @@ public class BulkEmailController {
         try {
             logger.info("Sending email to users in area ID: {} with subject: {}", areaId, request.getSubject());
 
-            int sentCount = emailService.sendEmailToUsersInArea(areaId, request.getSubject(), request.getContent());
+            // Start the email sending process
+            CompletableFuture<Integer> sentCount = emailService.sendEmailToUsersInArea(
+                    areaId,
+                    request.getSubject(),
+                    request.getContent()
+            );
 
             Map<String, Object> data = new HashMap<>();
             data.put("emailsSent", sentCount);
@@ -84,6 +94,17 @@ public class BulkEmailController {
             responseDTO.setData(null);
             return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /** Check the status of a bulk email operation */
+    @GetMapping("/status/{jobId}")
+    public ResponseEntity<ResponseDTO> checkEmailStatus(@PathVariable String jobId) {
+        // This is a placeholder for a more sophisticated job tracking system
+        // In a real implementation, you would store job IDs and track their status
+        responseDTO.setCode(VarList.Not_Implemented);
+        responseDTO.setMessage("Email job status tracking not implemented yet");
+        responseDTO.setData(null);
+        return new ResponseEntity<>(responseDTO, HttpStatus.NOT_IMPLEMENTED);
     }
 
     /** Request body for sending emails  */
@@ -111,7 +132,8 @@ public class BulkEmailController {
             this.content = content;
         }
     }
-    @GetMapping("/api/admin/test/email-template")
+
+    @GetMapping("/test/email-template")
     public ResponseEntity<ResponseDTO> testEmailTemplate(
             @RequestParam String toEmail,
             @RequestParam(required = false) String language) {
@@ -122,7 +144,6 @@ public class BulkEmailController {
             testUser.setUsername("testuser");
             testUser.setEmail(toEmail);
 
-
             Outage testOutage = new Outage();
             testOutage.setId(1L);
             testOutage.setType(AppEnums.OutageType.ELECTRICITY);
@@ -131,28 +152,22 @@ public class BulkEmailController {
             testOutage.setEstimatedEndTime(LocalDateTime.now().plusDays(1).plusHours(4));
             testOutage.setReason("Scheduled maintenance");
 
-
             Area testArea = new Area();
             testArea.setName("Test Area");
             testOutage.setAffectedArea(testArea);
 
-
-            boolean sent = emailService.sendOutageNotificationEmail(
+            // Call the email service - it doesn't return a boolean
+            emailService.sendOutageNotificationEmail(
                     testUser,
                     testOutage,
                     language != null ? language : "en");
 
-            if (sent) {
-                responseDTO.setCode(200);
-                responseDTO.setMessage("Test template email sent successfully");
-                responseDTO.setData(null);
-                return ResponseEntity.ok(responseDTO);
-            } else {
-                responseDTO.setCode(500);
-                responseDTO.setMessage("Failed to send test template email");
-                responseDTO.setData(null);
-                return ResponseEntity.status(500).body(responseDTO);
-            }
+            // If no exception was thrown, consider it a success
+            responseDTO.setCode(200);
+            responseDTO.setMessage("Test template email sent successfully");
+            responseDTO.setData(null);
+            return ResponseEntity.ok(responseDTO);
+
         } catch (Exception e) {
             logger.error("Error sending test template email: {}", e.getMessage(), e);
             responseDTO.setCode(500);

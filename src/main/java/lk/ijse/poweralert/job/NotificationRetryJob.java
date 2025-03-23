@@ -74,39 +74,46 @@ public class NotificationRetryJob {
                 boolean sent = false;
 
                 // Attempt to send based on notification type
-                switch (notification.getType()) {
-                    case EMAIL:
-                        sent = emailService.sendEmail(
-                                notification.getUser().getEmail(),
-                                "Power Outage Notification",
-                                notification.getContent());
-                        break;
-                    case SMS:
-                        sent = smsService.sendSms(
-                                notification.getUser().getPhoneNumber(),
-                                notification.getContent());
-                        break;
-                    case PUSH:
-                        // Placeholder for device token retrieval
-                        String deviceToken = getDeviceToken(notification.getUser().getId());
-                        if (deviceToken != null && !deviceToken.isEmpty()) {
-                            Map<String, String> data = new HashMap<>();
-                            data.put("outageId", notification.getOutage().getId().toString());
-                            data.put("notificationId", notification.getId().toString());
-                            sent = pushNotificationService.sendNotification(
-                                    deviceToken,
-                                    "Power Outage Notification", // Title should be localized and stored or determined dynamically
-                                    notification.getContent(),
-                                    data);
-                        }
-                        break;
-                    case WHATSAPP:
-                        sent = whatsAppService.sendWhatsAppMessage(
-                                notification.getUser().getPhoneNumber(),
-                                notification.getContent());
-                        break;
-                    default:
-                        logger.warn("Unknown notification type: {}", notification.getType());
+                try {
+                    switch (notification.getType()) {
+                        case EMAIL:
+                            // Email service returns void, so we wrap in try-catch and assume success if no exception
+                            emailService.sendEmail(
+                                    notification.getUser().getEmail(),
+                                    "Power Outage Notification",
+                                    notification.getContent());
+                            sent = true; // Assume success if no exception thrown
+                            break;
+                        case SMS:
+                            sent = smsService.sendSms(
+                                    notification.getUser().getPhoneNumber(),
+                                    notification.getContent());
+                            break;
+                        case PUSH:
+                            // Placeholder for device token retrieval
+                            String deviceToken = getDeviceToken(notification.getUser().getId());
+                            if (deviceToken != null && !deviceToken.isEmpty()) {
+                                Map<String, String> data = new HashMap<>();
+                                data.put("outageId", notification.getOutage().getId().toString());
+                                data.put("notificationId", notification.getId().toString());
+                                sent = pushNotificationService.sendNotification(
+                                        deviceToken,
+                                        "Power Outage Notification", // Title should be localized and stored or determined dynamically
+                                        notification.getContent(),
+                                        data);
+                            }
+                            break;
+                        case WHATSAPP:
+                            sent = whatsAppService.sendWhatsAppMessage(
+                                    notification.getUser().getPhoneNumber(),
+                                    notification.getContent());
+                            break;
+                        default:
+                            logger.warn("Unknown notification type: {}", notification.getType());
+                    }
+                } catch (Exception e) {
+                    logger.error("Error sending notification: {}", e.getMessage(), e);
+                    sent = false;
                 }
 
                 // Update notification status

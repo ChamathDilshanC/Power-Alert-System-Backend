@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -28,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -88,10 +88,10 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Async
-    public boolean sendEmail(String to, String subject, String content) {
+    public void sendEmail(String to, String subject, String content) {
         if (!emailEnabled) {
             logger.info("Email sending is disabled. Would have sent to: {}, subject: {}", to, subject);
-            return true;
+            return;
         }
 
         try {
@@ -117,23 +117,20 @@ public class EmailServiceImpl implements EmailService {
 
                 mailSender.send(message);
                 logger.info("Email sent successfully to: {}", to);
-                return true;
             } catch (MailException me) {
                 logger.error("JavaMailSender error: {}", me.getMessage(), me);
-                return false;
             }
         } catch (Exception e) {
             logger.error("Exception preparing email to {}: {}", to, e.getMessage(), e);
-            return false;
         }
     }
 
     @Override
     @Async
-    public boolean sendTemplateEmail(String to, String subject, String templateName, Object model) {
+    public CompletableFuture<Boolean> sendTemplateEmail(String to, String subject, String templateName, Object model) {
         if (!emailEnabled) {
             logger.info("Email sending is disabled. Would have sent template email to: {}, subject: {}", to, subject);
-            return true;
+            return CompletableFuture.completedFuture(true);
         }
 
         try {
@@ -157,10 +154,12 @@ public class EmailServiceImpl implements EmailService {
                         template = freemarkerConfig.getTemplate(templateName + ".ftl");
                     } catch (IOException e2) {
                         logger.error("Failed to load template with .ftl extension: {}", e2.getMessage());
-                        return sendEmail(to, subject, createHtmlEmailContent(templateModel));
+                        sendEmail(to, subject, createHtmlEmailContent(templateModel));
+                        return CompletableFuture.completedFuture(true);
                     }
                 } else {
-                    return sendEmail(to, subject, createHtmlEmailContent(templateModel));
+                    sendEmail(to, subject, createHtmlEmailContent(templateModel));
+                    return CompletableFuture.completedFuture(true);
                 }
             }
 
@@ -170,7 +169,8 @@ public class EmailServiceImpl implements EmailService {
                 content = FreeMarkerTemplateUtils.processTemplateIntoString(template, templateModel);
             } catch (TemplateException e) {
                 logger.error("Error processing template '{}': {}", templateName, e.getMessage(), e);
-                return sendEmail(to, subject, createHtmlEmailContent(templateModel));
+                sendEmail(to, subject, createHtmlEmailContent(templateModel));
+                return CompletableFuture.completedFuture(true);
             }
 
             // Check if content was generated successfully
@@ -179,10 +179,11 @@ public class EmailServiceImpl implements EmailService {
                 content = createHtmlEmailContent(templateModel);
             }
 
-            return sendEmail(to, subject, content);
+            sendEmail(to, subject, content);
+            return CompletableFuture.completedFuture(true);
         } catch (Exception e) {
             logger.error("Failed to send template email to: {}: {}", to, e.getMessage(), e);
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
     }
 
@@ -211,11 +212,11 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Async
-    public boolean sendEmailWithAttachment(String to, String subject, String content,
-                                           String attachmentFilePath, String attachmentFileName) {
+    public CompletableFuture<Boolean> sendEmailWithAttachment(String to, String subject, String content,
+                                                              String attachmentFilePath, String attachmentFileName) {
         if (!emailEnabled) {
             logger.info("Email sending is disabled. Would have sent email with attachment to: {}, subject: {}", to, subject);
-            return true;
+            return CompletableFuture.completedFuture(true);
         }
 
         try {
@@ -233,7 +234,7 @@ public class EmailServiceImpl implements EmailService {
             File file = new File(attachmentFilePath);
             if (!file.exists() || !file.isFile()) {
                 logger.error("Attachment file not found or is not a file: {}", attachmentFilePath);
-                return false;
+                return CompletableFuture.completedFuture(false);
             }
 
             FileSystemResource fileResource = new FileSystemResource(file);
@@ -241,19 +242,19 @@ public class EmailServiceImpl implements EmailService {
 
             mailSender.send(message);
             logger.info("Email with attachment sent successfully to: {}", to);
-            return true;
+            return CompletableFuture.completedFuture(true);
         } catch (MessagingException e) {
             logger.error("Messaging exception when sending email with attachment: {}", e.getMessage(), e);
-            return false;
+            return CompletableFuture.completedFuture(false);
         } catch (Exception e) {
             logger.error("Failed to send email with attachment to: {}: {}", to, e.getMessage(), e);
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
     }
 
     @Override
     @Async
-    public boolean sendOutageNotificationEmail(User user, Outage outage, String language) {
+    public CompletableFuture<Boolean> sendOutageNotificationEmail(User user, Outage outage, String language) {
         try {
             logger.info("Preparing outage notification email for user: {}", user.getEmail());
 
@@ -283,15 +284,17 @@ public class EmailServiceImpl implements EmailService {
                 // Try to get template
                 Template template = freemarkerConfig.getTemplate("outage-notification.ftl");
                 String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
-                return sendEmail(user.getEmail(), subject, content);
+                sendEmail(user.getEmail(), subject, content);
+                return CompletableFuture.completedFuture(true);
             } catch (Exception e) {
                 logger.error("Failed to process template: {}", e.getMessage(), e);
                 // Send fallback email
-                return sendEmail(user.getEmail(), subject, createSimpleFallbackEmail(user, outage));
+                sendEmail(user.getEmail(), subject, createSimpleFallbackEmail(user, outage));
+                return CompletableFuture.completedFuture(true);
             }
         } catch (Exception e) {
             logger.error("Error sending outage notification email to {}: {}", user.getEmail(), e.getMessage(), e);
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
     }
 
@@ -322,124 +325,6 @@ public class EmailServiceImpl implements EmailService {
         sb.append("</body></html>");
 
         return sb.toString();
-    }
-
-    private void populateTemplateModel(Map<String, Object> model, User user, Outage outage, ResourceBundle bundle) {
-        try {
-            model.put("title", getLocalizedMessage(bundle, "email.outage.title", "Utility Outage Notification"));
-            model.put("greeting", getLocalizedMessage(bundle, "email.greeting", "Hello") + " " + user.getUsername());
-            model.put("message", String.format(
-                    getLocalizedMessage(bundle, "email.outage.message",
-                            "We are writing to inform you about a %s outage that affects your registered address."),
-                    outage.getType()));
-
-            // Outage details
-            model.put("outageTypeLabel", getLocalizedMessage(bundle, "outage.type", "Type"));
-            model.put("outageType", outage.getType().toString());
-            model.put("areaLabel", getLocalizedMessage(bundle, "outage.area", "Affected Area"));
-            model.put("area", outage.getAffectedArea().getName());
-            model.put("statusLabel", getLocalizedMessage(bundle, "outage.status", "Status"));
-            model.put("status", outage.getStatus().toString());
-
-            // Status labels
-            model.put("scheduledLabel", getLocalizedMessage(bundle, "outage.status.scheduled", "Scheduled"));
-            model.put("ongoingLabel", getLocalizedMessage(bundle, "outage.status.ongoing", "Ongoing"));
-            model.put("completedLabel", getLocalizedMessage(bundle, "outage.status.completed", "Completed"));
-            model.put("cancelledLabel", getLocalizedMessage(bundle, "outage.status.cancelled", "Cancelled"));
-
-            // Time information
-            model.put("startTimeLabel", getLocalizedMessage(bundle, "outage.startTime", "Start Time"));
-            model.put("startTime", outage.getStartTime().format(DATE_FORMATTER));
-
-            if (outage.getEstimatedEndTime() != null) {
-                model.put("endTimeLabel", getLocalizedMessage(bundle, "outage.estimatedEndTime", "Estimated End Time"));
-                model.put("endTime", outage.getEstimatedEndTime().format(DATE_FORMATTER));
-            }
-
-            if (outage.getReason() != null && !outage.getReason().isEmpty()) {
-                model.put("reasonLabel", getLocalizedMessage(bundle, "outage.reason", "Reason"));
-                model.put("reason", outage.getReason());
-            }
-
-            // Additional information
-            model.put("additionalInfo", getLocalizedMessage(bundle, "email.outage.additionalInfo",
-                    "Please plan accordingly. We apologize for any inconvenience this may cause."));
-
-            // Button and links
-            model.put("portalUrl", "https://poweralert.lk/outages/" + outage.getId());
-            model.put("viewDetailsLabel", getLocalizedMessage(bundle, "email.viewDetails", "View Details"));
-
-            // Footer information
-            model.put("footerText", getLocalizedMessage(bundle, "email.footer",
-                    "This is an automated message from Power Alert. Please do not reply to this email."));
-            model.put("unsubscribeText", getLocalizedMessage(bundle, "email.unsubscribe",
-                    "To update your notification preferences"));
-            model.put("unsubscribeUrl", "https://poweralert.lk/preferences/notifications?userId=" + user.getId() + "&token=UNSUBSCRIBE_TOKEN");
-            model.put("unsubscribeHereLabel", getLocalizedMessage(bundle, "email.unsubscribeHere", "click here"));
-            model.put("year", Year.now().toString());
-
-        } catch (Exception e) {
-            logger.warn("Error populating template model: {}", e.getMessage());
-            // If there's an error, fall back to default values
-            setFallbackModelValues(model, user, outage);
-        }
-    }
-
-    private String getLocalizedMessage(ResourceBundle bundle, String key, String defaultValue) {
-        try {
-            return bundle.getString(key);
-        } catch (MissingResourceException e) {
-            return defaultValue;
-        }
-    }
-
-    private void setFallbackModelValues(Map<String, Object> model, User user, Outage outage) {
-        // Populate model with hardcoded values as fallback
-        model.put("title", "Utility Outage Notification");
-        model.put("greeting", "Hello " + user.getUsername());
-        model.put("message", "We are writing to inform you about a " + outage.getType() + " outage that affects your registered address.");
-
-        // Outage details
-        model.put("outageTypeLabel", "Type");
-        model.put("outageType", outage.getType().toString());
-        model.put("areaLabel", "Affected Area");
-        model.put("area", outage.getAffectedArea().getName());
-        model.put("statusLabel", "Status");
-        model.put("status", outage.getStatus().toString());
-
-        // Status labels
-        model.put("scheduledLabel", "Scheduled");
-        model.put("ongoingLabel", "Ongoing");
-        model.put("completedLabel", "Completed");
-        model.put("cancelledLabel", "Cancelled");
-
-        // Time information
-        model.put("startTimeLabel", "Start Time");
-        model.put("startTime", outage.getStartTime().format(DATE_FORMATTER));
-
-        if (outage.getEstimatedEndTime() != null) {
-            model.put("endTimeLabel", "Estimated End Time");
-            model.put("endTime", outage.getEstimatedEndTime().format(DATE_FORMATTER));
-        }
-
-        if (outage.getReason() != null && !outage.getReason().isEmpty()) {
-            model.put("reasonLabel", "Reason");
-            model.put("reason", outage.getReason());
-        }
-
-        // Additional information
-        model.put("additionalInfo", "Please plan accordingly. We apologize for any inconvenience this may cause.");
-
-        // Button and links
-        model.put("portalUrl", "https://poweralert.lk/outages/" + outage.getId());
-        model.put("viewDetailsLabel", "View Details");
-
-        // Footer information
-        model.put("footerText", "This is an automated message from Power Alert. Please do not reply to this email.");
-        model.put("unsubscribeText", "To update your notification preferences");
-        model.put("unsubscribeUrl", "https://poweralert.lk/preferences/notifications?userId=" + user.getId() + "&token=UNSUBSCRIBE_TOKEN");
-        model.put("unsubscribeHereLabel", "click here");
-        model.put("year", Year.now().toString());
     }
 
     private String createHtmlEmailContent(Map<String, Object> model) {
@@ -511,7 +396,8 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public int sendEmailToAllUsers(String subject, String content) {
+    @Async
+    public CompletableFuture<Integer> sendEmailToAllUsers(String subject, String content) {
         logger.info("Sending email to all active users with subject: {}", subject);
 
         List<User> activeUsers = userRepository.findByIsActiveTrue();
@@ -519,21 +405,20 @@ public class EmailServiceImpl implements EmailService {
 
         activeUsers.forEach(user -> {
             try {
-                boolean sent = sendEmail(user.getEmail(), subject, content);
-                if (sent) {
-                    successCount.incrementAndGet();
-                }
+                sendEmail(user.getEmail(), subject, content);
+                successCount.incrementAndGet();
             } catch (Exception e) {
                 logger.error("Failed to send email to user {}: {}", user.getEmail(), e.getMessage());
             }
         });
 
         logger.info("Successfully sent emails to {}/{} active users", successCount.get(), activeUsers.size());
-        return successCount.get();
+        return CompletableFuture.completedFuture(successCount.get());
     }
 
     @Override
-    public int sendEmailToUsersInArea(Long areaId, String subject, String content) {
+    @Async
+    public CompletableFuture<Integer> sendEmailToUsersInArea(Long areaId, String subject, String content) {
         logger.info("Sending email to users in area ID: {} with subject: {}", areaId, subject);
 
         List<User> usersInArea = userRepository.findUsersByAreaId(areaId);
@@ -541,17 +426,15 @@ public class EmailServiceImpl implements EmailService {
 
         usersInArea.forEach(user -> {
             try {
-                boolean sent = sendEmail(user.getEmail(), subject, content);
-                if (sent) {
-                    successCount.incrementAndGet();
-                }
+                sendEmail(user.getEmail(), subject, content);
+                successCount.incrementAndGet();
             } catch (Exception e) {
                 logger.error("Failed to send email to user {}: {}", user.getEmail(), e.getMessage());
             }
         });
 
         logger.info("Successfully sent emails to {}/{} users in area", successCount.get(), usersInArea.size());
-        return successCount.get();
+        return CompletableFuture.completedFuture(successCount.get());
     }
 
     /** Helper method to get email subject with robust error handling */

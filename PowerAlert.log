@@ -1,0 +1,943 @@
+2025-03-23T11:37:36.588+05:30  INFO 5448 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Starting PowerAlertApplication using Java 22.0.2 with PID 5448 (I:\Projects\PowerAlert\target\classes started by Chamath in I:\Projects\PowerAlert)
+2025-03-23T11:37:36.590+05:30 DEBUG 5448 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Running with Spring Boot v3.2.4, Spring v6.1.5
+2025-03-23T11:37:36.590+05:30  INFO 5448 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : No active profile set, falling back to 1 default profile: "default"
+2025-03-23T11:37:36.737+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in C:\Users\dilsh\.m2\repository\com\sun\xml\bind\jaxb-core\2.3.0.1\jaxb-core-2.3.0.1.jar referenced one or more files that do not exist: file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-core/2.3.0.1/jaxb-api.jar
+2025-03-23T11:37:36.737+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in C:\Users\dilsh\.m2\repository\com\sun\xml\bind\jaxb-impl\2.3.1\jaxb-impl-2.3.1.jar referenced one or more files that do not exist: file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-runtime-2.3.1.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/txw2-2.3.1.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/istack-commons-runtime-3.0.7.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/stax-ex-1.8.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/FastInfoset-1.2.15.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/javax.activation-api-1.2.0.jar
+2025-03-23T11:37:36.737+05:30  INFO 5448 --- [PowerAlert] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-03-23T11:37:36.737+05:30  INFO 5448 --- [PowerAlert] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-03-23T11:37:41.484+05:30  INFO 5448 --- [PowerAlert] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-03-23T11:37:41.732+05:30  INFO 5448 --- [PowerAlert] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 229 ms. Found 13 JPA repository interfaces.
+2025-03-23T11:37:44.059+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-03-23T11:37:44.081+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-03-23T11:37:44.083+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.19]
+2025-03-23T11:37:44.222+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-03-23T11:37:44.222+05:30  INFO 5448 --- [PowerAlert] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 7485 ms
+2025-03-23T11:37:44.576+05:30  INFO 5448 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-03-23T11:37:45.884+05:30  INFO 5448 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@d20a4b6
+2025-03-23T11:37:45.886+05:30  INFO 5448 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-03-23T11:37:45.903+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/poweralert?createDatabaseIfNotExist=true'
+2025-03-23T11:37:46.079+05:30  INFO 5448 --- [PowerAlert] [restartedMain] lk.ijse.poweralert.util.JwtUtil          : JWT signing key initialized with new random key
+2025-03-23T11:37:46.619+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-03-23T11:37:46.803+05:30  INFO 5448 --- [PowerAlert] [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2025-03-23T11:37:46.891+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-03-23T11:37:47.357+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-03-23T11:37:47.568+05:30  WARN 5448 --- [PowerAlert] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-03-23T11:37:47.573+05:30  WARN 5448 --- [PowerAlert] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-03-23T11:37:50.139+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-03-23T11:37:50.494+05:30  INFO 5448 --- [PowerAlert] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-03-23T11:37:51.317+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-03-23T11:37:52.311+05:30 DEBUG 5448 --- [PowerAlert] [restartedMain] lk.ijse.poweralert.config.JwtFilter      : Filter 'jwtFilter' configured for use
+2025-03-23T11:37:54.022+05:30  INFO 5448 --- [PowerAlert] [restartedMain] l.i.p.s.i.PushNotificationServiceImpl    : Push notification service is disabled
+2025-03-23T11:37:54.467+05:30  INFO 5448 --- [PowerAlert] [restartedMain] l.i.poweralert.config.FreemarkerConfig   : Configuring FreeMarker
+2025-03-23T11:37:54.475+05:30  INFO 5448 --- [PowerAlert] [restartedMain] l.i.poweralert.config.FreemarkerConfig   : FreeMarker configured with template path: classpath:/templates/
+2025-03-23T11:37:54.709+05:30  INFO 5448 --- [PowerAlert] [restartedMain] l.i.p.service.impl.SmsServiceImpl        : SMS service is disabled or not fully configured
+2025-03-23T11:37:56.598+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2025-03-23T11:37:56.681+05:30  INFO 5448 --- [PowerAlert] [restartedMain] l.ijse.poweralert.config.SecurityConfig  : Configuring SecurityFilterChain
+2025-03-23T11:37:56.871+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@57ef587d, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@148ec8a9, org.springframework.security.web.context.SecurityContextHolderFilter@4531fabf, org.springframework.security.web.header.HeaderWriterFilter@1a583e38, org.springframework.web.filter.CorsFilter@3a1772b4, org.springframework.security.web.authentication.logout.LogoutFilter@5afb102f, lk.ijse.poweralert.config.JwtFilter@38db86f8, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@59b36426, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@16bc670e, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@56a5f82, org.springframework.security.web.session.SessionManagementFilter@3bb589b0, org.springframework.security.web.access.ExceptionTranslationFilter@65ab5b47, org.springframework.security.web.access.intercept.AuthorizationFilter@4bf27861]
+2025-03-23T11:37:58.841+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-03-23T11:37:59.147+05:30  INFO 5448 --- [PowerAlert] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
+2025-03-23T11:37:59.186+05:30  INFO 5448 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Started PowerAlertApplication in 23.597 seconds (process running for 28.707)
+2025-03-23T11:38:26.121+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-03-23T11:38:26.121+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-03-23T11:38:26.125+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2025-03-23T11:38:26.168+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/login
+2025-03-23T11:38:26.191+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-2] lk.ijse.poweralert.config.JwtFilter      : Request path: /api/auth/login
+2025-03-23T11:38:26.191+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-2] lk.ijse.poweralert.config.JwtFilter      : Skipping JWT validation for excluded path: /api/auth/login
+2025-03-23T11:38:26.195+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-2] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-23T11:38:26.207+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/login
+2025-03-23T11:38:26.525+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-2] l.i.p.controller.AdminController         : Login attempt for user: admin@poweralert.lk
+2025-03-23T11:38:27.273+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-2] l.i.p.s.impl.CustomUserDetailsService    : Loading user by username/email: admin@poweralert.lk
+2025-03-23T11:38:27.321+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-2] l.i.p.s.impl.CustomUserDetailsService    : User not found by username, trying email...
+2025-03-23T11:38:27.368+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-2] l.i.p.s.impl.CustomUserDetailsService    : User found with role: ADMIN
+2025-03-23T11:38:27.580+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-2] o.s.s.a.dao.DaoAuthenticationProvider    : Authenticated user
+2025-03-23T11:38:27.611+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-2] l.i.p.service.impl.UserServiceImpl       : Fetching basic info for user with username: admin
+2025-03-23T11:38:27.611+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-2] l.i.p.service.impl.UserServiceImpl       : Fetching user entity with username: admin
+2025-03-23T11:38:27.706+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-2] lk.ijse.poweralert.util.JwtUtil          : Generated token for user admin with role ADMIN
+2025-03-23T11:38:27.708+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-2] l.i.p.service.impl.UserServiceImpl       : Updating last login time for user with email: admin@poweralert.lk
+2025-03-23T11:39:00.431+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-3] o.s.security.web.FilterChainProxy        : Securing POST /api/provider/outages
+2025-03-23T11:39:00.431+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-3] lk.ijse.poweralert.config.JwtFilter      : Request path: /api/provider/outages
+2025-03-23T11:39:00.434+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-3] lk.ijse.poweralert.config.JwtFilter      : Authorization header: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOjEsImVtYWlsIjoiYWRtaW5AcG93ZXJhbGVydC5sayIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzQyNzEwMTA3LCJleHAiOjE3NDM3NDY5MDd9.uvYRixTw-a03FPpNqBQT0XQ2GxutQ9i7vvZdz9CvFeqxEHcqIRsN6nMd0gNtSXDeH8sji5KPXP4F3MRUdIfCIw
+2025-03-23T11:39:00.491+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-3] lk.ijse.poweralert.config.JwtFilter      : Extracted username from token: admin
+2025-03-23T11:39:00.491+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.s.impl.CustomUserDetailsService    : Loading user by username/email: admin
+2025-03-23T11:39:00.500+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.s.impl.CustomUserDetailsService    : User found with role: ADMIN
+2025-03-23T11:39:00.507+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-3] lk.ijse.poweralert.config.JwtFilter      : Authentication set for user: admin with authorities: [ROLE_ADMIN]
+2025-03-23T11:39:00.515+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-3] o.s.security.web.FilterChainProxy        : Secured POST /api/provider/outages
+2025-03-23T11:39:00.548+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-3] horizationManagerBeforeMethodInterceptor : Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity lk.ijse.poweralert.controller.OutageController.createOutage(lk.ijse.poweralert.dto.OutageCreateDTO); target is of class [lk.ijse.poweralert.controller.OutageController]
+2025-03-23T11:39:00.577+05:30 DEBUG 5448 --- [PowerAlert] [http-nio-8080-exec-3] horizationManagerBeforeMethodInterceptor : Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity lk.ijse.poweralert.controller.OutageController.createOutage(lk.ijse.poweralert.dto.OutageCreateDTO); target is of class [lk.ijse.poweralert.controller.OutageController]
+2025-03-23T11:39:00.581+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.OutageServiceImpl     : Creating new outage of type: WATER
+2025-03-23T11:39:00.631+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.OutageServiceImpl     : Outage created with ID: 20
+2025-03-23T11:39:00.631+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.OutageServiceImpl     : Initial outage update recorded
+2025-03-23T11:39:00.639+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.s.impl.OutageHistoryServiceImpl    : Updating outage history for outage ID: 20
+2025-03-23T11:39:00.665+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.s.impl.OutageHistoryServiceImpl    : Updated outage history for area: Colombo Central District, type: WATER, month: 4, year: 2025
+2025-03-23T11:39:00.665+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.OutageServiceImpl     : Outage history updated for new outage ID: 20
+2025-03-23T11:39:00.684+05:30 ERROR 5448 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.OutageServiceImpl     : Error sending debug notification: Invalid return type for async method (only Future and void supported): boolean
+
+java.lang.IllegalArgumentException: Invalid return type for async method (only Future and void supported): boolean
+	at org.springframework.aop.interceptor.AsyncExecutionAspectSupport.doSubmit(AsyncExecutionAspectSupport.java:301) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.interceptor.AsyncExecutionInterceptor.invoke(AsyncExecutionInterceptor.java:127) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:220) ~[spring-aop-6.1.5.jar:6.1.5]
+	at jdk.proxy4/jdk.proxy4.$Proxy173.sendEmail(Unknown Source) ~[na:na]
+	at lk.ijse.poweralert.service.impl.OutageServiceImpl.createOutage(OutageServiceImpl.java:125) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:351) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:392) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:717) ~[spring-aop-6.1.5.jar:6.1.5]
+	at lk.ijse.poweralert.service.impl.OutageServiceImpl$$SpringCGLIB$$0.createOutage(<generated>) ~[classes/:na]
+	at lk.ijse.poweralert.controller.OutageController.createOutage(OutageController.java:94) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:351) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.invoke(AuthorizationManagerBeforeMethodInterceptor.java:198) ~[spring-security-core-6.2.3.jar:6.2.3]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:717) ~[spring-aop-6.1.5.jar:6.1.5]
+	at lk.ijse.poweralert.controller.OutageController$$SpringCGLIB$$0.createOutage(<generated>) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:188) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.1.5.jar:6.1.5]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:925) ~[spring-webmvc-6.1.5.jar:6.1.5]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:830) ~[spring-webmvc-6.1.5.jar:6.1.5]
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.1.5.jar:6.1.5]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089) ~[spring-webmvc-6.1.5.jar:6.1.5]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979) ~[spring-webmvc-6.1.5.jar:6.1.5]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014) ~[spring-webmvc-6.1.5.jar:6.1.5]
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914) ~[spring-webmvc-6.1.5.jar:6.1.5]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590) ~[tomcat-embed-core-10.1.19.jar:6.0]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.1.5.jar:6.1.5]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.19.jar:6.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.19.jar:10.1.19]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:479) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:340) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:82) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:128) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:100) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:131) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:85) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at lk.ijse.poweralert.config.JwtFilter.doFilterInternal(JwtFilter.java:105) ~[classes/:na]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:323) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:224) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191) ~[spring-security-web-6.2.3.jar:6.2.3]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$3(HandlerMappingIntrospector.java:195) ~[spring-webmvc-6.1.5.jar:6.1.5]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:230) ~[spring-security-config-6.2.3.jar:6.2.3]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:352) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:268) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:109) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.1.5.jar:6.1.5]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:391) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:896) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1744) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.19.jar:10.1.19]
+	at java.base/java.lang.Thread.run(Thread.java:1570) ~[na:na]
+
+2025-03-23T11:39:00.752+05:30  INFO 5448 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.OutageServiceImpl     : Notification request submitted for outage ID: 20
+2025-03-23T11:39:00.777+05:30  INFO 5448 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Sending notifications for new outage ID: 20
+2025-03-23T11:39:00.830+05:30  INFO 5448 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Found 3 affected users for outage ID: 20
+2025-03-23T11:39:00.832+05:30 ERROR 5448 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Error processing notification for user ID: 1 for outage ID: 20: Invalid return type for async method (only Future and void supported): boolean
+
+java.lang.IllegalArgumentException: Invalid return type for async method (only Future and void supported): boolean
+	at org.springframework.aop.interceptor.AsyncExecutionAspectSupport.doSubmit(AsyncExecutionAspectSupport.java:301) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.interceptor.AsyncExecutionInterceptor.invoke(AsyncExecutionInterceptor.java:127) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:220) ~[spring-aop-6.1.5.jar:6.1.5]
+	at jdk.proxy4/jdk.proxy4.$Proxy173.sendOutageNotificationEmail(Unknown Source) ~[na:na]
+	at lk.ijse.poweralert.service.impl.NotificationServiceImpl.processUserNotification(NotificationServiceImpl.java:124) ~[classes/:na]
+	at lk.ijse.poweralert.service.impl.NotificationServiceImpl.sendOutageNotifications(NotificationServiceImpl.java:76) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:351) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:392) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.interceptor.AsyncExecutionInterceptor.lambda$invoke$0(AsyncExecutionInterceptor.java:113) ~[spring-aop-6.1.5.jar:6.1.5]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1570) ~[na:na]
+
+2025-03-23T11:39:00.835+05:30 ERROR 5448 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Error processing notification for user ID: 2 for outage ID: 20: Invalid return type for async method (only Future and void supported): boolean
+
+java.lang.IllegalArgumentException: Invalid return type for async method (only Future and void supported): boolean
+	at org.springframework.aop.interceptor.AsyncExecutionAspectSupport.doSubmit(AsyncExecutionAspectSupport.java:301) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.interceptor.AsyncExecutionInterceptor.invoke(AsyncExecutionInterceptor.java:127) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:220) ~[spring-aop-6.1.5.jar:6.1.5]
+	at jdk.proxy4/jdk.proxy4.$Proxy173.sendOutageNotificationEmail(Unknown Source) ~[na:na]
+	at lk.ijse.poweralert.service.impl.NotificationServiceImpl.processUserNotification(NotificationServiceImpl.java:124) ~[classes/:na]
+	at lk.ijse.poweralert.service.impl.NotificationServiceImpl.sendOutageNotifications(NotificationServiceImpl.java:76) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:351) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:392) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.interceptor.AsyncExecutionInterceptor.lambda$invoke$0(AsyncExecutionInterceptor.java:113) ~[spring-aop-6.1.5.jar:6.1.5]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1570) ~[na:na]
+
+2025-03-23T11:39:00.838+05:30 ERROR 5448 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Error processing notification for user ID: 4 for outage ID: 20: Invalid return type for async method (only Future and void supported): boolean
+
+java.lang.IllegalArgumentException: Invalid return type for async method (only Future and void supported): boolean
+	at org.springframework.aop.interceptor.AsyncExecutionAspectSupport.doSubmit(AsyncExecutionAspectSupport.java:301) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.interceptor.AsyncExecutionInterceptor.invoke(AsyncExecutionInterceptor.java:127) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:220) ~[spring-aop-6.1.5.jar:6.1.5]
+	at jdk.proxy4/jdk.proxy4.$Proxy173.sendOutageNotificationEmail(Unknown Source) ~[na:na]
+	at lk.ijse.poweralert.service.impl.NotificationServiceImpl.processUserNotification(NotificationServiceImpl.java:124) ~[classes/:na]
+	at lk.ijse.poweralert.service.impl.NotificationServiceImpl.sendOutageNotifications(NotificationServiceImpl.java:76) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:351) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:392) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.interceptor.AsyncExecutionInterceptor.lambda$invoke$0(AsyncExecutionInterceptor.java:113) ~[spring-aop-6.1.5.jar:6.1.5]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1570) ~[na:na]
+
+2025-03-23T11:55:54.915+05:30  INFO 5448 --- [PowerAlert] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-03-23T11:55:54.923+05:30  INFO 5448 --- [PowerAlert] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-03-23T11:55:54.971+05:30  INFO 5448 --- [PowerAlert] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-03-23T11:57:44.530+05:30  INFO 21044 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Starting PowerAlertApplication using Java 22.0.2 with PID 21044 (I:\Projects\PowerAlert\target\classes started by Chamath in I:\Projects\PowerAlert)
+2025-03-23T11:57:44.532+05:30 DEBUG 21044 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Running with Spring Boot v3.2.4, Spring v6.1.5
+2025-03-23T11:57:44.534+05:30  INFO 21044 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : No active profile set, falling back to 1 default profile: "default"
+2025-03-23T11:57:44.668+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in C:\Users\dilsh\.m2\repository\com\sun\xml\bind\jaxb-core\2.3.0.1\jaxb-core-2.3.0.1.jar referenced one or more files that do not exist: file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-core/2.3.0.1/jaxb-api.jar
+2025-03-23T11:57:44.668+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in C:\Users\dilsh\.m2\repository\com\sun\xml\bind\jaxb-impl\2.3.1\jaxb-impl-2.3.1.jar referenced one or more files that do not exist: file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-runtime-2.3.1.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/txw2-2.3.1.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/istack-commons-runtime-3.0.7.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/stax-ex-1.8.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/FastInfoset-1.2.15.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/javax.activation-api-1.2.0.jar
+2025-03-23T11:57:44.668+05:30  INFO 21044 --- [PowerAlert] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-03-23T11:57:44.670+05:30  INFO 21044 --- [PowerAlert] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-03-23T11:57:47.405+05:30  INFO 21044 --- [PowerAlert] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-03-23T11:57:47.611+05:30  INFO 21044 --- [PowerAlert] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 194 ms. Found 13 JPA repository interfaces.
+2025-03-23T11:57:49.529+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-03-23T11:57:49.545+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-03-23T11:57:49.545+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.19]
+2025-03-23T11:57:49.708+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-03-23T11:57:49.708+05:30  INFO 21044 --- [PowerAlert] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 5036 ms
+2025-03-23T11:57:50.006+05:30  INFO 21044 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-03-23T11:57:50.555+05:30  INFO 21044 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7c4d173f
+2025-03-23T11:57:50.563+05:30  INFO 21044 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-03-23T11:57:50.585+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/poweralert?createDatabaseIfNotExist=true'
+2025-03-23T11:57:50.730+05:30  INFO 21044 --- [PowerAlert] [restartedMain] lk.ijse.poweralert.util.JwtUtil          : JWT signing key initialized with new random key
+2025-03-23T11:57:51.145+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-03-23T11:57:51.235+05:30  INFO 21044 --- [PowerAlert] [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2025-03-23T11:57:51.292+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-03-23T11:57:51.662+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-03-23T11:57:51.771+05:30  WARN 21044 --- [PowerAlert] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-03-23T11:57:51.777+05:30  WARN 21044 --- [PowerAlert] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-03-23T11:57:54.077+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-03-23T11:57:54.389+05:30  INFO 21044 --- [PowerAlert] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-03-23T11:57:55.088+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-03-23T11:57:55.983+05:30 DEBUG 21044 --- [PowerAlert] [restartedMain] lk.ijse.poweralert.config.JwtFilter      : Filter 'jwtFilter' configured for use
+2025-03-23T11:57:57.476+05:30  INFO 21044 --- [PowerAlert] [restartedMain] l.i.poweralert.config.FreemarkerConfig   : Configuring FreeMarker
+2025-03-23T11:57:57.484+05:30  INFO 21044 --- [PowerAlert] [restartedMain] l.i.poweralert.config.FreemarkerConfig   : FreeMarker configured with template path: classpath:/templates/
+2025-03-23T11:57:57.970+05:30  INFO 21044 --- [PowerAlert] [restartedMain] l.i.p.s.i.PushNotificationServiceImpl    : Push notification service is disabled
+2025-03-23T11:57:58.469+05:30  INFO 21044 --- [PowerAlert] [restartedMain] l.i.p.service.impl.SmsServiceImpl        : SMS service is disabled or not fully configured
+2025-03-23T11:58:00.009+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2025-03-23T11:58:00.140+05:30  INFO 21044 --- [PowerAlert] [restartedMain] l.ijse.poweralert.config.SecurityConfig  : Configuring SecurityFilterChain
+2025-03-23T11:58:00.309+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@1854b876, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@2bb69be4, org.springframework.security.web.context.SecurityContextHolderFilter@494077d5, org.springframework.security.web.header.HeaderWriterFilter@51c6e43, org.springframework.web.filter.CorsFilter@74eb1b52, org.springframework.security.web.authentication.logout.LogoutFilter@226bfe73, lk.ijse.poweralert.config.JwtFilter@6da19be9, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@1f9397bd, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@2b05357c, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@6f75a99e, org.springframework.security.web.session.SessionManagementFilter@419a69f5, org.springframework.security.web.access.ExceptionTranslationFilter@ea7c25, org.springframework.security.web.access.intercept.AuthorizationFilter@ba0e81]
+2025-03-23T11:58:01.699+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-03-23T11:58:01.860+05:30  INFO 21044 --- [PowerAlert] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
+2025-03-23T11:58:01.888+05:30  INFO 21044 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Started PowerAlertApplication in 18.371 seconds (process running for 20.454)
+2025-03-23T11:58:27.496+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-03-23T11:58:27.496+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-03-23T11:58:27.503+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 4 ms
+2025-03-23T11:58:27.547+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Securing POST /api/provider/outages
+2025-03-23T11:58:27.572+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-2] lk.ijse.poweralert.config.JwtFilter      : Request path: /api/provider/outages
+2025-03-23T11:58:27.574+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-2] lk.ijse.poweralert.config.JwtFilter      : Authorization header: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOjEsImVtYWlsIjoiYWRtaW5AcG93ZXJhbGVydC5sayIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzQyNzEwMTA3LCJleHAiOjE3NDM3NDY5MDd9.uvYRixTw-a03FPpNqBQT0XQ2GxutQ9i7vvZdz9CvFeqxEHcqIRsN6nMd0gNtSXDeH8sji5KPXP4F3MRUdIfCIw
+2025-03-23T11:58:27.732+05:30 ERROR 21044 --- [PowerAlert] [http-nio-8080-exec-2] lk.ijse.poweralert.config.JwtFilter      : Error extracting username from token: JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.
+2025-03-23T11:58:27.740+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-2] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-23T11:58:27.802+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-2] o.s.s.w.a.Http403ForbiddenEntryPoint     : Pre-authenticated entry point called. Rejecting access
+2025-03-23T11:58:27.831+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Securing POST /error
+2025-03-23T11:58:27.835+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-2] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-23T11:58:27.837+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-2] o.s.s.w.a.Http403ForbiddenEntryPoint     : Pre-authenticated entry point called. Rejecting access
+2025-03-23T11:58:35.882+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-3] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/login
+2025-03-23T11:58:35.885+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-3] lk.ijse.poweralert.config.JwtFilter      : Request path: /api/auth/login
+2025-03-23T11:58:35.885+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-3] lk.ijse.poweralert.config.JwtFilter      : Skipping JWT validation for excluded path: /api/auth/login
+2025-03-23T11:58:35.885+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-3] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-23T11:58:35.890+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-3] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/login
+2025-03-23T11:58:36.100+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.controller.AdminController         : Login attempt for user: admin@poweralert.lk
+2025-03-23T11:58:36.821+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.s.impl.CustomUserDetailsService    : Loading user by username/email: admin@poweralert.lk
+2025-03-23T11:58:36.867+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.s.impl.CustomUserDetailsService    : User not found by username, trying email...
+2025-03-23T11:58:36.914+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.s.impl.CustomUserDetailsService    : User found with role: ADMIN
+2025-03-23T11:58:37.123+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-3] o.s.s.a.dao.DaoAuthenticationProvider    : Authenticated user
+2025-03-23T11:58:37.158+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.UserServiceImpl       : Fetching basic info for user with username: admin
+2025-03-23T11:58:37.158+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.UserServiceImpl       : Fetching user entity with username: admin
+2025-03-23T11:58:37.205+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-3] lk.ijse.poweralert.util.JwtUtil          : Generated token for user admin with role ADMIN
+2025-03-23T11:58:37.214+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.UserServiceImpl       : Updating last login time for user with email: admin@poweralert.lk
+2025-03-23T11:58:59.922+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Securing POST /api/provider/outages
+2025-03-23T11:58:59.930+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-4] lk.ijse.poweralert.config.JwtFilter      : Request path: /api/provider/outages
+2025-03-23T11:58:59.930+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-4] lk.ijse.poweralert.config.JwtFilter      : Authorization header: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOjEsImVtYWlsIjoiYWRtaW5AcG93ZXJhbGVydC5sayIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzQyNzExMzE3LCJleHAiOjE3NDM3NDgxMTd9.tyPalpjQF6RS4K8Gb6Vmb_7ePzJRzWlEB5gD3JA0JiFBq128qyxHlEjbwq6r9NvVk5Q-s8_nfphXPGFwogSfGA
+2025-03-23T11:58:59.934+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-4] lk.ijse.poweralert.config.JwtFilter      : Extracted username from token: admin
+2025-03-23T11:58:59.934+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.s.impl.CustomUserDetailsService    : Loading user by username/email: admin
+2025-03-23T11:58:59.946+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.s.impl.CustomUserDetailsService    : User found with role: ADMIN
+2025-03-23T11:58:59.955+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-4] lk.ijse.poweralert.config.JwtFilter      : Authentication set for user: admin with authorities: [ROLE_ADMIN]
+2025-03-23T11:58:59.957+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Secured POST /api/provider/outages
+2025-03-23T11:58:59.997+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-4] horizationManagerBeforeMethodInterceptor : Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity lk.ijse.poweralert.controller.OutageController.createOutage(lk.ijse.poweralert.dto.OutageCreateDTO); target is of class [lk.ijse.poweralert.controller.OutageController]
+2025-03-23T11:59:00.028+05:30 DEBUG 21044 --- [PowerAlert] [http-nio-8080-exec-4] horizationManagerBeforeMethodInterceptor : Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity lk.ijse.poweralert.controller.OutageController.createOutage(lk.ijse.poweralert.dto.OutageCreateDTO); target is of class [lk.ijse.poweralert.controller.OutageController]
+2025-03-23T11:59:00.032+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Creating new outage of type: WATER
+2025-03-23T11:59:00.077+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Outage created with ID: 21
+2025-03-23T11:59:00.083+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Initial outage update recorded
+2025-03-23T11:59:00.083+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.s.impl.OutageHistoryServiceImpl    : Updating outage history for outage ID: 21
+2025-03-23T11:59:00.106+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.s.impl.OutageHistoryServiceImpl    : Updated outage history for area: Colombo Central District, type: WATER, month: 4, year: 2025
+2025-03-23T11:59:00.106+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Outage history updated for new outage ID: 21
+2025-03-23T11:59:00.107+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Sending notifications asynchronously for outage ID: 21
+2025-03-23T11:59:00.107+05:30  INFO 21044 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Notifications sent successfully for outage ID: 21
+2025-03-23T11:59:00.107+05:30  INFO 21044 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Sending notifications for new outage ID: 21
+2025-03-23T11:59:00.136+05:30  INFO 21044 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Found 1 affected users for outage ID: 21
+2025-03-23T11:59:00.168+05:30 DEBUG 21044 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : User 2 has no notification preferences, using defaults
+2025-03-23T11:59:00.170+05:30 DEBUG 21044 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Creating notification for user ID: 2 via EMAIL
+2025-03-23T11:59:00.332+05:30  WARN 21044 --- [PowerAlert] [task-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 1406, SQLState: 22001
+2025-03-23T11:59:00.340+05:30 ERROR 21044 --- [PowerAlert] [task-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : Data truncation: Data too long for column 'content' at row 1
+2025-03-23T11:59:00.359+05:30 ERROR 21044 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Error creating notification: could not execute statement [Data truncation: Data too long for column 'content' at row 1] [insert into notifications (content,created_at,delivered_at,language,outage_id,sent_at,status,type,user_id) values (?,?,?,?,?,?,?,?,?)]; SQL [insert into notifications (content,created_at,delivered_at,language,outage_id,sent_at,status,type,user_id) values (?,?,?,?,?,?,?,?,?)]
+
+org.springframework.dao.DataIntegrityViolationException: could not execute statement [Data truncation: Data too long for column 'content' at row 1] [insert into notifications (content,created_at,delivered_at,language,outage_id,sent_at,status,type,user_id) values (?,?,?,?,?,?,?,?,?)]; SQL [insert into notifications (content,created_at,delivered_at,language,outage_id,sent_at,status,type,user_id) values (?,?,?,?,?,?,?,?,?)]
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:293) ~[spring-orm-6.1.5.jar:6.1.5]
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:241) ~[spring-orm-6.1.5.jar:6.1.5]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550) ~[spring-orm-6.1.5.jar:6.1.5]
+	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:335) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:152) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:164) ~[spring-data-jpa-3.2.4.jar:3.2.4]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:97) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:220) ~[spring-aop-6.1.5.jar:6.1.5]
+	at jdk.proxy4/jdk.proxy4.$Proxy176.save(Unknown Source) ~[na:na]
+	at lk.ijse.poweralert.service.impl.NotificationServiceImpl.createAndSendNotification(NotificationServiceImpl.java:344) ~[classes/:na]
+	at lk.ijse.poweralert.service.impl.NotificationServiceImpl.processUserNotification(NotificationServiceImpl.java:112) ~[classes/:na]
+	at lk.ijse.poweralert.service.impl.NotificationServiceImpl.sendOutageNotifications(NotificationServiceImpl.java:73) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:351) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.interceptor.AsyncExecutionInterceptor.lambda$invoke$0(AsyncExecutionInterceptor.java:113) ~[spring-aop-6.1.5.jar:6.1.5]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1570) ~[na:na]
+Caused by: org.hibernate.exception.DataException: could not execute statement [Data truncation: Data too long for column 'content' at row 1] [insert into notifications (content,created_at,delivered_at,language,outage_id,sent_at,status,type,user_id) values (?,?,?,?,?,?,?,?,?)]
+	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:55) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:58) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:108) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:197) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.id.insert.GetGeneratedKeysDelegate.performInsert(GetGeneratedKeysDelegate.java:107) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.engine.jdbc.mutation.internal.MutationExecutorPostInsertSingleTable.execute(MutationExecutorPostInsertSingleTable.java:100) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.persister.entity.mutation.InsertCoordinator.doStaticInserts(InsertCoordinator.java:175) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.persister.entity.mutation.InsertCoordinator.coordinateInsert(InsertCoordinator.java:113) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.persister.entity.AbstractEntityPersister.insert(AbstractEntityPersister.java:2868) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.action.internal.EntityIdentityInsertAction.execute(EntityIdentityInsertAction.java:81) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.engine.spi.ActionQueue.execute(ActionQueue.java:670) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.engine.spi.ActionQueue.addResolvedEntityInsertAction(ActionQueue.java:291) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.engine.spi.ActionQueue.addInsertAction(ActionQueue.java:272) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.engine.spi.ActionQueue.addAction(ActionQueue.java:322) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.AbstractSaveEventListener.addInsertAction(AbstractSaveEventListener.java:386) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSaveOrReplicate(AbstractSaveEventListener.java:300) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSave(AbstractSaveEventListener.java:219) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.AbstractSaveEventListener.saveWithGeneratedId(AbstractSaveEventListener.java:134) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.DefaultPersistEventListener.entityIsTransient(DefaultPersistEventListener.java:175) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.DefaultPersistEventListener.persist(DefaultPersistEventListener.java:93) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:77) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:54) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:127) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.internal.SessionImpl.firePersist(SessionImpl.java:754) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:738) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:319) ~[spring-orm-6.1.5.jar:6.1.5]
+	at jdk.proxy4/jdk.proxy4.$Proxy153.persist(Unknown Source) ~[na:na]
+	at org.springframework.data.jpa.repository.support.SimpleJpaRepository.save(SimpleJpaRepository.java:618) ~[spring-data-jpa-3.2.4.jar:3.2.4]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:351) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker$RepositoryFragmentMethodInvoker.lambda$new$0(RepositoryMethodInvoker.java:277) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:170) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:516) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:285) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:628) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:168) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:143) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:70) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:392) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:137) ~[spring-tx-6.1.5.jar:6.1.5]
+	... 21 common frames omitted
+Caused by: com.mysql.cj.jdbc.exceptions.MysqlDataTruncation: Data truncation: Data too long for column 'content' at row 1
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:104) ~[mysql-connector-j-8.3.0.jar:8.3.0]
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:912) ~[mysql-connector-j-8.3.0.jar:8.3.0]
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1054) ~[mysql-connector-j-8.3.0.jar:8.3.0]
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1003) ~[mysql-connector-j-8.3.0.jar:8.3.0]
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeLargeUpdate(ClientPreparedStatement.java:1312) ~[mysql-connector-j-8.3.0.jar:8.3.0]
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdate(ClientPreparedStatement.java:988) ~[mysql-connector-j-8.3.0.jar:8.3.0]
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61) ~[HikariCP-5.0.1.jar:na]
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java) ~[HikariCP-5.0.1.jar:na]
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:194) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	... 67 common frames omitted
+
+2025-03-23T12:03:03.837+05:30  INFO 21044 --- [PowerAlert] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-03-23T12:03:03.847+05:30  INFO 21044 --- [PowerAlert] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-03-23T12:03:03.873+05:30  INFO 21044 --- [PowerAlert] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-03-23T12:03:15.214+05:30  INFO 7176 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Starting PowerAlertApplication using Java 22.0.2 with PID 7176 (I:\Projects\PowerAlert\target\classes started by Chamath in I:\Projects\PowerAlert)
+2025-03-23T12:03:15.216+05:30 DEBUG 7176 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Running with Spring Boot v3.2.4, Spring v6.1.5
+2025-03-23T12:03:15.220+05:30  INFO 7176 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : No active profile set, falling back to 1 default profile: "default"
+2025-03-23T12:03:15.338+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in C:\Users\dilsh\.m2\repository\com\sun\xml\bind\jaxb-core\2.3.0.1\jaxb-core-2.3.0.1.jar referenced one or more files that do not exist: file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-core/2.3.0.1/jaxb-api.jar
+2025-03-23T12:03:15.338+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in C:\Users\dilsh\.m2\repository\com\sun\xml\bind\jaxb-impl\2.3.1\jaxb-impl-2.3.1.jar referenced one or more files that do not exist: file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-runtime-2.3.1.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/txw2-2.3.1.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/istack-commons-runtime-3.0.7.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/stax-ex-1.8.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/FastInfoset-1.2.15.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/javax.activation-api-1.2.0.jar
+2025-03-23T12:03:15.338+05:30  INFO 7176 --- [PowerAlert] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-03-23T12:03:15.338+05:30  INFO 7176 --- [PowerAlert] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-03-23T12:03:18.054+05:30  INFO 7176 --- [PowerAlert] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-03-23T12:03:18.279+05:30  INFO 7176 --- [PowerAlert] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 204 ms. Found 13 JPA repository interfaces.
+2025-03-23T12:03:20.795+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-03-23T12:03:20.833+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-03-23T12:03:20.837+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.19]
+2025-03-23T12:03:21.230+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-03-23T12:03:21.230+05:30  INFO 7176 --- [PowerAlert] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 5888 ms
+2025-03-23T12:03:21.736+05:30  INFO 7176 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-03-23T12:03:22.363+05:30  INFO 7176 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@1e4370d9
+2025-03-23T12:03:22.369+05:30  INFO 7176 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-03-23T12:03:22.385+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/poweralert?createDatabaseIfNotExist=true'
+2025-03-23T12:03:22.536+05:30  INFO 7176 --- [PowerAlert] [restartedMain] lk.ijse.poweralert.util.JwtUtil          : JWT signing key initialized with new random key
+2025-03-23T12:03:22.906+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-03-23T12:03:23.007+05:30  INFO 7176 --- [PowerAlert] [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2025-03-23T12:03:23.060+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-03-23T12:03:23.448+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-03-23T12:03:23.545+05:30  WARN 7176 --- [PowerAlert] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-03-23T12:03:23.553+05:30  WARN 7176 --- [PowerAlert] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-03-23T12:03:25.963+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-03-23T12:03:26.259+05:30  INFO 7176 --- [PowerAlert] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-03-23T12:03:26.996+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-03-23T12:03:27.874+05:30 DEBUG 7176 --- [PowerAlert] [restartedMain] lk.ijse.poweralert.config.JwtFilter      : Filter 'jwtFilter' configured for use
+2025-03-23T12:03:29.263+05:30  INFO 7176 --- [PowerAlert] [restartedMain] l.i.poweralert.config.FreemarkerConfig   : Configuring FreeMarker
+2025-03-23T12:03:29.263+05:30  INFO 7176 --- [PowerAlert] [restartedMain] l.i.poweralert.config.FreemarkerConfig   : FreeMarker configured with template path: classpath:/templates/
+2025-03-23T12:03:29.755+05:30  INFO 7176 --- [PowerAlert] [restartedMain] l.i.p.s.i.PushNotificationServiceImpl    : Push notification service is disabled
+2025-03-23T12:03:30.265+05:30  INFO 7176 --- [PowerAlert] [restartedMain] l.i.p.service.impl.SmsServiceImpl        : SMS service is disabled or not fully configured
+2025-03-23T12:03:31.817+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2025-03-23T12:03:31.905+05:30  INFO 7176 --- [PowerAlert] [restartedMain] l.ijse.poweralert.config.SecurityConfig  : Configuring SecurityFilterChain
+2025-03-23T12:03:32.038+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@7b8dab9d, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@75c30fa, org.springframework.security.web.context.SecurityContextHolderFilter@161df62d, org.springframework.security.web.header.HeaderWriterFilter@185696a8, org.springframework.web.filter.CorsFilter@3aeead67, org.springframework.security.web.authentication.logout.LogoutFilter@2932b635, lk.ijse.poweralert.config.JwtFilter@286b1b6d, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6266e36b, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@672e753b, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2882b285, org.springframework.security.web.session.SessionManagementFilter@65e66b24, org.springframework.security.web.access.ExceptionTranslationFilter@59a90bee, org.springframework.security.web.access.intercept.AuthorizationFilter@69dc2aa7]
+2025-03-23T12:03:33.529+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-03-23T12:03:33.684+05:30  INFO 7176 --- [PowerAlert] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
+2025-03-23T12:03:33.715+05:30  INFO 7176 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Started PowerAlertApplication in 19.488 seconds (process running for 21.58)
+2025-03-23T12:03:52.896+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-03-23T12:03:52.902+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-03-23T12:03:52.905+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-03-23T12:03:52.963+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing POST /api/provider/outages
+2025-03-23T12:03:52.995+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-1] lk.ijse.poweralert.config.JwtFilter      : Request path: /api/provider/outages
+2025-03-23T12:03:52.995+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-1] lk.ijse.poweralert.config.JwtFilter      : Authorization header: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOjEsImVtYWlsIjoiYWRtaW5AcG93ZXJhbGVydC5sayIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzQyNzExMzE3LCJleHAiOjE3NDM3NDgxMTd9.tyPalpjQF6RS4K8Gb6Vmb_7ePzJRzWlEB5gD3JA0JiFBq128qyxHlEjbwq6r9NvVk5Q-s8_nfphXPGFwogSfGA
+2025-03-23T12:03:53.120+05:30 ERROR 7176 --- [PowerAlert] [http-nio-8080-exec-1] lk.ijse.poweralert.config.JwtFilter      : Error extracting username from token: JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.
+2025-03-23T12:03:53.129+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-23T12:03:53.153+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-1] o.s.s.w.a.Http403ForbiddenEntryPoint     : Pre-authenticated entry point called. Rejecting access
+2025-03-23T12:03:53.180+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing POST /error
+2025-03-23T12:03:53.182+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-23T12:03:53.187+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-1] o.s.s.w.a.Http403ForbiddenEntryPoint     : Pre-authenticated entry point called. Rejecting access
+2025-03-23T12:03:58.444+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-3] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/login
+2025-03-23T12:03:58.445+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-3] lk.ijse.poweralert.config.JwtFilter      : Request path: /api/auth/login
+2025-03-23T12:03:58.445+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-3] lk.ijse.poweralert.config.JwtFilter      : Skipping JWT validation for excluded path: /api/auth/login
+2025-03-23T12:03:58.445+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-3] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-23T12:03:58.445+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-3] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/login
+2025-03-23T12:03:58.636+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.controller.AdminController         : Login attempt for user: admin@poweralert.lk
+2025-03-23T12:03:59.379+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.s.impl.CustomUserDetailsService    : Loading user by username/email: admin@poweralert.lk
+2025-03-23T12:03:59.427+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.s.impl.CustomUserDetailsService    : User not found by username, trying email...
+2025-03-23T12:03:59.493+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.s.impl.CustomUserDetailsService    : User found with role: ADMIN
+2025-03-23T12:03:59.686+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-3] o.s.s.a.dao.DaoAuthenticationProvider    : Authenticated user
+2025-03-23T12:03:59.706+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.UserServiceImpl       : Fetching basic info for user with username: admin
+2025-03-23T12:03:59.706+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.UserServiceImpl       : Fetching user entity with username: admin
+2025-03-23T12:03:59.765+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-3] lk.ijse.poweralert.util.JwtUtil          : Generated token for user admin with role ADMIN
+2025-03-23T12:03:59.765+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.UserServiceImpl       : Updating last login time for user with email: admin@poweralert.lk
+2025-03-23T12:04:18.001+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Securing POST /api/provider/outages
+2025-03-23T12:04:18.001+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-4] lk.ijse.poweralert.config.JwtFilter      : Request path: /api/provider/outages
+2025-03-23T12:04:18.001+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-4] lk.ijse.poweralert.config.JwtFilter      : Authorization header: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOjEsImVtYWlsIjoiYWRtaW5AcG93ZXJhbGVydC5sayIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzQyNzExNjM5LCJleHAiOjE3NDM3NDg0Mzl9.lMDdfKfWlRN54sy-AIrU2NkZoU8nekNpTy9iH9VpR8EEsm0fs_T6i7_KdZwJfe45G0WOFcQTNRkVcuSes4uihg
+2025-03-23T12:04:18.006+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-4] lk.ijse.poweralert.config.JwtFilter      : Extracted username from token: admin
+2025-03-23T12:04:18.009+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.s.impl.CustomUserDetailsService    : Loading user by username/email: admin
+2025-03-23T12:04:18.018+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.s.impl.CustomUserDetailsService    : User found with role: ADMIN
+2025-03-23T12:04:18.033+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-4] lk.ijse.poweralert.config.JwtFilter      : Authentication set for user: admin with authorities: [ROLE_ADMIN]
+2025-03-23T12:04:18.036+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Secured POST /api/provider/outages
+2025-03-23T12:04:18.075+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-4] horizationManagerBeforeMethodInterceptor : Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity lk.ijse.poweralert.controller.OutageController.createOutage(lk.ijse.poweralert.dto.OutageCreateDTO); target is of class [lk.ijse.poweralert.controller.OutageController]
+2025-03-23T12:04:18.099+05:30 DEBUG 7176 --- [PowerAlert] [http-nio-8080-exec-4] horizationManagerBeforeMethodInterceptor : Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity lk.ijse.poweralert.controller.OutageController.createOutage(lk.ijse.poweralert.dto.OutageCreateDTO); target is of class [lk.ijse.poweralert.controller.OutageController]
+2025-03-23T12:04:18.099+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Creating new outage of type: WATER
+2025-03-23T12:04:18.140+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Outage created with ID: 22
+2025-03-23T12:04:18.148+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Initial outage update recorded
+2025-03-23T12:04:18.148+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.s.impl.OutageHistoryServiceImpl    : Updating outage history for outage ID: 22
+2025-03-23T12:04:18.173+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.s.impl.OutageHistoryServiceImpl    : Updated outage history for area: Colombo Central District, type: WATER, month: 4, year: 2025
+2025-03-23T12:04:18.173+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Outage history updated for new outage ID: 22
+2025-03-23T12:04:18.173+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Sending notifications asynchronously for outage ID: 22
+2025-03-23T12:04:18.173+05:30  INFO 7176 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Notifications sent successfully for outage ID: 22
+2025-03-23T12:04:18.173+05:30  INFO 7176 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Sending notifications for new outage ID: 22
+2025-03-23T12:04:18.201+05:30  INFO 7176 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Found 1 affected users for outage ID: 22
+2025-03-23T12:04:18.226+05:30 DEBUG 7176 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : User 2 has no notification preferences, using defaults
+2025-03-23T12:04:18.229+05:30 DEBUG 7176 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Creating notification for user ID: 2 via EMAIL
+2025-03-23T12:04:18.323+05:30  WARN 7176 --- [PowerAlert] [task-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 1406, SQLState: 22001
+2025-03-23T12:04:18.329+05:30 ERROR 7176 --- [PowerAlert] [task-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : Data truncation: Data too long for column 'content' at row 1
+2025-03-23T12:04:18.337+05:30 ERROR 7176 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Error creating notification: could not execute statement [Data truncation: Data too long for column 'content' at row 1] [insert into notifications (content,created_at,delivered_at,language,outage_id,sent_at,status,type,user_id) values (?,?,?,?,?,?,?,?,?)]; SQL [insert into notifications (content,created_at,delivered_at,language,outage_id,sent_at,status,type,user_id) values (?,?,?,?,?,?,?,?,?)]
+
+org.springframework.dao.DataIntegrityViolationException: could not execute statement [Data truncation: Data too long for column 'content' at row 1] [insert into notifications (content,created_at,delivered_at,language,outage_id,sent_at,status,type,user_id) values (?,?,?,?,?,?,?,?,?)]; SQL [insert into notifications (content,created_at,delivered_at,language,outage_id,sent_at,status,type,user_id) values (?,?,?,?,?,?,?,?,?)]
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:293) ~[spring-orm-6.1.5.jar:6.1.5]
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:241) ~[spring-orm-6.1.5.jar:6.1.5]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550) ~[spring-orm-6.1.5.jar:6.1.5]
+	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:335) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:152) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:164) ~[spring-data-jpa-3.2.4.jar:3.2.4]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:97) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:220) ~[spring-aop-6.1.5.jar:6.1.5]
+	at jdk.proxy4/jdk.proxy4.$Proxy176.save(Unknown Source) ~[na:na]
+	at lk.ijse.poweralert.service.impl.NotificationServiceImpl.createAndSendNotification(NotificationServiceImpl.java:344) ~[classes/:na]
+	at lk.ijse.poweralert.service.impl.NotificationServiceImpl.processUserNotification(NotificationServiceImpl.java:112) ~[classes/:na]
+	at lk.ijse.poweralert.service.impl.NotificationServiceImpl.sendOutageNotifications(NotificationServiceImpl.java:73) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:351) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.interceptor.AsyncExecutionInterceptor.lambda$invoke$0(AsyncExecutionInterceptor.java:113) ~[spring-aop-6.1.5.jar:6.1.5]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1570) ~[na:na]
+Caused by: org.hibernate.exception.DataException: could not execute statement [Data truncation: Data too long for column 'content' at row 1] [insert into notifications (content,created_at,delivered_at,language,outage_id,sent_at,status,type,user_id) values (?,?,?,?,?,?,?,?,?)]
+	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:55) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:58) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:108) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:197) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.id.insert.GetGeneratedKeysDelegate.performInsert(GetGeneratedKeysDelegate.java:107) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.engine.jdbc.mutation.internal.MutationExecutorPostInsertSingleTable.execute(MutationExecutorPostInsertSingleTable.java:100) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.persister.entity.mutation.InsertCoordinator.doStaticInserts(InsertCoordinator.java:175) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.persister.entity.mutation.InsertCoordinator.coordinateInsert(InsertCoordinator.java:113) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.persister.entity.AbstractEntityPersister.insert(AbstractEntityPersister.java:2868) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.action.internal.EntityIdentityInsertAction.execute(EntityIdentityInsertAction.java:81) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.engine.spi.ActionQueue.execute(ActionQueue.java:670) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.engine.spi.ActionQueue.addResolvedEntityInsertAction(ActionQueue.java:291) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.engine.spi.ActionQueue.addInsertAction(ActionQueue.java:272) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.engine.spi.ActionQueue.addAction(ActionQueue.java:322) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.AbstractSaveEventListener.addInsertAction(AbstractSaveEventListener.java:386) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSaveOrReplicate(AbstractSaveEventListener.java:300) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSave(AbstractSaveEventListener.java:219) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.AbstractSaveEventListener.saveWithGeneratedId(AbstractSaveEventListener.java:134) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.DefaultPersistEventListener.entityIsTransient(DefaultPersistEventListener.java:175) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.DefaultPersistEventListener.persist(DefaultPersistEventListener.java:93) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:77) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:54) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:127) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.internal.SessionImpl.firePersist(SessionImpl.java:754) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:738) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:319) ~[spring-orm-6.1.5.jar:6.1.5]
+	at jdk.proxy4/jdk.proxy4.$Proxy153.persist(Unknown Source) ~[na:na]
+	at org.springframework.data.jpa.repository.support.SimpleJpaRepository.save(SimpleJpaRepository.java:618) ~[spring-data-jpa-3.2.4.jar:3.2.4]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:351) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker$RepositoryFragmentMethodInvoker.lambda$new$0(RepositoryMethodInvoker.java:277) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:170) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:516) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:285) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:628) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:168) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:143) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:70) ~[spring-data-commons-3.2.4.jar:3.2.4]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:392) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:137) ~[spring-tx-6.1.5.jar:6.1.5]
+	... 21 common frames omitted
+Caused by: com.mysql.cj.jdbc.exceptions.MysqlDataTruncation: Data truncation: Data too long for column 'content' at row 1
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:104) ~[mysql-connector-j-8.3.0.jar:8.3.0]
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:912) ~[mysql-connector-j-8.3.0.jar:8.3.0]
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1054) ~[mysql-connector-j-8.3.0.jar:8.3.0]
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1003) ~[mysql-connector-j-8.3.0.jar:8.3.0]
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeLargeUpdate(ClientPreparedStatement.java:1312) ~[mysql-connector-j-8.3.0.jar:8.3.0]
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdate(ClientPreparedStatement.java:988) ~[mysql-connector-j-8.3.0.jar:8.3.0]
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61) ~[HikariCP-5.0.1.jar:na]
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java) ~[HikariCP-5.0.1.jar:na]
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:194) ~[hibernate-core-6.4.4.Final.jar:6.4.4.Final]
+	... 67 common frames omitted
+
+2025-03-23T12:10:25.757+05:30  INFO 7176 --- [PowerAlert] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-03-23T12:10:25.769+05:30  INFO 7176 --- [PowerAlert] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-03-23T12:10:25.789+05:30  INFO 7176 --- [PowerAlert] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-03-23T12:10:31.966+05:30  INFO 18656 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Starting PowerAlertApplication using Java 22.0.2 with PID 18656 (I:\Projects\PowerAlert\target\classes started by Chamath in I:\Projects\PowerAlert)
+2025-03-23T12:10:31.970+05:30 DEBUG 18656 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Running with Spring Boot v3.2.4, Spring v6.1.5
+2025-03-23T12:10:31.971+05:30  INFO 18656 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : No active profile set, falling back to 1 default profile: "default"
+2025-03-23T12:10:32.121+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in C:\Users\dilsh\.m2\repository\com\sun\xml\bind\jaxb-core\2.3.0.1\jaxb-core-2.3.0.1.jar referenced one or more files that do not exist: file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-core/2.3.0.1/jaxb-api.jar
+2025-03-23T12:10:32.121+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in C:\Users\dilsh\.m2\repository\com\sun\xml\bind\jaxb-impl\2.3.1\jaxb-impl-2.3.1.jar referenced one or more files that do not exist: file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-runtime-2.3.1.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/txw2-2.3.1.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/istack-commons-runtime-3.0.7.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/stax-ex-1.8.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/FastInfoset-1.2.15.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/javax.activation-api-1.2.0.jar
+2025-03-23T12:10:32.121+05:30  INFO 18656 --- [PowerAlert] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-03-23T12:10:32.123+05:30  INFO 18656 --- [PowerAlert] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-03-23T12:10:34.851+05:30  INFO 18656 --- [PowerAlert] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-03-23T12:10:35.056+05:30  INFO 18656 --- [PowerAlert] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 196 ms. Found 13 JPA repository interfaces.
+2025-03-23T12:10:36.981+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-03-23T12:10:36.998+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-03-23T12:10:36.998+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.19]
+2025-03-23T12:10:37.147+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-03-23T12:10:37.147+05:30  INFO 18656 --- [PowerAlert] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 5022 ms
+2025-03-23T12:10:37.451+05:30  INFO 18656 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-03-23T12:10:38.013+05:30  INFO 18656 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3f42d799
+2025-03-23T12:10:38.018+05:30  INFO 18656 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-03-23T12:10:38.026+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/poweralert?createDatabaseIfNotExist=true'
+2025-03-23T12:10:38.167+05:30  INFO 18656 --- [PowerAlert] [restartedMain] lk.ijse.poweralert.util.JwtUtil          : JWT signing key initialized with new random key
+2025-03-23T12:10:38.532+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-03-23T12:10:38.624+05:30  INFO 18656 --- [PowerAlert] [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2025-03-23T12:10:38.680+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-03-23T12:10:39.080+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-03-23T12:10:39.186+05:30  WARN 18656 --- [PowerAlert] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-03-23T12:10:39.190+05:30  WARN 18656 --- [PowerAlert] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-03-23T12:10:41.490+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-03-23T12:10:41.777+05:30  INFO 18656 --- [PowerAlert] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-03-23T12:10:42.581+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-03-23T12:10:43.475+05:30 DEBUG 18656 --- [PowerAlert] [restartedMain] lk.ijse.poweralert.config.JwtFilter      : Filter 'jwtFilter' configured for use
+2025-03-23T12:10:44.908+05:30  INFO 18656 --- [PowerAlert] [restartedMain] l.i.poweralert.config.FreemarkerConfig   : Configuring FreeMarker
+2025-03-23T12:10:44.908+05:30  INFO 18656 --- [PowerAlert] [restartedMain] l.i.poweralert.config.FreemarkerConfig   : FreeMarker configured with template path: classpath:/templates/
+2025-03-23T12:10:45.408+05:30  INFO 18656 --- [PowerAlert] [restartedMain] l.i.p.s.i.PushNotificationServiceImpl    : Push notification service is disabled
+2025-03-23T12:10:45.941+05:30  INFO 18656 --- [PowerAlert] [restartedMain] l.i.p.service.impl.SmsServiceImpl        : SMS service is disabled or not fully configured
+2025-03-23T12:10:47.503+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2025-03-23T12:10:47.643+05:30  INFO 18656 --- [PowerAlert] [restartedMain] l.ijse.poweralert.config.SecurityConfig  : Configuring SecurityFilterChain
+2025-03-23T12:10:47.814+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@46d1f533, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@5f84cf5, org.springframework.security.web.context.SecurityContextHolderFilter@2ea2166c, org.springframework.security.web.header.HeaderWriterFilter@3b539567, org.springframework.web.filter.CorsFilter@28d99e7e, org.springframework.security.web.authentication.logout.LogoutFilter@2ba2f820, lk.ijse.poweralert.config.JwtFilter@64924d4a, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@3b3309fa, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@7fc66349, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@3394c1b9, org.springframework.security.web.session.SessionManagementFilter@1d5de3df, org.springframework.security.web.access.ExceptionTranslationFilter@7b28fb08, org.springframework.security.web.access.intercept.AuthorizationFilter@226bfe73]
+2025-03-23T12:10:49.327+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-03-23T12:10:49.515+05:30  INFO 18656 --- [PowerAlert] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
+2025-03-23T12:10:49.548+05:30  INFO 18656 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Started PowerAlertApplication in 18.689 seconds (process running for 20.749)
+2025-03-23T12:10:57.408+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-03-23T12:10:57.408+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-03-23T12:10:57.408+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2025-03-23T12:10:57.456+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/login
+2025-03-23T12:10:57.472+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-1] lk.ijse.poweralert.config.JwtFilter      : Request path: /api/auth/login
+2025-03-23T12:10:57.472+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-1] lk.ijse.poweralert.config.JwtFilter      : Skipping JWT validation for excluded path: /api/auth/login
+2025-03-23T12:10:57.481+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-23T12:10:57.496+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/login
+2025-03-23T12:10:57.786+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-1] l.i.p.controller.AdminController         : Login attempt for user: admin@poweralert.lk
+2025-03-23T12:10:58.477+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-1] l.i.p.s.impl.CustomUserDetailsService    : Loading user by username/email: admin@poweralert.lk
+2025-03-23T12:10:58.537+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-1] l.i.p.s.impl.CustomUserDetailsService    : User not found by username, trying email...
+2025-03-23T12:10:58.583+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-1] l.i.p.s.impl.CustomUserDetailsService    : User found with role: ADMIN
+2025-03-23T12:10:58.780+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-1] o.s.s.a.dao.DaoAuthenticationProvider    : Authenticated user
+2025-03-23T12:10:58.804+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-1] l.i.p.service.impl.UserServiceImpl       : Fetching basic info for user with username: admin
+2025-03-23T12:10:58.804+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-1] l.i.p.service.impl.UserServiceImpl       : Fetching user entity with username: admin
+2025-03-23T12:10:58.891+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-1] lk.ijse.poweralert.util.JwtUtil          : Generated token for user admin with role ADMIN
+2025-03-23T12:10:58.891+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-1] l.i.p.service.impl.UserServiceImpl       : Updating last login time for user with email: admin@poweralert.lk
+2025-03-23T12:11:22.191+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-3] o.s.security.web.FilterChainProxy        : Securing POST /api/provider/outages
+2025-03-23T12:11:22.193+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-3] lk.ijse.poweralert.config.JwtFilter      : Request path: /api/provider/outages
+2025-03-23T12:11:22.193+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-3] lk.ijse.poweralert.config.JwtFilter      : Authorization header: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOjEsImVtYWlsIjoiYWRtaW5AcG93ZXJhbGVydC5sayIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzQyNzEyMDU4LCJleHAiOjE3NDM3NDg4NTh9.F7gvgh593ThyCL__JsqUdoqelw7bM93QGdZ4rihToy7XpV5G48agSgFCWJlmsq1C2aL9-8InnEvoVuxBVF0OMg
+2025-03-23T12:11:22.244+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-3] lk.ijse.poweralert.config.JwtFilter      : Extracted username from token: admin
+2025-03-23T12:11:22.244+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.s.impl.CustomUserDetailsService    : Loading user by username/email: admin
+2025-03-23T12:11:22.252+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.s.impl.CustomUserDetailsService    : User found with role: ADMIN
+2025-03-23T12:11:22.260+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-3] lk.ijse.poweralert.config.JwtFilter      : Authentication set for user: admin with authorities: [ROLE_ADMIN]
+2025-03-23T12:11:22.268+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-3] o.s.security.web.FilterChainProxy        : Secured POST /api/provider/outages
+2025-03-23T12:11:22.308+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-3] horizationManagerBeforeMethodInterceptor : Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity lk.ijse.poweralert.controller.OutageController.createOutage(lk.ijse.poweralert.dto.OutageCreateDTO); target is of class [lk.ijse.poweralert.controller.OutageController]
+2025-03-23T12:11:22.326+05:30 DEBUG 18656 --- [PowerAlert] [http-nio-8080-exec-3] horizationManagerBeforeMethodInterceptor : Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity lk.ijse.poweralert.controller.OutageController.createOutage(lk.ijse.poweralert.dto.OutageCreateDTO); target is of class [lk.ijse.poweralert.controller.OutageController]
+2025-03-23T12:11:22.326+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.OutageServiceImpl     : Creating new outage of type: WATER
+2025-03-23T12:11:22.378+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.OutageServiceImpl     : Outage created with ID: 23
+2025-03-23T12:11:22.383+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.OutageServiceImpl     : Initial outage update recorded
+2025-03-23T12:11:22.383+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.s.impl.OutageHistoryServiceImpl    : Updating outage history for outage ID: 23
+2025-03-23T12:11:22.408+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.s.impl.OutageHistoryServiceImpl    : Updated outage history for area: Colombo Central District, type: WATER, month: 4, year: 2025
+2025-03-23T12:11:22.408+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.OutageServiceImpl     : Outage history updated for new outage ID: 23
+2025-03-23T12:11:22.408+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.OutageServiceImpl     : Sending notifications asynchronously for outage ID: 23
+2025-03-23T12:11:22.412+05:30  INFO 18656 --- [PowerAlert] [http-nio-8080-exec-3] l.i.p.service.impl.OutageServiceImpl     : Notifications sent successfully for outage ID: 23
+2025-03-23T12:11:22.412+05:30  INFO 18656 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Sending notifications for new outage ID: 23
+2025-03-23T12:11:22.439+05:30  INFO 18656 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Found 1 affected users for outage ID: 23
+2025-03-23T12:11:22.461+05:30 DEBUG 18656 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : User 2 has no notification preferences, using defaults
+2025-03-23T12:11:22.464+05:30 DEBUG 18656 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Creating notification for user ID: 2 via EMAIL
+2025-03-23T12:11:22.525+05:30  WARN 18656 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Could not get email subject from resource bundle, using fallback: Can't find resource for bundle java.util.PropertyResourceBundle, key outage.email.subject
+2025-03-23T12:11:22.527+05:30 ERROR 18656 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Error sending notification: Invalid return type for async method (only Future and void supported): boolean
+
+java.lang.IllegalArgumentException: Invalid return type for async method (only Future and void supported): boolean
+	at org.springframework.aop.interceptor.AsyncExecutionAspectSupport.doSubmit(AsyncExecutionAspectSupport.java:301) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.interceptor.AsyncExecutionInterceptor.invoke(AsyncExecutionInterceptor.java:127) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:220) ~[spring-aop-6.1.5.jar:6.1.5]
+	at jdk.proxy4/jdk.proxy4.$Proxy174.sendEmail(Unknown Source) ~[na:na]
+	at lk.ijse.poweralert.service.impl.NotificationServiceImpl.createAndSendNotification(NotificationServiceImpl.java:352) ~[classes/:na]
+	at lk.ijse.poweralert.service.impl.NotificationServiceImpl.processUserNotification(NotificationServiceImpl.java:112) ~[classes/:na]
+	at lk.ijse.poweralert.service.impl.NotificationServiceImpl.sendOutageNotifications(NotificationServiceImpl.java:73) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:351) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765) ~[spring-aop-6.1.5.jar:6.1.5]
+	at org.springframework.aop.interceptor.AsyncExecutionInterceptor.lambda$invoke$0(AsyncExecutionInterceptor.java:113) ~[spring-aop-6.1.5.jar:6.1.5]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1570) ~[na:na]
+
+2025-03-23T12:24:10.986+05:30  INFO 18656 --- [PowerAlert] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-03-23T12:24:11.023+05:30  INFO 18656 --- [PowerAlert] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-03-23T12:24:11.078+05:30  INFO 18656 --- [PowerAlert] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-03-23T12:35:12.231+05:30  INFO 15828 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Starting PowerAlertApplication using Java 22.0.2 with PID 15828 (I:\Projects\PowerAlert\target\classes started by Chamath in I:\Projects\PowerAlert)
+2025-03-23T12:35:12.233+05:30 DEBUG 15828 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Running with Spring Boot v3.2.4, Spring v6.1.5
+2025-03-23T12:35:12.235+05:30  INFO 15828 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : No active profile set, falling back to 1 default profile: "default"
+2025-03-23T12:35:12.319+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in C:\Users\dilsh\.m2\repository\com\sun\xml\bind\jaxb-core\2.3.0.1\jaxb-core-2.3.0.1.jar referenced one or more files that do not exist: file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-core/2.3.0.1/jaxb-api.jar
+2025-03-23T12:35:12.320+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in C:\Users\dilsh\.m2\repository\com\sun\xml\bind\jaxb-impl\2.3.1\jaxb-impl-2.3.1.jar referenced one or more files that do not exist: file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-runtime-2.3.1.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/txw2-2.3.1.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/istack-commons-runtime-3.0.7.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/stax-ex-1.8.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/FastInfoset-1.2.15.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/javax.activation-api-1.2.0.jar
+2025-03-23T12:35:12.320+05:30  INFO 15828 --- [PowerAlert] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-03-23T12:35:12.320+05:30  INFO 15828 --- [PowerAlert] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-03-23T12:35:14.177+05:30  INFO 15828 --- [PowerAlert] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-03-23T12:35:14.290+05:30  INFO 15828 --- [PowerAlert] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 106 ms. Found 13 JPA repository interfaces.
+2025-03-23T12:35:15.394+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-03-23T12:35:15.407+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-03-23T12:35:15.408+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.19]
+2025-03-23T12:35:15.475+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-03-23T12:35:15.476+05:30  INFO 15828 --- [PowerAlert] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3155 ms
+2025-03-23T12:35:15.664+05:30  INFO 15828 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-03-23T12:35:15.953+05:30  INFO 15828 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@51258a72
+2025-03-23T12:35:15.955+05:30  INFO 15828 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-03-23T12:35:15.963+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/poweralert?createDatabaseIfNotExist=true'
+2025-03-23T12:35:16.040+05:30  INFO 15828 --- [PowerAlert] [restartedMain] lk.ijse.poweralert.util.JwtUtil          : JWT signing key initialized with new random key
+2025-03-23T12:35:16.262+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-03-23T12:35:16.326+05:30  INFO 15828 --- [PowerAlert] [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2025-03-23T12:35:16.364+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-03-23T12:35:16.566+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-03-23T12:35:16.625+05:30  WARN 15828 --- [PowerAlert] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-03-23T12:35:16.626+05:30  WARN 15828 --- [PowerAlert] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-03-23T12:35:17.878+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-03-23T12:35:18.041+05:30  INFO 15828 --- [PowerAlert] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-03-23T12:35:18.429+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-03-23T12:35:18.874+05:30 DEBUG 15828 --- [PowerAlert] [restartedMain] lk.ijse.poweralert.config.JwtFilter      : Filter 'jwtFilter' configured for use
+2025-03-23T12:35:19.610+05:30  INFO 15828 --- [PowerAlert] [restartedMain] l.i.poweralert.config.FreemarkerConfig   : Configuring FreeMarker
+2025-03-23T12:35:19.611+05:30  INFO 15828 --- [PowerAlert] [restartedMain] l.i.poweralert.config.FreemarkerConfig   : FreeMarker configured with template path: classpath:/templates/
+2025-03-23T12:35:19.864+05:30  INFO 15828 --- [PowerAlert] [restartedMain] l.i.p.s.i.PushNotificationServiceImpl    : Push notification service is disabled
+2025-03-23T12:35:20.127+05:30  INFO 15828 --- [PowerAlert] [restartedMain] l.i.p.service.impl.SmsServiceImpl        : SMS service is disabled or not fully configured
+2025-03-23T12:35:20.995+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2025-03-23T12:35:21.043+05:30  INFO 15828 --- [PowerAlert] [restartedMain] l.ijse.poweralert.config.SecurityConfig  : Configuring SecurityFilterChain
+2025-03-23T12:35:21.109+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@1b33c2be, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@6266e36b, org.springframework.security.web.context.SecurityContextHolderFilter@1510794b, org.springframework.security.web.header.HeaderWriterFilter@706e243, org.springframework.web.filter.CorsFilter@2f39eadf, org.springframework.security.web.authentication.logout.LogoutFilter@6fc12f83, lk.ijse.poweralert.config.JwtFilter@2a077c70, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@10c0cd1c, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@49b035f5, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2d594340, org.springframework.security.web.session.SessionManagementFilter@539da333, org.springframework.security.web.access.ExceptionTranslationFilter@51f0e192, org.springframework.security.web.access.intercept.AuthorizationFilter@5f8bb527]
+2025-03-23T12:35:21.914+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-03-23T12:35:22.014+05:30  INFO 15828 --- [PowerAlert] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
+2025-03-23T12:35:22.032+05:30  INFO 15828 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Started PowerAlertApplication in 10.537 seconds (process running for 12.171)
+2025-03-23T12:35:22.964+05:30  INFO 15828 --- [PowerAlert] [RMI TCP Connection(2)-192.168.1.26] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-03-23T12:35:22.970+05:30  INFO 15828 --- [PowerAlert] [RMI TCP Connection(2)-192.168.1.26] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-03-23T12:35:22.973+05:30  INFO 15828 --- [PowerAlert] [RMI TCP Connection(2)-192.168.1.26] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2025-03-23T12:35:35.789+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing POST /api/provider/outages
+2025-03-23T12:35:35.802+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-1] lk.ijse.poweralert.config.JwtFilter      : Request path: /api/provider/outages
+2025-03-23T12:35:35.802+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-1] lk.ijse.poweralert.config.JwtFilter      : Authorization header: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOjEsImVtYWlsIjoiYWRtaW5AcG93ZXJhbGVydC5sayIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzQyNzEyMDU4LCJleHAiOjE3NDM3NDg4NTh9.F7gvgh593ThyCL__JsqUdoqelw7bM93QGdZ4rihToy7XpV5G48agSgFCWJlmsq1C2aL9-8InnEvoVuxBVF0OMg
+2025-03-23T12:35:35.846+05:30 ERROR 15828 --- [PowerAlert] [http-nio-8080-exec-1] lk.ijse.poweralert.config.JwtFilter      : Error extracting username from token: JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.
+2025-03-23T12:35:35.849+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-23T12:35:35.863+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-1] o.s.s.w.a.Http403ForbiddenEntryPoint     : Pre-authenticated entry point called. Rejecting access
+2025-03-23T12:35:35.872+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing POST /error
+2025-03-23T12:35:35.874+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-23T12:35:35.875+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-1] o.s.s.w.a.Http403ForbiddenEntryPoint     : Pre-authenticated entry point called. Rejecting access
+2025-03-23T12:35:45.199+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/login
+2025-03-23T12:35:45.201+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-2] lk.ijse.poweralert.config.JwtFilter      : Request path: /api/auth/login
+2025-03-23T12:35:45.201+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-2] lk.ijse.poweralert.config.JwtFilter      : Skipping JWT validation for excluded path: /api/auth/login
+2025-03-23T12:35:45.202+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-2] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-23T12:35:45.205+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/login
+2025-03-23T12:35:45.288+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-2] l.i.p.controller.AdminController         : Login attempt for user: admin@poweralert.lk
+2025-03-23T12:35:45.617+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-2] l.i.p.s.impl.CustomUserDetailsService    : Loading user by username/email: admin@poweralert.lk
+2025-03-23T12:35:45.639+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-2] l.i.p.s.impl.CustomUserDetailsService    : User not found by username, trying email...
+2025-03-23T12:35:45.671+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-2] l.i.p.s.impl.CustomUserDetailsService    : User found with role: ADMIN
+2025-03-23T12:35:45.757+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-2] o.s.s.a.dao.DaoAuthenticationProvider    : Authenticated user
+2025-03-23T12:35:45.766+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-2] l.i.p.service.impl.UserServiceImpl       : Fetching basic info for user with username: admin
+2025-03-23T12:35:45.767+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-2] l.i.p.service.impl.UserServiceImpl       : Fetching user entity with username: admin
+2025-03-23T12:35:45.786+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-2] lk.ijse.poweralert.util.JwtUtil          : Generated token for user admin with role ADMIN
+2025-03-23T12:35:45.787+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-2] l.i.p.service.impl.UserServiceImpl       : Updating last login time for user with email: admin@poweralert.lk
+2025-03-23T12:36:00.134+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Securing POST /api/provider/outages
+2025-03-23T12:36:00.135+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-4] lk.ijse.poweralert.config.JwtFilter      : Request path: /api/provider/outages
+2025-03-23T12:36:00.136+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-4] lk.ijse.poweralert.config.JwtFilter      : Authorization header: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOjEsImVtYWlsIjoiYWRtaW5AcG93ZXJhbGVydC5sayIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzQyNzEzNTQ1LCJleHAiOjE3NDM3NTAzNDV9.74zHc2xn1H-TMEEdBMHeIXfGD5edKoJKF5BDcBO-b5QZExhLBp3jZEMr-Nwofq22C91aIKz_sW8jbFDloEahUA
+2025-03-23T12:36:00.140+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-4] lk.ijse.poweralert.config.JwtFilter      : Extracted username from token: admin
+2025-03-23T12:36:00.141+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.s.impl.CustomUserDetailsService    : Loading user by username/email: admin
+2025-03-23T12:36:00.148+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.s.impl.CustomUserDetailsService    : User found with role: ADMIN
+2025-03-23T12:36:00.152+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-4] lk.ijse.poweralert.config.JwtFilter      : Authentication set for user: admin with authorities: [ROLE_ADMIN]
+2025-03-23T12:36:00.153+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Secured POST /api/provider/outages
+2025-03-23T12:36:00.177+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-4] horizationManagerBeforeMethodInterceptor : Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity lk.ijse.poweralert.controller.OutageController.createOutage(lk.ijse.poweralert.dto.OutageCreateDTO); target is of class [lk.ijse.poweralert.controller.OutageController]
+2025-03-23T12:36:00.188+05:30 DEBUG 15828 --- [PowerAlert] [http-nio-8080-exec-4] horizationManagerBeforeMethodInterceptor : Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity lk.ijse.poweralert.controller.OutageController.createOutage(lk.ijse.poweralert.dto.OutageCreateDTO); target is of class [lk.ijse.poweralert.controller.OutageController]
+2025-03-23T12:36:00.189+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Creating new outage of type: WATER
+2025-03-23T12:36:00.218+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Outage created with ID: 24
+2025-03-23T12:36:00.222+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Initial outage update recorded
+2025-03-23T12:36:00.223+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.s.impl.OutageHistoryServiceImpl    : Updating outage history for outage ID: 24
+2025-03-23T12:36:00.241+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.s.impl.OutageHistoryServiceImpl    : Updated outage history for area: Colombo Central District, type: WATER, month: 4, year: 2025
+2025-03-23T12:36:00.242+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Outage history updated for new outage ID: 24
+2025-03-23T12:36:00.242+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Sending notifications asynchronously for outage ID: 24
+2025-03-23T12:36:00.246+05:30  INFO 15828 --- [PowerAlert] [http-nio-8080-exec-4] l.i.p.service.impl.OutageServiceImpl     : Notifications sent successfully for outage ID: 24
+2025-03-23T12:36:00.246+05:30  INFO 15828 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Sending notifications for new outage ID: 24
+2025-03-23T12:36:00.260+05:30  INFO 15828 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Found 1 affected users for outage ID: 24
+2025-03-23T12:36:00.275+05:30 DEBUG 15828 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : User 2 has no notification preferences, using defaults
+2025-03-23T12:36:00.277+05:30 DEBUG 15828 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Creating notification for user ID: 2 via EMAIL
+2025-03-23T12:36:00.318+05:30  WARN 15828 --- [PowerAlert] [task-1] l.i.p.s.impl.NotificationServiceImpl     : Could not get email subject from resource bundle, using fallback: Can't find resource for bundle java.util.PropertyResourceBundle, key outage.email.subject
+2025-03-23T12:36:00.329+05:30  INFO 15828 --- [PowerAlert] [task-2] l.i.p.service.impl.EmailServiceImpl      : Sending email to: dilshancolonne123@gmail.com, subject: WATER Outage Alert - Colombo Central District
+2025-03-23T12:36:00.343+05:30 DEBUG 15828 --- [PowerAlert] [task-2] l.i.p.service.impl.EmailServiceImpl      : From email: alerts.poweralert@gmail.com
+2025-03-23T12:36:00.444+05:30 DEBUG 15828 --- [PowerAlert] [task-2] l.i.p.service.impl.EmailServiceImpl      : Email content preview: {0} outage scheduled in {1} from {2} to {3}. Reason: {4}
+2025-03-23T12:36:05.831+05:30  INFO 15828 --- [PowerAlert] [task-2] l.i.p.service.impl.EmailServiceImpl      : Email sent successfully to: dilshancolonne123@gmail.com
+2025-03-23T12:42:46.858+05:30  INFO 15828 --- [PowerAlert] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-03-23T12:42:46.865+05:30  INFO 15828 --- [PowerAlert] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-03-23T12:42:46.905+05:30  INFO 15828 --- [PowerAlert] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-03-23T12:42:53.510+05:30  INFO 13056 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Starting PowerAlertApplication using Java 22.0.2 with PID 13056 (I:\Projects\PowerAlert\target\classes started by Chamath in I:\Projects\PowerAlert)
+2025-03-23T12:42:53.512+05:30 DEBUG 13056 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Running with Spring Boot v3.2.4, Spring v6.1.5
+2025-03-23T12:42:53.513+05:30  INFO 13056 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : No active profile set, falling back to 1 default profile: "default"
+2025-03-23T12:42:53.587+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in C:\Users\dilsh\.m2\repository\com\sun\xml\bind\jaxb-core\2.3.0.1\jaxb-core-2.3.0.1.jar referenced one or more files that do not exist: file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-core/2.3.0.1/jaxb-api.jar
+2025-03-23T12:42:53.587+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in C:\Users\dilsh\.m2\repository\com\sun\xml\bind\jaxb-impl\2.3.1\jaxb-impl-2.3.1.jar referenced one or more files that do not exist: file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-runtime-2.3.1.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/txw2-2.3.1.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/istack-commons-runtime-3.0.7.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/stax-ex-1.8.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/FastInfoset-1.2.15.jar,file:/C:/Users/dilsh/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/javax.activation-api-1.2.0.jar
+2025-03-23T12:42:53.588+05:30  INFO 13056 --- [PowerAlert] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-03-23T12:42:53.588+05:30  INFO 13056 --- [PowerAlert] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-03-23T12:42:55.117+05:30  INFO 13056 --- [PowerAlert] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-03-23T12:42:55.232+05:30  INFO 13056 --- [PowerAlert] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 108 ms. Found 13 JPA repository interfaces.
+2025-03-23T12:42:56.281+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-03-23T12:42:56.292+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-03-23T12:42:56.293+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.19]
+2025-03-23T12:42:56.362+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-03-23T12:42:56.362+05:30  INFO 13056 --- [PowerAlert] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2773 ms
+2025-03-23T12:42:56.558+05:30  INFO 13056 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-03-23T12:42:56.859+05:30  INFO 13056 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@741fcead
+2025-03-23T12:42:56.861+05:30  INFO 13056 --- [PowerAlert] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-03-23T12:42:56.870+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/poweralert?createDatabaseIfNotExist=true'
+2025-03-23T12:42:56.942+05:30  INFO 13056 --- [PowerAlert] [restartedMain] lk.ijse.poweralert.util.JwtUtil          : JWT signing key initialized with new random key
+2025-03-23T12:42:57.123+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-03-23T12:42:57.184+05:30  INFO 13056 --- [PowerAlert] [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2025-03-23T12:42:57.221+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-03-23T12:42:57.439+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-03-23T12:42:57.501+05:30  WARN 13056 --- [PowerAlert] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-03-23T12:42:57.502+05:30  WARN 13056 --- [PowerAlert] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-03-23T12:42:58.727+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-03-23T12:42:58.891+05:30  INFO 13056 --- [PowerAlert] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-03-23T12:42:59.285+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-03-23T12:42:59.734+05:30 DEBUG 13056 --- [PowerAlert] [restartedMain] lk.ijse.poweralert.config.JwtFilter      : Filter 'jwtFilter' configured for use
+2025-03-23T12:43:00.517+05:30  INFO 13056 --- [PowerAlert] [restartedMain] l.i.poweralert.config.FreemarkerConfig   : Configuring FreeMarker
+2025-03-23T12:43:00.518+05:30  INFO 13056 --- [PowerAlert] [restartedMain] l.i.poweralert.config.FreemarkerConfig   : FreeMarker configured with template path: classpath:/templates/
+2025-03-23T12:43:01.100+05:30  INFO 13056 --- [PowerAlert] [restartedMain] l.i.p.s.i.PushNotificationServiceImpl    : Push notification service is disabled
+2025-03-23T12:43:01.468+05:30  INFO 13056 --- [PowerAlert] [restartedMain] l.i.p.service.impl.SmsServiceImpl        : SMS service is disabled or not fully configured
+2025-03-23T12:43:02.521+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2025-03-23T12:43:02.577+05:30  INFO 13056 --- [PowerAlert] [restartedMain] l.ijse.poweralert.config.SecurityConfig  : Configuring SecurityFilterChain
+2025-03-23T12:43:02.661+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@77f1531f, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@18daa800, org.springframework.security.web.context.SecurityContextHolderFilter@4dbf7c30, org.springframework.security.web.header.HeaderWriterFilter@1fac6b51, org.springframework.web.filter.CorsFilter@97b64ac, org.springframework.security.web.authentication.logout.LogoutFilter@4c58bd50, lk.ijse.poweralert.config.JwtFilter@56302d40, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6bc26b98, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@67564e0e, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@10c6b2be, org.springframework.security.web.session.SessionManagementFilter@1f508e21, org.springframework.security.web.access.ExceptionTranslationFilter@38119044, org.springframework.security.web.access.intercept.AuthorizationFilter@91278ee]
+2025-03-23T12:43:03.550+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-03-23T12:43:03.640+05:30  INFO 13056 --- [PowerAlert] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
+2025-03-23T12:43:03.655+05:30  INFO 13056 --- [PowerAlert] [restartedMain] l.ijse.poweralert.PowerAlertApplication  : Started PowerAlertApplication in 10.706 seconds (process running for 11.849)
+2025-03-23T12:43:05.950+05:30  INFO 13056 --- [PowerAlert] [RMI TCP Connection(3)-192.168.1.26] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-03-23T12:43:05.953+05:30  INFO 13056 --- [PowerAlert] [RMI TCP Connection(3)-192.168.1.26] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-03-23T12:43:05.958+05:30  INFO 13056 --- [PowerAlert] [RMI TCP Connection(3)-192.168.1.26] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms

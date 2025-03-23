@@ -4,6 +4,8 @@ import lk.ijse.poweralert.entity.Outage;
 import lk.ijse.poweralert.entity.User;
 import org.springframework.mail.javamail.JavaMailSender;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * Service interface for sending emails
  */
@@ -15,9 +17,8 @@ public interface EmailService {
      * @param to the recipient email address
      * @param subject the email subject
      * @param content the email content (can be plain text or HTML)
-     * @return true if the email was sent successfully, false otherwise
      */
-    boolean sendEmail(String to, String subject, String content);
+    void sendEmail(String to, String subject, String content);
 
     /**
      * Send an email with template
@@ -26,9 +27,9 @@ public interface EmailService {
      * @param subject the email subject
      * @param templateName the name of the template to use
      * @param model the model to populate the template with
-     * @return true if the email was sent successfully, false otherwise
+     * @return CompletableFuture containing a boolean indicating success
      */
-    boolean sendTemplateEmail(String to, String subject, String templateName, Object model);
+    CompletableFuture<Boolean> sendTemplateEmail(String to, String subject, String templateName, Object model);
 
     /**
      * Send an email with attachment
@@ -38,10 +39,10 @@ public interface EmailService {
      * @param content the email content
      * @param attachmentFilePath the path to the attachment file
      * @param attachmentFileName the name to display for the attachment
-     * @return true if the email was sent successfully, false otherwise
+     * @return CompletableFuture containing a boolean indicating success
      */
-    boolean sendEmailWithAttachment(String to, String subject, String content,
-                                    String attachmentFilePath, String attachmentFileName);
+    CompletableFuture<Boolean> sendEmailWithAttachment(String to, String subject, String content,
+                                                       String attachmentFilePath, String attachmentFileName);
 
     /**
      * Send an outage notification email to a user
@@ -49,18 +50,18 @@ public interface EmailService {
      * @param user the user to send the email to
      * @param outage the outage details
      * @param language the user's preferred language
-     * @return true if the email was sent successfully, false otherwise
+     * @return CompletableFuture containing a boolean indicating success
      */
-    boolean sendOutageNotificationEmail(User user, Outage outage, String language);
+    CompletableFuture<Boolean> sendOutageNotificationEmail(User user, Outage outage, String language);
 
     /**
      * Send an email to all active users in the system
      *
      * @param subject the email subject
      * @param content the email content
-     * @return the number of successfully sent emails
+     * @return CompletableFuture containing the number of successfully sent emails
      */
-    int sendEmailToAllUsers(String subject, String content);
+    CompletableFuture<Integer> sendEmailToAllUsers(String subject, String content);
 
     /**
      * Send an email to users in a specific area
@@ -68,9 +69,9 @@ public interface EmailService {
      * @param areaId the area ID
      * @param subject the email subject
      * @param content the email content
-     * @return the number of successfully sent emails
+     * @return CompletableFuture containing the number of successfully sent emails
      */
-    int sendEmailToUsersInArea(Long areaId, String subject, String content);
+    CompletableFuture<Integer> sendEmailToUsersInArea(Long areaId, String subject, String content);
 
     /**
      * Get the JavaMailSender instance for testing
