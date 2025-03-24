@@ -24,6 +24,7 @@ import freemarker.template.TemplateException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -484,5 +485,104 @@ public class EmailServiceImpl implements EmailService {
     private ResourceBundle loadResourceBundle(String language) throws MissingResourceException {
         Locale locale = getLocale(language);
         return ResourceBundle.getBundle("messages", locale);
+    }
+
+    @Async
+    @Override
+    public CompletableFuture<Boolean> sendLoginNotificationEmail(User user, String ipAddress, String device, String location) {
+        if (!emailEnabled) {
+            logger.info("Email sending is disabled. Would have sent login notification to: {}", user.getEmail());
+            return CompletableFuture.completedFuture(true);
+        }
+
+        try {
+            logger.info("Sending login notification email to: {}", user.getEmail());
+
+            // Create the model with the template variables
+            Map<String, Object> model = new HashMap<>();
+            model.put("username", user.getUsername());
+            model.put("email", user.getEmail());
+            model.put("loginTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            model.put("ipAddress", ipAddress != null ? ipAddress : "Unknown");
+            model.put("device", device != null ? device : "Unknown");
+            model.put("location", location != null ? location : "Unknown");
+            model.put("accountSecurityUrl", "https://poweralert.lk/account/security");
+            model.put("year", Year.now().toString());
+            model.put("unsubscribeUrl", "https://poweralert.lk/preferences/unsubscribe?email=" +
+                    java.net.URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8.name()));
+
+            // Try to process the template
+            try {
+                Template template = freemarkerConfig.getTemplate("login-notification.ftl");
+                String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+                sendEmail(user.getEmail(), "PowerAlert Security Alert: New Login", content);
+                return CompletableFuture.completedFuture(true);
+            } catch (Exception e) {
+                logger.error("Failed to process login notification template: {}", e.getMessage(), e);
+
+                // Fallback to generate HTML content directly if template fails
+                String content = createLoginNotificationHtml(model);
+                sendEmail(user.getEmail(), "PowerAlert Security Alert: New Login", content);
+                return CompletableFuture.completedFuture(true);
+            }
+        } catch (Exception e) {
+            logger.error("Error sending login notification email to {}: {}", user.getEmail(), e.getMessage(), e);
+            return CompletableFuture.completedFuture(false);
+        }
+    }
+
+    /**
+     * Create HTML content for login notification when template processing fails
+     */
+    private String createLoginNotificationHtml(Map<String, Object> model) {
+        StringBuilder html = new StringBuilder();
+        html.append("<!DOCTYPE html><html><head>");
+        html.append("<meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
+        html.append("<title>PowerAlert Login Notification</title>");
+        html.append("<style>");
+        html.append("body{font-family:'Segoe UI',Arial,sans-serif;line-height:1.6;color:#333;margin:0;padding:0;background-color:#f5f5f5;}");
+        html.append(".container{max-width:600px;margin:0 auto;padding:20px;}");
+        html.append(".header{background-color:#4285F4;color:white;padding:20px;text-align:center;border-radius:5px 5px 0 0;}");
+        html.append(".content{background-color:white;padding:30px;border-left:1px solid #ddd;border-right:1px solid #ddd;box-shadow:0 2px 5px rgba(0,0,0,0.1);}");
+        html.append(".login-info{background-color:#f9f9f9;border:1px solid #eee;border-radius:5px;padding:20px;margin:20px 0;}");
+        html.append(".button{display:inline-block;background-color:#4285F4;color:white;text-decoration:none;padding:12px 25px;border-radius:4px;font-weight:bold;margin:15px 0;}");
+        html.append(".footer{background-color:#f1f1f1;padding:15px;text-align:center;font-size:12px;color:#666;border-radius:0 0 5px 5px;border:1px solid #ddd;}");
+        html.append("</style></head><body><div class=\"container\">");
+
+        // Header
+        html.append("<div class=\"header\"><h1>Login Notification</h1></div>");
+
+        // Content
+        html.append("<div class=\"content\">");
+        html.append("<p>Hello ").append(model.get("username")).append(",</p>");
+        html.append("<p>We detected a new login to your PowerAlert account.</p>");
+
+        // Login info box
+        html.append("<div class=\"login-info\">");
+        html.append("<p><strong>Username:</strong> ").append(model.get("username")).append("</p>");
+        html.append("<p><strong>Time:</strong> ").append(model.get("loginTime")).append("</p>");
+        html.append("<p><strong>IP Address:</strong> ").append(model.get("ipAddress")).append("</p>");
+        html.append("<p><strong>Device:</strong> ").append(model.get("device")).append("</p>");
+        html.append("<p><strong>Location:</strong> ").append(model.get("location")).append("</p>");
+        html.append("</div>");
+
+        html.append("<p>If this was you, no further action is required. If you didn't login recently, please secure your account immediately by changing your password.</p>");
+
+        // Button
+        String accountUrl = (String) model.getOrDefault("accountSecurityUrl", "https://poweralert.lk/account/security");
+        html.append("<div style=\"text-align:center;\">");
+        html.append("<a href=\"").append(accountUrl).append("\" class=\"button\" style=\"color:white;\">Manage Account Security</a>");
+        html.append("</div>");
+
+        html.append("</div>");
+
+        // Footer
+        html.append("<div class=\"footer\">");
+        html.append("<p>This is an automated message from Power Alert. Please do not reply to this email.</p>");
+        html.append("<p>If you did not request this email, please contact support at support@poweralert.lk</p>");
+        html.append("<p>&copy; ").append(model.get("year")).append(" Power Alert</p>");
+        html.append("</div></div></body></html>");
+
+        return html.toString();
     }
 }

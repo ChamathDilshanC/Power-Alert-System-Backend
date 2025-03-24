@@ -1,8 +1,11 @@
 package lk.ijse.poweralert.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lk.ijse.poweralert.dto.*;
+import lk.ijse.poweralert.entity.User;
 import lk.ijse.poweralert.enums.AppEnums;
+import lk.ijse.poweralert.service.EmailService;
 import lk.ijse.poweralert.service.UserService;
 import lk.ijse.poweralert.util.JwtUtil;
 import lk.ijse.poweralert.util.VarList;
@@ -38,8 +41,11 @@ public class AuthController {
     @Autowired
     private ResponseDTO responseDTO;
 
+    @Autowired
+    private EmailService emailService;
+
     @PostMapping("/login")
-    public ResponseEntity<ResponseDTO> login(@Valid @RequestBody AuthRequestDTO authRequest) {
+    public ResponseEntity<ResponseDTO> login(@Valid @RequestBody AuthRequestDTO authRequest, HttpServletRequest request) {
         try {
             logger.info("Login attempt for user: {}", authRequest.getUsername());
 
@@ -68,7 +74,18 @@ public class AuthController {
             responseDTO.setMessage("Authentication successful");
             responseDTO.setData(authDTO);
 
+            // Update last login
             userService.updateLastLogin(userDTO.getEmail());
+
+            // Send login notification email asynchronously
+            String ipAddress = getClientIp(request);
+            String device = request.getHeader("User-Agent");
+            String location = "Unknown"; // You could integrate with a geolocation service here
+
+            // Convert UserDTO to User entity and send notification
+            // This depends on how your service is designed
+            User user = userService.getUserEntityByUsername(userDTO.getUsername());
+            emailService.sendLoginNotificationEmail(user, ipAddress, device, location);
 
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
 
@@ -85,6 +102,21 @@ public class AuthController {
             responseDTO.setData(null);
             return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    // Helper method to get client IP address
+    private String getClientIp(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-Forwarded-For");
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getRemoteAddr();
+        }
+        return ipAddress;
     }
 
     @PostMapping("/register")

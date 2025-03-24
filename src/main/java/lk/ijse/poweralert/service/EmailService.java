@@ -55,6 +55,17 @@ public interface EmailService {
     CompletableFuture<Boolean> sendOutageNotificationEmail(User user, Outage outage, String language);
 
     /**
+     * Send a login notification email to a user
+     *
+     * @param user the user to send the email to
+     * @param ipAddress the IP address from which login occurred
+     * @param device the device/user agent used for login
+     * @param location the approximate location based on IP (if available)
+     * @return CompletableFuture containing a boolean indicating success
+     */
+    CompletableFuture<Boolean> sendLoginNotificationEmail(User user, String ipAddress, String device, String location);
+
+    /**
      * Send an email to all active users in the system
      *
      * @param subject the email subject
