@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${outageType} Outage Alert</title>
+    <title>${outageType} Outage Cancellation</title>
     <style>
         /* Base styles */
         body {
@@ -23,7 +23,7 @@
         }
 
         .header {
-            background-color: #2563EB;
+            background-color: #DC2626;
             color: white;
             padding: 20px;
             text-align: center;
@@ -75,24 +75,8 @@
             border-radius: 16px;
             font-size: 14px;
             font-weight: 600;
-            background-color: #FEF3C7;
-            color: #D97706;
-        }
-
-        .btn-action {
-            display: inline-block;
-            background-color: #2563EB;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-top: 20px;
-            transition: background-color 0.2s;
-        }
-
-        .btn-action:hover {
-            background-color: #1D4ED8;
+            background-color: #FEE2E2;
+            color: #DC2626;
         }
 
         .footer {
@@ -120,17 +104,17 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1>${outageType} Outage Alert</h1>
+        <h1>${outageType} Outage Cancelled</h1>
     </div>
 
     <div class="content">
         <p>Hello ${username},</p>
 
-        <p>We're notifying you of a scheduled <strong>${outageType}</strong> outage that will affect your area: <strong>${areaName}</strong>.</p>
+        <p>We're writing to inform you that the scheduled <strong>${outageType}</strong> outage in your area: <strong>${areaName}</strong> has been <strong>cancelled</strong>.</p>
 
         <div class="outage-card">
-            <svg xmlns="http://www.w3.org/2000/svg" class="alert-icon" fill="none" viewBox="0 0 24 24" stroke="#2563EB">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="alert-icon" fill="none" viewBox="0 0 24 24" stroke="#DC2626">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
 
             <p class="outage-label">Type:</p>
@@ -141,32 +125,21 @@
 
             <p class="outage-label">Status:</p>
             <p class="outage-value">
-                <span class="status-badge">${status}</span>
+                <span class="status-badge">CANCELLED</span>
             </p>
 
-            <p class="outage-label">Start Time:</p>
+            <p class="outage-label">Original Start Time:</p>
             <p class="outage-value">${startTime}</p>
 
-            <#if endTime??>
-                <p class="outage-label">Estimated End Time:</p>
-                <p class="outage-value">${endTime}</p>
-            </#if>
-
-            <#if reason??>
-                <p class="outage-label">Reason:</p>
-                <p class="outage-value">${reason}</p>
+            <#if cancellationReason??>
+                <p class="outage-label">Reason for Cancellation:</p>
+                <p class="outage-value">${cancellationReason}</p>
             </#if>
         </div>
 
-        <p>We recommend taking precautions before the outage begins, such as backing up important data, charging essential devices, and preparing necessary supplies.</p>
+        <p>You may continue to use the services as normal. There is no interruption to expect.</p>
 
-        <#if additionalInfo??>
-            <p>${additionalInfo}</p>
-        </#if>
-
-        <p>Thank you for your understanding as we work to maintain and improve our infrastructure.</p>
-
-        <a href="${portalUrl}" class="btn-action">View Details</a>
+        <p>We apologize for any inconvenience the previous notification may have caused.</p>
 
     </div>
 

@@ -1,8 +1,6 @@
 package lk.ijse.poweralert.service.impl;
 
-import lk.ijse.poweralert.dto.OutageCreateDTO;
-import lk.ijse.poweralert.dto.OutageDTO;
-import lk.ijse.poweralert.dto.OutageUpdateDTO;
+import lk.ijse.poweralert.dto.*;
 import lk.ijse.poweralert.entity.*;
 import lk.ijse.poweralert.enums.AppEnums.OutageStatus;
 import lk.ijse.poweralert.event.NotificationEventPublisher;
@@ -22,7 +20,10 @@ import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class OutageServiceImpl implements OutageService {
@@ -137,7 +138,41 @@ public class OutageServiceImpl implements OutageService {
             Outage outage = outageRepository.findById(outageId)
                     .orElseThrow(() -> new EntityNotFoundException("Outage not found with ID: " + outageId));
 
+            // Send notifications via the notification service
             notificationService.sendOutageNotifications(outage);
+
+            // Get affected users and send email notifications
+            List<User> affectedUsers = findAffectedUsers(outage);
+            logger.info("Found {} affected users for outage ID: {}", affectedUsers.size(), outageId);
+
+            // Send emails to affected users using template
+            for (User user : affectedUsers) {
+                try {
+                    // Create template model
+                    Map<String, Object> templateModel = createOutageTemplateModel(outage, user);
+
+                    // Send email with template
+                    String subject = outage.getType() + " Outage Alert - " + outage.getAffectedArea().getName();
+
+                    CompletableFuture<Boolean> emailResult = emailService.sendTemplateEmail(
+                            user.getEmail(),
+                            subject,
+                            "outage-notification",
+                            templateModel
+                    );
+
+                    // If template fails, send direct notification
+                    emailResult.exceptionally(ex -> {
+                        logger.warn("Template email failed for user {}, falling back to direct notification", user.getEmail(), ex);
+                        emailService.sendOutageNotificationEmail(user, outage, user.getPreferredLanguage());
+                        return false;
+                    });
+
+                } catch (Exception e) {
+                    logger.error("Error sending email to user {}: {}", user.getEmail(), e.getMessage());
+                }
+            }
+
             logger.info("Notifications sent successfully for outage ID: {}", outageId);
         } catch (Exception e) {
             logger.error("Error sending notifications for outage ID {}: {}", outageId, e.getMessage(), e);
@@ -285,7 +320,43 @@ public class OutageServiceImpl implements OutageService {
             Outage outage = outageRepository.findById(outageId)
                     .orElseThrow(() -> new EntityNotFoundException("Outage not found with ID: " + outageId));
 
+            // Send notifications via notification service
             notificationService.sendOutageUpdateNotifications(outage);
+
+            // Find affected users
+            List<User> affectedUsers = findAffectedUsers(outage);
+            logger.info("Found {} affected users for outage update ID: {}", affectedUsers.size(), outageId);
+
+            // Send email updates to affected users
+            for (User user : affectedUsers) {
+                try {
+                    // Create the template model
+                    Map<String, Object> templateModel = createOutageUpdateTemplateModel(outage, user);
+
+                    // Send the update email
+                    String subject = outage.getType() + " Outage Update - " + outage.getAffectedArea().getName();
+
+                    CompletableFuture<Boolean> emailResult = emailService.sendTemplateEmail(
+                            user.getEmail(),
+                            subject,
+                            "outage-update",
+                            templateModel
+                    );
+
+                    // If template fails, create simple HTML
+                    emailResult.exceptionally(ex -> {
+                        logger.warn("Template email failed for user {}, using simplified format", user.getEmail(), ex);
+                        // Create simplified HTML
+                        String simpleContent = createSimpleUpdateEmail(outage, user);
+                        emailService.sendEmail(user.getEmail(), subject, simpleContent);
+                        return false;
+                    });
+
+                } catch (Exception e) {
+                    logger.error("Error sending update email to user {}: {}", user.getEmail(), e.getMessage());
+                }
+            }
+
             logger.info("Update notifications sent successfully for outage ID: {}", outageId);
         } catch (Exception e) {
             logger.error("Error sending update notifications for outage ID {}: {}", outageId, e.getMessage(), e);
@@ -414,7 +485,43 @@ public class OutageServiceImpl implements OutageService {
             Outage outage = outageRepository.findById(outageId)
                     .orElseThrow(() -> new EntityNotFoundException("Outage not found with ID: " + outageId));
 
+            // Send notifications via notification service
             notificationService.sendOutageCancellationNotifications(outage);
+
+            // Find affected users
+            List<User> affectedUsers = findAffectedUsers(outage);
+            logger.info("Found {} affected users for outage cancellation ID: {}", affectedUsers.size(), outageId);
+
+            // Send email cancellation notifications to affected users
+            for (User user : affectedUsers) {
+                try {
+                    // Create the template model
+                    Map<String, Object> templateModel = createOutageCancellationTemplateModel(outage, user);
+
+                    // Send the cancellation email
+                    String subject = outage.getType() + " Outage Cancellation - " + outage.getAffectedArea().getName();
+
+                    CompletableFuture<Boolean> emailResult = emailService.sendTemplateEmail(
+                            user.getEmail(),
+                            subject,
+                            "outage-cancellation",
+                            templateModel
+                    );
+
+                    // If template fails, create simple HTML
+                    emailResult.exceptionally(ex -> {
+                        logger.warn("Cancellation template email failed for user {}, using simplified format", user.getEmail(), ex);
+                        // Create simplified HTML
+                        String simpleContent = createSimpleCancellationEmail(outage, user);
+                        emailService.sendEmail(user.getEmail(), subject, simpleContent);
+                        return false;
+                    });
+
+                } catch (Exception e) {
+                    logger.error("Error sending cancellation email to user {}: {}", user.getEmail(), e.getMessage());
+                }
+            }
+
             logger.info("Cancellation notifications sent successfully for outage ID: {}", outageId);
         } catch (Exception e) {
             logger.error("Error sending cancellation notifications for outage ID {}: {}", outageId, e.getMessage(), e);
@@ -451,11 +558,210 @@ public class OutageServiceImpl implements OutageService {
     }
 
     /**
+     * Helper method to find users affected by an outage
+     *
+     * @param outage The outage
+     * @return List of affected users
+     */
+    private List<User> findAffectedUsers(Outage outage) {
+        // For now, simple implementation that gets all users with addresses in the affected area's district
+        return userRepository.findUsersInDistrict(outage.getAffectedArea().getDistrict());
+    }
+
+    /**
+     * Create model for the new outage template
+     */
+    private Map<String, Object> createOutageTemplateModel(Outage outage, User user) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("username", user.getUsername());
+        model.put("outageType", outage.getType().toString());
+        model.put("areaName", outage.getAffectedArea().getName());
+        model.put("status", outage.getStatus().toString());
+        model.put("startTime", outage.getStartTime().format(DATE_FORMATTER));
+
+        if (outage.getEstimatedEndTime() != null) {
+            model.put("endTime", outage.getEstimatedEndTime().format(DATE_FORMATTER));
+        }
+
+        if (outage.getReason() != null && !outage.getReason().isEmpty()) {
+            model.put("reason", outage.getReason());
+        } else {
+            model.put("reason", "Scheduled maintenance");
+        }
+
+        if (outage.getAdditionalInfo() != null && !outage.getAdditionalInfo().isEmpty()) {
+            model.put("additionalInfo", outage.getAdditionalInfo());
+        }
+
+        // Add portal URL for viewing details
+        model.put("portalUrl", "https://poweralert.lk/outages/" + outage.getId());
+
+        return model;
+    }
+
+    /**
+     * Create model for the outage update template
+     */
+    private Map<String, Object> createOutageUpdateTemplateModel(Outage outage, User user) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("username", user.getUsername());
+        model.put("outageType", outage.getType().toString());
+        model.put("areaName", outage.getAffectedArea().getName());
+        model.put("status", outage.getStatus().toString());
+        model.put("startTime", outage.getStartTime().format(DATE_FORMATTER));
+        model.put("updatedAt", outage.getUpdatedAt().format(DATE_FORMATTER));
+
+        if (outage.getEstimatedEndTime() != null) {
+            model.put("endTime", outage.getEstimatedEndTime().format(DATE_FORMATTER));
+        }
+
+        if (outage.getReason() != null && !outage.getReason().isEmpty()) {
+            model.put("reason", outage.getReason());
+        }
+
+        // Get latest update info
+        outage.getUpdates().stream()
+                .max((a, b) -> a.getCreatedAt().compareTo(b.getCreatedAt()))
+                .ifPresent(update -> {
+                    model.put("updateInfo", update.getUpdateInfo());
+                    if (update.getReason() != null && !update.getReason().isEmpty()) {
+                        model.put("updateReason", update.getReason());
+                    }
+                });
+
+        // Add portal URL for viewing details
+        model.put("portalUrl", "https://poweralert.lk/outages/" + outage.getId());
+
+        return model;
+    }
+
+    /**
+     * Create model for outage cancellation template
+     */
+    private Map<String, Object> createOutageCancellationTemplateModel(Outage outage, User user) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("username", user.getUsername());
+        model.put("outageType", outage.getType().toString());
+        model.put("areaName", outage.getAffectedArea().getName());
+        model.put("status", outage.getStatus().toString());
+        model.put("startTime", outage.getStartTime().format(DATE_FORMATTER));
+        model.put("cancelledAt", outage.getUpdatedAt().format(DATE_FORMATTER));
+
+        // Get cancellation reason
+        outage.getUpdates().stream()
+                .filter(u -> u.getNewStatus() == OutageStatus.CANCELLED)
+                .max((a, b) -> a.getCreatedAt().compareTo(b.getCreatedAt()))
+                .ifPresent(update -> {
+                    if (update.getUpdateInfo() != null && !update.getUpdateInfo().isEmpty()) {
+                        model.put("cancellationReason", update.getUpdateInfo());
+                    }
+                });
+
+        return model;
+    }
+
+    /**
+     * Create simple HTML email for outage update when template fails
+     */
+    private String createSimpleUpdateEmail(Outage outage, User user) {
+        StringBuilder html = new StringBuilder();
+        html.append("<!DOCTYPE html><html><body>");
+        html.append("<h2>").append(outage.getType()).append(" Outage Update</h2>");
+        html.append("<p>Hello ").append(user.getUsername()).append(",</p>");
+        html.append("<p>We have an update regarding the ").append(outage.getType())
+                .append(" outage affecting ").append(outage.getAffectedArea().getName()).append("</p>");
+
+        html.append("<p><strong>Status:</strong> ").append(outage.getStatus()).append("</p>");
+
+        if (outage.getEstimatedEndTime() != null) {
+            html.append("<p><strong>Estimated End Time:</strong> ")
+                    .append(outage.getEstimatedEndTime().format(DATE_FORMATTER)).append("</p>");
+        }
+
+        // Get update information
+        outage.getUpdates().stream()
+                .max((a, b) -> a.getCreatedAt().compareTo(b.getCreatedAt()))
+                .ifPresent(update -> {
+                    html.append("<p><strong>Update:</strong> ").append(update.getUpdateInfo()).append("</p>");
+                });
+
+        html.append("<p>You can view more details at <a href=\"https://poweralert.lk/outages/")
+                .append(outage.getId()).append("\">our portal</a>.</p>");
+
+        html.append("<p>Thank you for your patience.</p>");
+        html.append("<p>Power Alert System</p>");
+        html.append("</body></html>");
+
+        return html.toString();
+    }
+
+    /**
+     * Create simple HTML email for outage cancellation when template fails
+     */
+    private String createSimpleCancellationEmail(Outage outage, User user) {
+        StringBuilder html = new StringBuilder();
+        html.append("<!DOCTYPE html><html><body>");
+        html.append("<h2>").append(outage.getType()).append(" Outage Cancellation</h2>");
+        html.append("<p>Hello ").append(user.getUsername()).append(",</p>");
+        html.append("<p>The previously scheduled ").append(outage.getType())
+                .append(" outage for ").append(outage.getAffectedArea().getName())
+                .append(" has been <strong>cancelled</strong>.</p>");
+
+        html.append("<p><strong>Original Start Time:</strong> ")
+                .append(outage.getStartTime().format(DATE_FORMATTER)).append("</p>");
+
+        // Get cancellation reason if available
+        outage.getUpdates().stream()
+                .filter(u -> u.getNewStatus() == OutageStatus.CANCELLED)
+                .max((a, b) -> a.getCreatedAt().compareTo(b.getCreatedAt()))
+                .ifPresent(update -> {
+                    if (update.getUpdateInfo() != null && !update.getUpdateInfo().isEmpty()) {
+                        html.append("<p><strong>Reason for Cancellation:</strong> ")
+                                .append(update.getUpdateInfo()).append("</p>");
+                    }
+                });
+
+        html.append("<p>You may continue to use the services as normal.</p>");
+        html.append("<p>Thank you for your understanding.</p>");
+        html.append("<p>Power Alert System</p>");
+        html.append("</body></html>");
+
+        return html.toString();
+    }
+
+    /**
      * Convert Outage entity to OutageDTO
      * @param outage the outage entity
      * @return the outage DTO
      */
     private OutageDTO convertToDTO(Outage outage) {
-        return modelMapper.map(outage, OutageDTO.class);
+        if (outage == null) {
+            return null;
+        }
+
+        // Using ModelMapper for basic mapping
+        OutageDTO outageDTO = modelMapper.map(outage, OutageDTO.class);
+
+        // If any specific mappings need manual handling, add them here
+        // For example, if nested objects need explicit mapping:
+        if (outage.getAffectedArea() != null) {
+            outageDTO.setAffectedArea(modelMapper.map(outage.getAffectedArea(), AreaDTO.class));
+        }
+
+        if (outage.getUtilityProvider() != null) {
+            outageDTO.setUtilityProvider(modelMapper.map(outage.getUtilityProvider(), UtilityProviderDTO.class));
+        }
+
+        // Map updates if needed
+        if (outage.getUpdates() != null) {
+            outageDTO.setUpdates(
+                    outage.getUpdates().stream()
+                            .map(update -> modelMapper.map(update, OutageUpdateDTO.class))
+                            .collect(Collectors.toList())
+            );
+        }
+
+        return outageDTO;
     }
+
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${outageType} Outage Alert</title>
+    <title>${outageType} Outage Update</title>
     <style>
         /* Base styles */
         body {
@@ -23,7 +23,7 @@
         }
 
         .header {
-            background-color: #2563EB;
+            background-color: #0E7490;
             color: white;
             padding: 20px;
             text-align: center;
@@ -75,13 +75,13 @@
             border-radius: 16px;
             font-size: 14px;
             font-weight: 600;
-            background-color: #FEF3C7;
-            color: #D97706;
+            background-color: #ECFEFF;
+            color: #0E7490;
         }
 
         .btn-action {
             display: inline-block;
-            background-color: #2563EB;
+            background-color: #0E7490;
             color: white;
             padding: 12px 24px;
             border-radius: 6px;
@@ -92,7 +92,7 @@
         }
 
         .btn-action:hover {
-            background-color: #1D4ED8;
+            background-color: #0c697d;
         }
 
         .footer {
@@ -115,22 +115,38 @@
             color: #64748b;
             text-decoration: none;
         }
+
+        .update-info {
+            background-color: #ECFEFF;
+            border-left: 4px solid #0E7490;
+            padding: 15px;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>${outageType} Outage Alert</h1>
+        <h1>${outageType} Outage Update</h1>
     </div>
 
     <div class="content">
         <p>Hello ${username},</p>
 
-        <p>We're notifying you of a scheduled <strong>${outageType}</strong> outage that will affect your area: <strong>${areaName}</strong>.</p>
+        <p>We have an important update regarding the previously notified <strong>${outageType}</strong> outage in your area: <strong>${areaName}</strong>.</p>
+
+        <#if updateInfo??>
+            <div class="update-info">
+                <p><strong>Update:</strong> ${updateInfo}</p>
+                <#if updateReason??>
+                    <p><strong>Reason:</strong> ${updateReason}</p>
+                </#if>
+            </div>
+        </#if>
 
         <div class="outage-card">
-            <svg xmlns="http://www.w3.org/2000/svg" class="alert-icon" fill="none" viewBox="0 0 24 24" stroke="#2563EB">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="alert-icon" fill="none" viewBox="0 0 24 24" stroke="#0E7490">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
 
             <p class="outage-label">Type:</p>
@@ -152,21 +168,13 @@
                 <p class="outage-value">${endTime}</p>
             </#if>
 
-            <#if reason??>
-                <p class="outage-label">Reason:</p>
-                <p class="outage-value">${reason}</p>
-            </#if>
+            <p class="outage-label">Last Updated:</p>
+            <p class="outage-value">${updatedAt}</p>
         </div>
 
-        <p>We recommend taking precautions before the outage begins, such as backing up important data, charging essential devices, and preparing necessary supplies.</p>
+        <p>Please continue to plan accordingly. We'll provide further updates as they become available.</p>
 
-        <#if additionalInfo??>
-            <p>${additionalInfo}</p>
-        </#if>
-
-        <p>Thank you for your understanding as we work to maintain and improve our infrastructure.</p>
-
-        <a href="${portalUrl}" class="btn-action">View Details</a>
+        <a href="${portalUrl}" class="btn-action">View Full Details</a>
 
     </div>
 
