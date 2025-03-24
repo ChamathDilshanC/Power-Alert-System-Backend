@@ -68,4 +68,10 @@ public interface OutageRepository extends JpaRepository<Outage, Long> {
 
     /** Find completed outages with actual end time */
     List<Outage> findByStatusAndActualEndTimeIsNotNull(OutageStatus status);
+
+    /**
+     * Find outages by status and with start time after specified time
+     */
+    List<Outage> findByStatusAndStartTimeAfter(OutageStatus status, LocalDateTime startTimeFrom);
+
 }

@@ -2,6 +2,7 @@ package lk.ijse.poweralert.repository;
 
 import lk.ijse.poweralert.entity.NotificationPreference;
 import lk.ijse.poweralert.entity.User;
+import lk.ijse.poweralert.enums.AppEnums;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -25,4 +26,10 @@ public interface NotificationPreferenceRepository extends JpaRepository<Notifica
      * @return list of notification preferences
      */
     List<NotificationPreference> findByUserId(Long userId);
+
+    /**
+     * Find notification preferences by user, outage type, and channel type
+     */
+    List<NotificationPreference> findByUserAndOutageTypeAndChannelType(
+            User user, AppEnums.OutageType outageType, AppEnums.NotificationType channelType);
 }

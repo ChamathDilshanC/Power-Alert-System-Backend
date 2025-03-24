@@ -5,6 +5,7 @@ import lk.ijse.poweralert.dto.ResponseDTO;
 import lk.ijse.poweralert.dto.UserCreateDTO;
 import lk.ijse.poweralert.dto.UserDTO;
 import lk.ijse.poweralert.enums.AppEnums.Role;
+import lk.ijse.poweralert.job.AdvanceNotificationJob;
 import lk.ijse.poweralert.service.UserService;
 import lk.ijse.poweralert.util.VarList;
 import org.slf4j.Logger;
@@ -32,6 +33,9 @@ public class AdminController {
 
     @Autowired
     private ResponseDTO responseDTO;
+
+    @Autowired
+    private AdvanceNotificationJob advanceNotificationJob;
 
     @GetMapping("/debug-role")
     public ResponseEntity<String> debugRole(Authentication authentication) {
@@ -137,6 +141,30 @@ public class AdminController {
             responseDTO.setCode(VarList.Internal_Server_Error);
             responseDTO.setMessage("Error: " + e.getMessage());
             responseDTO.setData(null);
+            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/trigger-advance-notifications")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<ResponseDTO> triggerAdvanceNotifications() {
+        try {
+            logger.info("Admin manually triggering advance notifications job");
+
+            advanceNotificationJob.sendAdvanceNotifications();
+
+            responseDTO.setCode(VarList.OK);
+            responseDTO.setMessage("Advance notifications job triggered successfully");
+            responseDTO.setData(null);
+
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error triggering advance notifications job: {}", e.getMessage(), e);
+
+            responseDTO.setCode(VarList.Internal_Server_Error);
+            responseDTO.setMessage("Error: " + e.getMessage());
+            responseDTO.setData(null);
+
             return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

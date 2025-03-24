@@ -174,6 +174,30 @@
             <artifactId>jaxb-impl</artifactId>
             <version>2.3.1</version>
         </dependency>
+        <!-- MapBox Java SDK -->
+        <dependency>
+            <groupId>com.mapbox.mapboxsdk</groupId>
+            <artifactId>mapbox-sdk-services</artifactId>
+            <version>5.8.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>androidx.annotation</groupId>
+                    <artifactId>annotation</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- GeoJSON support -->
+        <dependency>
+            <groupId>org.wololo</groupId>
+            <artifactId>jts2geojson</artifactId>
+            <version>0.16.1</version>
+        </dependency>
+        <!-- For geospatial operations -->
+        <dependency>
+            <groupId>org.locationtech.jts</groupId>
+            <artifactId>jts-core</artifactId>
+            <version>1.18.2</version>
+        </dependency>
 
     </dependencies>
 
