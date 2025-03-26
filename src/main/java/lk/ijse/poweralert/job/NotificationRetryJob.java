@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 public class NotificationRetryJob {
@@ -85,9 +86,11 @@ public class NotificationRetryJob {
                             sent = true; // Assume success if no exception thrown
                             break;
                         case SMS:
-                            sent = smsService.sendSms(
+                            // Get the CompletableFuture and retrieve its result
+                            CompletableFuture<Boolean> smsFuture = smsService.sendSms(
                                     notification.getUser().getPhoneNumber(),
                                     notification.getContent());
+                            sent = smsFuture.get(); // This will block until the result is available
                             break;
                         case PUSH:
                             // Placeholder for device token retrieval
@@ -104,9 +107,11 @@ public class NotificationRetryJob {
                             }
                             break;
                         case WHATSAPP:
-                            sent = whatsAppService.sendWhatsAppMessage(
+                            // Get the CompletableFuture and retrieve its result
+                            CompletableFuture<Boolean> whatsappFuture = whatsAppService.sendWhatsAppMessage(
                                     notification.getUser().getPhoneNumber(),
                                     notification.getContent());
+                            sent = whatsappFuture.get(); // This will block until the result is available
                             break;
                         default:
                             logger.warn("Unknown notification type: {}", notification.getType());

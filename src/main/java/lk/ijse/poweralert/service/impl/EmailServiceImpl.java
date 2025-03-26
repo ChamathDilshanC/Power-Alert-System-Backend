@@ -127,15 +127,20 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    @Async
     public CompletableFuture<Boolean> sendTemplateEmail(String to, String subject, String templateName, Object model) {
+        return null;
+    }
+
+    @Override
+    @Async
+    public CompletableFuture<Boolean> sendTemplateEmail(String to, String subject, String templateName, Object model, String language) {
         if (!emailEnabled) {
             logger.info("Email sending is disabled. Would have sent template email to: {}, subject: {}", to, subject);
             return CompletableFuture.completedFuture(true);
         }
 
         try {
-            logger.info("Sending template email to: {}, subject: {}, template: {}", to, subject, templateName);
+            logger.info("Sending template email to: {}, subject: {}, template: {}, language: {}", to, subject, templateName, language);
 
             // Ensure the model is a map (if not already)
             Map<String, Object> templateModel = convertToMap(model);
@@ -143,35 +148,30 @@ public class EmailServiceImpl implements EmailService {
             // Add default values for common template variables if not present
             ensureDefaultTemplateValues(templateModel);
 
-            // Try to get the template
-            Template template;
-            try {
-                template = freemarkerConfig.getTemplate(templateName);
-            } catch (IOException e) {
-                logger.error("Failed to load template '{}': {}", templateName, e.getMessage(), e);
-                // Try with .ftl extension if not already included
-                if (!templateName.endsWith(".ftl")) {
-                    try {
-                        template = freemarkerConfig.getTemplate(templateName + ".ftl");
-                    } catch (IOException e2) {
-                        logger.error("Failed to load template with .ftl extension: {}", e2.getMessage());
-                        sendEmail(to, subject, createHtmlEmailContent(templateModel));
-                        return CompletableFuture.completedFuture(true);
-                    }
-                } else {
-                    sendEmail(to, subject, createHtmlEmailContent(templateModel));
-                    return CompletableFuture.completedFuture(true);
-                }
+            // First try language-specific template if language is specified
+            String templateToUse = templateName;
+            if (language != null && !language.equals("en")) {
+                templateToUse = templateName + "_" + language;
             }
 
-            // Process the template
+            // Process the template with fallback to default template
             String content;
             try {
+                Template template = freemarkerConfig.getTemplate(templateToUse);
                 content = FreeMarkerTemplateUtils.processTemplateIntoString(template, templateModel);
+            } catch (IOException e) {
+                logger.warn("Language-specific template '{}' not found, trying default template", templateToUse);
+                try {
+                    // Fall back to default template
+                    Template defaultTemplate = freemarkerConfig.getTemplate(templateName);
+                    content = FreeMarkerTemplateUtils.processTemplateIntoString(defaultTemplate, templateModel);
+                } catch (Exception ex) {
+                    logger.error("Failed to process default template '{}': {}", templateName, ex.getMessage(), ex);
+                    content = createHtmlEmailContent(templateModel);
+                }
             } catch (TemplateException e) {
-                logger.error("Error processing template '{}': {}", templateName, e.getMessage(), e);
-                sendEmail(to, subject, createHtmlEmailContent(templateModel));
-                return CompletableFuture.completedFuture(true);
+                logger.error("Error processing template '{}': {}", templateToUse, e.getMessage(), e);
+                content = createHtmlEmailContent(templateModel);
             }
 
             // Check if content was generated successfully
@@ -187,7 +187,6 @@ public class EmailServiceImpl implements EmailService {
             return CompletableFuture.completedFuture(false);
         }
     }
-
     private void ensureDefaultTemplateValues(Map<String, Object> model) {
         if (!model.containsKey("year")) {
             model.put("year", Year.now().toString());

@@ -176,8 +176,8 @@
         <p>&copy; ${.now?string('yyyy')} Power Alert. All rights reserved.</p>
 
         <div class="social-links">
-            <a href="https://facebook.com/poweralert">Facebook</a> •
-            <a href="https://twitter.com/poweralert">Twitter</a> •
+            <a href="https://facebook.com/poweralert">Facebook</a>
+            <a href="https://twitter.com/poweralert">Twitter</a>
             <a href="https://poweralert.lk/preferences">Preferences</a>
         </div>
     </div>

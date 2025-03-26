@@ -44,7 +44,7 @@ public class NotificationServiceImpl implements NotificationService {
     private EmailService emailService;
 
     @Autowired(required = false)
-    @Qualifier("vonageSmsServiceImpl")
+    @Qualifier("twilioSmsServiceImpl")
     private SmsService smsService;
 
     @Autowired(required = false)
@@ -355,27 +355,36 @@ public class NotificationServiceImpl implements NotificationService {
             notification.setCreatedAt(LocalDateTime.now());
 
             // Save notification
-            notification = notificationRepository.save(notification);
-
-            // Attempt to send notification
-            boolean sent = false;
+            final Notification savedNotification = notificationRepository.save(notification);
 
             try {
                 switch (type) {
                     case EMAIL:
                         // Email service returns void, not boolean
                         emailService.sendEmail(user.getEmail(), getEmailSubject(outage, user.getPreferredLanguage()), content);
-                        sent = true; // Assume success since exceptions are caught in the email service
+                        // Update status immediately since email service is synchronous
+                        updateNotificationStatus(savedNotification, true);
                         break;
+
                     case SMS:
-                        // Uses VonageSmsServiceImpl through the SmsService interface
                         if (smsService != null) {
-                            sent = smsService.sendSms(user.getPhoneNumber(), content);
+                            // Use the CompletableFuture with callback
+                            CompletableFuture<Boolean> smsFuture = smsService.sendSms(user.getPhoneNumber(), content);
+
+                            // Handle the result asynchronously
+                            smsFuture.thenAccept(sent -> {
+                                updateNotificationStatus(savedNotification, sent);
+                            }).exceptionally(ex -> {
+                                logger.error("Error in SMS future: {}", ex.getMessage());
+                                updateNotificationStatus(savedNotification, false);
+                                return null;
+                            });
                         } else {
                             logger.warn("SMS service not available");
-                            sent = false;
+                            updateNotificationStatus(savedNotification, false);
                         }
                         break;
+
                     case PUSH:
                         // Create a data map for push notification
                         Map<String, String> data = new HashMap<>();
@@ -387,40 +396,49 @@ public class NotificationServiceImpl implements NotificationService {
                         String deviceToken = getDeviceToken(user);
 
                         if (pushNotificationService != null && deviceToken != null && !deviceToken.isEmpty()) {
-                            sent = pushNotificationService.sendNotification(
+                            boolean sent = pushNotificationService.sendNotification(
                                     deviceToken,
                                     getOutageTitle(outage, user.getPreferredLanguage()),
                                     content,
                                     data);
+                            updateNotificationStatus(savedNotification, sent);
                         } else {
                             logger.warn("Push notification service or device token not available for user ID: {}", user.getId());
-                            sent = false;
+                            updateNotificationStatus(savedNotification, false);
                         }
                         break;
+
                     case WHATSAPP:
                         if (whatsAppService != null) {
-                            sent = whatsAppService.sendWhatsAppMessage(user.getPhoneNumber(), content);
+                            // Use the CompletableFuture with callback
+                            CompletableFuture<Boolean> whatsappFuture = whatsAppService.sendWhatsAppMessage(user.getPhoneNumber(), content);
+
+                            // Handle the result asynchronously
+                            whatsappFuture.thenAccept(sent -> {
+                                updateNotificationStatus(savedNotification, sent);
+                            }).exceptionally(ex -> {
+                                logger.error("Error in WhatsApp future: {}", ex.getMessage());
+                                updateNotificationStatus(savedNotification, false);
+                                return null;
+                            });
                         } else {
                             logger.warn("WhatsApp service not available");
-                            sent = false;
+                            updateNotificationStatus(savedNotification, false);
                         }
                         break;
+
                     default:
                         logger.warn("Unknown notification type: {}", type);
+                        updateNotificationStatus(savedNotification, false);
                 }
-
-                // Update notification status
-                updateNotificationStatus(notification, sent);
-
             } catch (Exception e) {
                 logger.error("Error sending notification: {}", e.getMessage(), e);
-                updateNotificationStatus(notification, false);
+                updateNotificationStatus(savedNotification, false);
             }
         } catch (Exception e) {
             logger.error("Error creating notification: {}", e.getMessage(), e);
         }
     }
-
     // Helper method to update notification status
     private void updateNotificationStatus(Notification notification, boolean sent) {
         try {

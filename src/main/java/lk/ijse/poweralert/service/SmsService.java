@@ -1,10 +1,8 @@
 package lk.ijse.poweralert.service;
 
+import java.util.concurrent.CompletableFuture;
+
 public interface SmsService {
-
-    /** Send an SMS message to the specified phone number    */
-    boolean sendSms(String phoneNumber, String message);
-
-    /** Check if a phone number is valid for receiving SMS   */
-    boolean isValidPhoneNumber(String phoneNumber);
+    CompletableFuture<Boolean> sendSms(String phoneNumber, String messageContent);
+    boolean isValidPhoneNumber(String phoneNumber); // This method can stay as boolean since it's not @Async
 }

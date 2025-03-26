@@ -8,27 +8,31 @@ import lk.ijse.poweralert.service.SmsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
+
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 @Service
-public class SmsServiceImpl implements SmsService {
+@Primary
+public class TwilioSmsServiceImpl implements SmsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(SmsServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(TwilioSmsServiceImpl.class);
 
     // E.164 phone number validation pattern
     private static final Pattern PHONE_PATTERN = Pattern.compile("^\\+[1-9]\\d{1,14}$");
 
-    @Value("${twilio.account.sid:}")
+    @Value("${twilio.account.sid}")
     private String accountSid;
 
-    @Value("${twilio.auth.token:}")
+    @Value("${twilio.auth.token}")
     private String authToken;
 
-    @Value("${twilio.phone.number:}")
+    @Value("${twilio.phone.number}")
     private String twilioPhoneNumber;
 
     @Value("${app.sms.enabled:false}")
@@ -52,15 +56,15 @@ public class SmsServiceImpl implements SmsService {
 
     @Override
     @Async
-    public boolean sendSms(String phoneNumber, String messageContent) {
+    public CompletableFuture<Boolean> sendSms(String phoneNumber, String messageContent) {
         if (!smsEnabled) {
             logger.info("SMS sending is disabled. Would have sent to: {}, message: {}", phoneNumber, messageContent);
-            return true;
+            return CompletableFuture.completedFuture(true);
         }
 
         if (!isValidPhoneNumber(phoneNumber)) {
             logger.error("Invalid phone number format: {}", phoneNumber);
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
 
         try {
@@ -73,16 +77,15 @@ public class SmsServiceImpl implements SmsService {
                     .create();
 
             logger.info("SMS sent successfully, SID: {}", message.getSid());
-            return true;
+            return CompletableFuture.completedFuture(true);
         } catch (ApiException e) {
             logger.error("Twilio API error sending SMS to {}: {}", phoneNumber, e.getMessage(), e);
-            return false;
+            return CompletableFuture.completedFuture(false);
         } catch (Exception e) {
             logger.error("Failed to send SMS to {}", phoneNumber, e);
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
     }
-
     @Override
     public boolean isValidPhoneNumber(String phoneNumber) {
         if (phoneNumber == null || phoneNumber.isEmpty()) {

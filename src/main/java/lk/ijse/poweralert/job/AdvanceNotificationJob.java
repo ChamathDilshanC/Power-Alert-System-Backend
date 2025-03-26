@@ -1,5 +1,6 @@
 package lk.ijse.poweralert.job;
 
+import jakarta.persistence.EntityNotFoundException;
 import lk.ijse.poweralert.entity.NotificationPreference;
 import lk.ijse.poweralert.entity.Outage;
 import lk.ijse.poweralert.entity.User;
@@ -226,6 +227,7 @@ public class AdvanceNotificationJob {
 
             // Send notification based on type
             boolean sent = false;
+            final lk.ijse.poweralert.entity.Notification finalNotification = notification;
 
             switch (notificationType) {
                 case EMAIL:
@@ -241,13 +243,11 @@ public class AdvanceNotificationJob {
                     );
 
                     // Handle the result asynchronously
-                    lk.ijse.poweralert.entity.Notification finalNotification = notification;
-                    lk.ijse.poweralert.entity.Notification finalNotification1 = notification;
                     emailFuture.thenAccept(success -> {
                         if (success) {
-                            updateNotificationStatus(finalNotification1.getId(), NotificationStatus.SENT);
+                            updateNotificationStatus(finalNotification.getId(), NotificationStatus.SENT);
                         } else {
-                            updateNotificationStatus(finalNotification1.getId(), NotificationStatus.FAILED);
+                            updateNotificationStatus(finalNotification.getId(), NotificationStatus.FAILED);
                         }
                     }).exceptionally(ex -> {
                         logger.error("Error sending advance notice email: {}", ex.getMessage());
@@ -261,7 +261,24 @@ public class AdvanceNotificationJob {
 
                 case SMS:
                     if (smsService != null) {
-                        sent = smsService.sendSms(user.getPhoneNumber(), content);
+                        // Use CompletableFuture for SMS
+                        CompletableFuture<Boolean> smsFuture = smsService.sendSms(user.getPhoneNumber(), content);
+
+                        // Handle SMS result asynchronously
+                        smsFuture.thenAccept(success -> {
+                            if (success) {
+                                updateNotificationStatus(finalNotification.getId(), NotificationStatus.SENT);
+                            } else {
+                                updateNotificationStatus(finalNotification.getId(), NotificationStatus.FAILED);
+                            }
+                        }).exceptionally(ex -> {
+                            logger.error("Error sending SMS: {}", ex.getMessage());
+                            updateNotificationStatus(finalNotification.getId(), NotificationStatus.FAILED);
+                            return null;
+                        });
+
+                        // For immediate return, we'll assume it's in progress
+                        sent = true; // This just indicates we have started the process
                     } else {
                         logger.warn("SMS service not available");
                         sent = false;
@@ -300,7 +317,24 @@ public class AdvanceNotificationJob {
 
                 case WHATSAPP:
                     if (whatsAppService != null) {
-                        sent = whatsAppService.sendWhatsAppMessage(user.getPhoneNumber(), content);
+                        // Use CompletableFuture for WhatsApp
+                        CompletableFuture<Boolean> whatsappFuture = whatsAppService.sendWhatsAppMessage(user.getPhoneNumber(), content);
+
+                        // Handle WhatsApp result asynchronously
+                        whatsappFuture.thenAccept(success -> {
+                            if (success) {
+                                updateNotificationStatus(finalNotification.getId(), NotificationStatus.SENT);
+                            } else {
+                                updateNotificationStatus(finalNotification.getId(), NotificationStatus.FAILED);
+                            }
+                        }).exceptionally(ex -> {
+                            logger.error("Error sending WhatsApp message: {}", ex.getMessage());
+                            updateNotificationStatus(finalNotification.getId(), NotificationStatus.FAILED);
+                            return null;
+                        });
+
+                        // For immediate return, we'll assume it's in progress
+                        sent = true; // This just indicates we have started the process
                     } else {
                         logger.warn("WhatsApp service not available");
                         sent = false;
@@ -313,7 +347,9 @@ public class AdvanceNotificationJob {
             }
 
             // Update notification status if not already handled by async flow
-            if (notificationType != NotificationType.EMAIL) {
+            if (notificationType != NotificationType.EMAIL &&
+                    notificationType != NotificationType.SMS &&
+                    notificationType != NotificationType.WHATSAPP) {
                 if (sent) {
                     notification.setStatus(NotificationStatus.SENT);
                     notification.setSentAt(LocalDateTime.now());
@@ -323,8 +359,8 @@ public class AdvanceNotificationJob {
                 notificationRepository.save(notification);
             }
 
-            logger.info("Advance notification {} sent to user ID: {} for outage ID: {}",
-                    sent ? "successfully" : "failed to be", user.getId(), outage.getId());
+            logger.info("Advance notification process initiated for user ID: {} for outage ID: {}",
+                    user.getId(), outage.getId());
 
         } catch (Exception e) {
             logger.error("Error sending advance notification to user ID: {} for outage ID: {}: {}",
@@ -332,21 +368,19 @@ public class AdvanceNotificationJob {
         }
     }
 
-    /**
-     * Update notification status after asynchronous operations
-     * @param notificationId The notification ID
-     * @param status The new status
-     */
-    @Transactional
-    public void updateNotificationStatus(Long notificationId, NotificationStatus status) {
+    // Helper method to update notification status
+    private void updateNotificationStatus(Long notificationId, NotificationStatus status) {
         try {
-            notificationRepository.findById(notificationId).ifPresent(notification -> {
-                notification.setStatus(status);
-                if (status == NotificationStatus.SENT) {
-                    notification.setSentAt(LocalDateTime.now());
-                }
-                notificationRepository.save(notification);
-            });
+            lk.ijse.poweralert.entity.Notification notification = notificationRepository.findById(notificationId)
+                    .orElseThrow(() -> new EntityNotFoundException("Notification not found with ID: " + notificationId));
+
+            notification.setStatus(status);
+            if (status == NotificationStatus.SENT) {
+                notification.setSentAt(LocalDateTime.now());
+            }
+
+            notificationRepository.save(notification);
+            logger.debug("Updated notification ID: {} status to: {}", notificationId, status);
         } catch (Exception e) {
             logger.error("Error updating notification status: {}", e.getMessage(), e);
         }

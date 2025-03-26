@@ -3,6 +3,7 @@ package lk.ijse.poweralert.service;
 import lk.ijse.poweralert.entity.Outage;
 import lk.ijse.poweralert.entity.User;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -29,7 +30,21 @@ public interface EmailService {
      * @param model the model to populate the template with
      * @return CompletableFuture containing a boolean indicating success
      */
+    @Async
     CompletableFuture<Boolean> sendTemplateEmail(String to, String subject, String templateName, Object model);
+
+    /**
+     * Send an email with template using the specified language
+     *
+     * @param to the recipient email address
+     * @param subject the email subject
+     * @param templateName the name of the template to use
+     * @param model the model to populate the template with
+     * @param language the language code (e.g., "en", "si", "ta")
+     * @return CompletableFuture containing a boolean indicating success
+     */
+    @Async
+    CompletableFuture<Boolean> sendTemplateEmail(String to, String subject, String templateName, Object model, String language);
 
     /**
      * Send an email with attachment
