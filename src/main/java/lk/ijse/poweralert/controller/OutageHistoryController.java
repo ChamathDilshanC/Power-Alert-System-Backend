@@ -19,6 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin
 public class OutageHistoryController {
 
     private static final Logger logger = LoggerFactory.getLogger(OutageHistoryController.class);

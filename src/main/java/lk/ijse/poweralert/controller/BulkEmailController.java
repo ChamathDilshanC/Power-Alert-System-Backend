@@ -25,6 +25,7 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @RequestMapping("/api/admin/emails")
 @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+@CrossOrigin
 public class BulkEmailController {
 
     private static final Logger logger = LoggerFactory.getLogger(BulkEmailController.class);

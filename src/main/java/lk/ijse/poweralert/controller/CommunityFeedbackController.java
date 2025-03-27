@@ -17,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin
 public class CommunityFeedbackController {
 
     private static final Logger logger = LoggerFactory.getLogger(CommunityFeedbackController.class);

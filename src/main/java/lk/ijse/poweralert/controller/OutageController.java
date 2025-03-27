@@ -21,6 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin
 public class OutageController {
 
     private static final Logger logger = LoggerFactory.getLogger(OutageController.class);

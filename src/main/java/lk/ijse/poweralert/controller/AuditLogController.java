@@ -25,6 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin/audit-logs")
 @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+@CrossOrigin
 public class AuditLogController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuditLogController.class);

@@ -18,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/user/addresses")
 @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
+@CrossOrigin
 public class AddressController {
 
     private static final Logger logger = LoggerFactory.getLogger(AddressController.class);

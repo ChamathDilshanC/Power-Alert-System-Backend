@@ -22,6 +22,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/outages/geo")
+@CrossOrigin
 public class OutageGeospatialController {
 
     private static final Logger logger = LoggerFactory.getLogger(OutageGeospatialController.class);

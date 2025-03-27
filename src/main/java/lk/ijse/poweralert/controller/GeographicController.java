@@ -22,6 +22,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/geo")
+@CrossOrigin
 public class GeographicController {
 
     private static final Logger logger = LoggerFactory.getLogger(GeographicController.class);

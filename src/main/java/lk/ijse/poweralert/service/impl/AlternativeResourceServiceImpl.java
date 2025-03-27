@@ -2,6 +2,7 @@ package lk.ijse.poweralert.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lk.ijse.poweralert.dto.AlternativeResourceDTO;
+import lk.ijse.poweralert.dto.ResourceImageDTO;
 import lk.ijse.poweralert.entity.AlternativeResource;
 import lk.ijse.poweralert.entity.Area;
 import lk.ijse.poweralert.repository.AlternativeResourceRepository;
@@ -13,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -143,22 +146,84 @@ public class AlternativeResourceServiceImpl implements AlternativeResourceServic
     }
 
     /**
-     * Convert AlternativeResource entity to DTO
-     * @param resource the entity to convert
-     * @return the DTO
-     */
-    private AlternativeResourceDTO convertToDTO(AlternativeResource resource) {
-        AlternativeResourceDTO dto = modelMapper.map(resource, AlternativeResourceDTO.class);
-        dto.setAreaId(resource.getArea().getId());
-        return dto;
-    }
-
-    /**
      * Convert AlternativeResourceDTO to entity
      * @param dto the DTO to convert
      * @return the entity
      */
     private AlternativeResource convertToEntity(AlternativeResourceDTO dto) {
         return modelMapper.map(dto, AlternativeResource.class);
+    }
+
+    // Add these new methods to your existing service implementation
+
+    @Override
+    @Transactional
+    public AlternativeResourceDTO uploadResourceImage(Long resourceId, MultipartFile file) throws IOException {
+        logger.info("Uploading image for resource with ID: {}", resourceId);
+
+        // Verify resource exists
+        AlternativeResource resource = alternativeResourceRepository.findById(resourceId)
+                .orElseThrow(() -> new EntityNotFoundException("Alternative resource not found with ID: " + resourceId));
+
+        // Save image data
+        resource.setImageData(file.getBytes());
+        resource.setImageContentType(file.getContentType());
+        resource.setImageName(file.getOriginalFilename());
+
+        AlternativeResource savedResource = alternativeResourceRepository.save(resource);
+        logger.info("Image uploaded for resource with ID: {}", resourceId);
+
+        return convertToDTO(savedResource);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ResourceImageDTO getResourceImage(Long resourceId) {
+        logger.info("Fetching image for resource with ID: {}", resourceId);
+
+        AlternativeResource resource = alternativeResourceRepository.findById(resourceId)
+                .orElseThrow(() -> new EntityNotFoundException("Alternative resource not found with ID: " + resourceId));
+
+        if (resource.getImageData() == null) {
+            throw new EntityNotFoundException("No image found for resource with ID: " + resourceId);
+        }
+
+        return ResourceImageDTO.builder()
+                .resourceId(resourceId)
+                .imageName(resource.getImageName())
+                .contentType(resource.getImageContentType())
+                .data(resource.getImageData())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteResourceImage(Long resourceId) {
+        logger.info("Deleting image for resource with ID: {}", resourceId);
+
+        AlternativeResource resource = alternativeResourceRepository.findById(resourceId)
+                .orElseThrow(() -> new EntityNotFoundException("Alternative resource not found with ID: " + resourceId));
+
+        resource.setImageData(null);
+        resource.setImageContentType(null);
+        resource.setImageName(null);
+
+        alternativeResourceRepository.save(resource);
+        logger.info("Image deleted for resource with ID: {}", resourceId);
+
+        return true;
+    }
+
+    // Modify your existing convertToDTO method to include image information
+    private AlternativeResourceDTO convertToDTO(AlternativeResource resource) {
+        AlternativeResourceDTO dto = modelMapper.map(resource, AlternativeResourceDTO.class);
+        dto.setAreaId(resource.getArea().getId());
+
+        // Set image metadata (but not the actual binary data)
+        dto.setImageName(resource.getImageName());
+        dto.setImageContentType(resource.getImageContentType());
+        dto.setHasImage(resource.getImageData() != null);
+
+        return dto;
     }
 }

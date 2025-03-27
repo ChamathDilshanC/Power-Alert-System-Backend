@@ -20,21 +20,21 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:63342","http://localhost:5500"})
 public class ForgotPasswordController {
 
     private static final Logger logger = LoggerFactory.getLogger(ForgotPasswordController.class);
-    private static final long TOKEN_EXPIRATION_MINUTES = 30;
+    private static final long CODE_EXPIRATION_MINUTES = 30;
 
-    // In-memory store for password reset tokens
+    // In-memory store for password reset codes
     // In a production environment, this would be stored in a database
-    private final Map<String, PasswordResetToken> resetTokens = new HashMap<>();
+    private final Map<String, PasswordResetCode> resetCodes = new HashMap<>();
 
     @Autowired
     private UserRepository userRepository;
@@ -49,7 +49,7 @@ public class ForgotPasswordController {
     private ResponseDTO responseDTO;
 
     /**
-     * Request a password reset token
+     * Request a password reset code
      */
     @PostMapping("/forgot-password")
     public ResponseEntity<ResponseDTO> requestPasswordReset(@Valid @RequestBody ForgotPasswordRequest request) {
@@ -70,17 +70,18 @@ public class ForgotPasswordController {
 
             User user = userOptional.get();
 
-            // Generate a secure random token
-            String token = generateSecureToken();
+            // Generate a 6-digit verification code
+            String verificationCode = generateVerificationCode();
 
-            // Store token with expiration time
-            resetTokens.put(token, new PasswordResetToken(
+            // Store code with expiration time
+            resetCodes.put(request.getEmail(), new PasswordResetCode(
                     user.getId(),
-                    LocalDateTime.now().plusMinutes(TOKEN_EXPIRATION_MINUTES)
+                    verificationCode,
+                    LocalDateTime.now().plusMinutes(CODE_EXPIRATION_MINUTES)
             ));
 
-            // Send password reset email
-            sendPasswordResetEmail(user.getEmail(), user.getUsername(), token);
+            // Send password reset email with code
+            sendPasswordResetEmail(user.getEmail(), user.getUsername(), verificationCode);
 
             responseDTO.setCode(VarList.OK);
             responseDTO.setMessage("If your email is registered, you will receive password reset instructions.");
@@ -97,61 +98,64 @@ public class ForgotPasswordController {
     }
 
     /**
-     * Validate password reset token
+     * Verify the password reset code
      */
-    @GetMapping("/validate-reset-token")
-    public ResponseEntity<ResponseDTO> validateResetToken(@RequestParam String token) {
+    @PostMapping("/verify-reset-code")
+    public ResponseEntity<ResponseDTO> verifyResetCode(@Valid @RequestBody VerifyCodeRequest request) {
         try {
-            logger.info("Validating password reset token");
+            logger.info("Verifying password reset code for email: {}", request.getEmail());
 
-            PasswordResetToken resetToken = resetTokens.get(token);
+            PasswordResetCode resetCode = resetCodes.get(request.getEmail());
 
-            if (resetToken == null || resetToken.isExpired()) {
-                logger.warn("Invalid or expired password reset token");
+            if (resetCode == null || resetCode.isExpired() || !resetCode.getCode().equals(request.getCode())) {
+                logger.warn("Invalid or expired password reset code for email: {}", request.getEmail());
                 responseDTO.setCode(VarList.Bad_Request);
-                responseDTO.setMessage("Invalid or expired password reset token");
+                responseDTO.setMessage("Invalid or expired verification code");
                 responseDTO.setData(null);
                 return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
             }
 
+            // Mark the code as verified but keep it in the map for the reset step
+            resetCode.setVerified(true);
+
             responseDTO.setCode(VarList.OK);
-            responseDTO.setMessage("Token is valid");
+            responseDTO.setMessage("Code verified successfully");
             responseDTO.setData(null);
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
 
         } catch (Exception e) {
-            logger.error("Error validating reset token: {}", e.getMessage(), e);
+            logger.error("Error verifying reset code: {}", e.getMessage(), e);
             responseDTO.setCode(VarList.Internal_Server_Error);
-            responseDTO.setMessage("Error validating token");
+            responseDTO.setMessage("Error verifying code");
             responseDTO.setData(null);
             return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     /**
-     * Reset password with token
+     * Reset password with email and verified code
      */
     @PostMapping("/reset-password")
     public ResponseEntity<ResponseDTO> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         try {
-            logger.info("Processing password reset");
+            logger.info("Processing password reset for email: {}", request.getEmail());
 
-            // Validate token
-            PasswordResetToken resetToken = resetTokens.get(request.getToken());
+            // Validate code
+            PasswordResetCode resetCode = resetCodes.get(request.getEmail());
 
-            if (resetToken == null || resetToken.isExpired()) {
-                logger.warn("Invalid or expired password reset token");
+            if (resetCode == null || resetCode.isExpired() || !resetCode.isVerified() || !resetCode.getCode().equals(request.getCode())) {
+                logger.warn("Invalid, unverified, or expired password reset code");
                 responseDTO.setCode(VarList.Bad_Request);
-                responseDTO.setMessage("Invalid or expired password reset token");
+                responseDTO.setMessage("Invalid, unverified, or expired verification code");
                 responseDTO.setData(null);
                 return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
             }
 
             // Find user
-            Optional<User> userOptional = userRepository.findById(resetToken.getUserId());
+            Optional<User> userOptional = userRepository.findById(resetCode.getUserId());
 
             if (userOptional.isEmpty()) {
-                logger.warn("User not found for reset token");
+                logger.warn("User not found for reset code");
                 responseDTO.setCode(VarList.Not_Found);
                 responseDTO.setMessage("User not found");
                 responseDTO.setData(null);
@@ -164,8 +168,8 @@ public class ForgotPasswordController {
             user.setPassword(passwordEncoder.encode(request.getNewPassword()));
             userRepository.save(user);
 
-            // Remove used token
-            resetTokens.remove(request.getToken());
+            // Remove used code
+            resetCodes.remove(request.getEmail());
 
             logger.info("Password reset successful for user ID: {}", user.getId());
 
@@ -184,23 +188,19 @@ public class ForgotPasswordController {
     }
 
     /**
-     * Generate a secure random token
+     * Generate a 6-digit verification code
      */
-    private String generateSecureToken() {
+    private String generateVerificationCode() {
         SecureRandom secureRandom = new SecureRandom();
-        byte[] tokenBytes = new byte[32];
-        secureRandom.nextBytes(tokenBytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
+        int code = secureRandom.nextInt(900000) + 100000; // Generates a number between 100000 and 999999
+        return String.valueOf(code);
     }
 
     /**
-     * Send password reset email
+     * Send password reset email with verification code
      */
-    private void sendPasswordResetEmail(String email, String username, String token) {
+    private void sendPasswordResetEmail(String email, String username, String verificationCode) {
         String subject = "Reset your PowerAlert password";
-
-        // Create the reset link
-        String resetLink = "https://poweralert.lk/reset-password?token=" + token;
 
         StringBuilder content = new StringBuilder();
         content.append("<!DOCTYPE html>");
@@ -218,6 +218,18 @@ public class ForgotPasswordController {
         content.append("    .content { padding: 40px 32px; }");
         content.append("    h1 { font-family: 'Google Sans', sans-serif; font-size: 22px; font-weight: 500; color: #202124; margin: 0 0 24px; }");
         content.append("    p { font-size: 14px; color: #3c4043; margin: 0 0 16px; }");
+        content.append("    .code-container { margin: 32px 0; text-align: center; }");
+        content.append("    .verification-code { ");
+        content.append("      display: inline-block;");
+        content.append("      font-family: monospace;");
+        content.append("      font-size: 32px;");
+        content.append("      font-weight: 700;");
+        content.append("      color: #202124;");
+        content.append("      background-color: #f1f3f4;");
+        content.append("      padding: 16px 32px;");
+        content.append("      border-radius: 8px;");
+        content.append("      letter-spacing: 4px;");
+        content.append("    }");
         content.append("    .button-container { text-align: center; margin: 32px 0; }");
         content.append("    .button { ");
         content.append("      display: inline-block;");
@@ -234,7 +246,6 @@ public class ForgotPasswordController {
         content.append("      transition: all 0.3s ease;");
         content.append("    }");
         content.append("    .button:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(110, 142, 251, 0.4); }");
-        content.append("    .link-text { font-size: 13px; color: #5f6368; margin-top: 16px; word-break: break-all; }");
         content.append("    .footer { padding: 24px 32px; font-size: 12px; color: #5f6368; border-top: 1px solid #f1f3f4; background-color: #fafafa; }");
         content.append("    .footer p { font-size: 12px; color: #5f6368; margin: 8px 0; }");
         content.append("  </style>");
@@ -248,13 +259,15 @@ public class ForgotPasswordController {
         content.append("    <div class=\"content\">");
         content.append("      <h1>Reset your password</h1>");
         content.append("      <p>Hi ").append(username).append(",</p>");
-        content.append("      <p>We received a request to reset the password for your PowerAlert account.</p>");
-        content.append("      <div class=\"button-container\">");
-        content.append("        <a href=\"").append(resetLink).append("\" class=\"button\">Reset password</a>");
+        content.append("      <p>We received a request to reset the password for your PowerAlert account. Use the verification code below to complete the process:</p>");
+        content.append("      <div class=\"code-container\">");
+        content.append("        <div class=\"verification-code\">").append(verificationCode).append("</div>");
         content.append("      </div>");
-        content.append("      <p>This link will expire in 30 minutes.</p>");
+        content.append("      <p>This code will expire in 30 minutes.</p>");
+        content.append("      <div class=\"button-container\">");
+        content.append("        <a href=\"http://localhost:63342/PowerAlert-Frontend/passwordReset.html\" class=\"button\">Reset your password</a>");
+        content.append("      </div>");
         content.append("      <p>If you didn't request this change, you can safely ignore this email.</p>");
-        content.append("      <p class=\"link-text\">Or copy and paste this URL into your browser:<br>").append(resetLink).append("</p>");
         content.append("    </div>");
         content.append("    <div class=\"footer\">");
         content.append("      <p>This email was sent to verify your identity. If you didn't request a password reset, you can safely ignore this message.</p>");
@@ -274,23 +287,39 @@ public class ForgotPasswordController {
     }
 
     /**
-     * Password reset token class
+     * Password reset code class
      */
-    private static class PasswordResetToken {
+    private static class PasswordResetCode {
         private final Long userId;
+        private final String code;
         private final LocalDateTime expiryDate;
+        private boolean verified;
 
-        public PasswordResetToken(Long userId, LocalDateTime expiryDate) {
+        public PasswordResetCode(Long userId, String code, LocalDateTime expiryDate) {
             this.userId = userId;
+            this.code = code;
             this.expiryDate = expiryDate;
+            this.verified = false;
         }
 
         public Long getUserId() {
             return userId;
         }
 
+        public String getCode() {
+            return code;
+        }
+
         public boolean isExpired() {
             return LocalDateTime.now().isAfter(expiryDate);
+        }
+
+        public boolean isVerified() {
+            return verified;
+        }
+
+        public void setVerified(boolean verified) {
+            this.verified = verified;
         }
     }
 
@@ -312,11 +341,45 @@ public class ForgotPasswordController {
     }
 
     /**
+     * Request body for verifying reset code
+     */
+    public static class VerifyCodeRequest {
+        @NotBlank(message = "Email is required")
+        @Email(message = "Email should be valid")
+        private String email;
+
+        @NotBlank(message = "Verification code is required")
+        @Size(min = 6, max = 6, message = "Verification code must be 6 digits")
+        private String code;
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+    }
+
+    /**
      * Request body for password reset
      */
     public static class ResetPasswordRequest {
-        @NotBlank(message = "Token is required")
-        private String token;
+        @NotBlank(message = "Email is required")
+        @Email(message = "Email should be valid")
+        private String email;
+
+        @NotBlank(message = "Verification code is required")
+        @Size(min = 6, max = 6, message = "Verification code must be 6 digits")
+        private String code;
 
         @NotBlank(message = "New password is required")
         @Size(min = 8, message = "Password must be at least 8 characters")
@@ -324,12 +387,20 @@ public class ForgotPasswordController {
                 message = "Password must contain at least one digit, one lowercase letter, one uppercase letter, one special character, and no whitespace")
         private String newPassword;
 
-        public String getToken() {
-            return token;
+        public String getEmail() {
+            return email;
         }
 
-        public void setToken(String token) {
-            this.token = token;
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
         }
 
         public String getNewPassword() {

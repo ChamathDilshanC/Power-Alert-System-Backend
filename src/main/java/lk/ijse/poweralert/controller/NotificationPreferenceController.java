@@ -22,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/user/notification-preferences")
 @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
+@CrossOrigin
 public class NotificationPreferenceController {
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationPreferenceController.class);

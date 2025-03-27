@@ -1,22 +1,28 @@
 package lk.ijse.poweralert.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lk.ijse.poweralert.dto.AlternativeResourceDTO;
+import lk.ijse.poweralert.dto.ResourceImageDTO;
 import lk.ijse.poweralert.dto.ResponseDTO;
 import lk.ijse.poweralert.service.AlternativeResourceService;
 import lk.ijse.poweralert.util.VarList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin
 public class AlternativeResourceController {
 
     private static final Logger logger = LoggerFactory.getLogger(AlternativeResourceController.class);
@@ -177,6 +183,100 @@ public class AlternativeResourceController {
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (Exception e) {
             logger.error("Error deleting alternative resource with ID {}: {}", id, e.getMessage(), e);
+
+            responseDTO.setCode(VarList.Internal_Server_Error);
+            responseDTO.setMessage("Error: " + e.getMessage());
+            responseDTO.setData(null);
+            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    // Add these endpoints to your existing controller
+
+    /**
+     * Upload an image for an alternative resource
+     */
+    @PostMapping("/admin/alternative-resources/{id}/image")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<ResponseDTO> uploadResourceImage(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            logger.debug("Uploading image for alternative resource with ID: {}", id);
+
+            if (file.isEmpty()) {
+                responseDTO.setCode(VarList.Bad_Request);
+                responseDTO.setMessage("Please select a file to upload");
+                responseDTO.setData(null);
+                return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+            }
+
+            // Validate file type
+            if (!file.getContentType().startsWith("image/")) {
+                responseDTO.setCode(VarList.Bad_Request);
+                responseDTO.setMessage("Only image files are allowed");
+                responseDTO.setData(null);
+                return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+            }
+
+            AlternativeResourceDTO updatedResource = alternativeResourceService.uploadResourceImage(id, file);
+
+            responseDTO.setCode(VarList.OK);
+            responseDTO.setMessage("Image uploaded successfully");
+            responseDTO.setData(updatedResource);
+
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error uploading image for resource with ID {}: {}", id, e.getMessage(), e);
+
+            responseDTO.setCode(VarList.Internal_Server_Error);
+            responseDTO.setMessage("Error: " + e.getMessage());
+            responseDTO.setData(null);
+            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Get the image of an alternative resource (public)
+     */
+    @GetMapping("/public/alternative-resources/{id}/image")
+    public ResponseEntity<?> getResourceImage(@PathVariable Long id) {
+        try {
+            logger.debug("Fetching image for alternative resource with ID: {}", id);
+
+            ResourceImageDTO imageDTO = alternativeResourceService.getResourceImage(id);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(imageDTO.getContentType()))
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "inline; filename=\"" + imageDTO.getImageName() + "\"")
+                    .body(imageDTO.getData());
+        } catch (EntityNotFoundException e) {
+            logger.error("Image not found for resource with ID {}: {}", id, e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            logger.error("Error retrieving image for resource with ID {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Delete an image of an alternative resource (admin only)
+     */
+    @DeleteMapping("/admin/alternative-resources/{id}/image")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<ResponseDTO> deleteResourceImage(@PathVariable Long id) {
+        try {
+            logger.debug("Deleting image for alternative resource with ID: {}", id);
+
+            boolean deleted = alternativeResourceService.deleteResourceImage(id);
+
+            responseDTO.setCode(VarList.OK);
+            responseDTO.setMessage("Image deleted successfully");
+            responseDTO.setData(null);
+
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error deleting image for resource with ID {}: {}", id, e.getMessage(), e);
 
             responseDTO.setCode(VarList.Internal_Server_Error);
             responseDTO.setMessage("Error: " + e.getMessage());

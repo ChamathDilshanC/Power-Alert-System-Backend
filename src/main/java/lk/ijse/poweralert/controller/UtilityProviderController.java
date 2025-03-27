@@ -21,6 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/provider")
+@CrossOrigin
 public class UtilityProviderController {
 
     private static final Logger logger = LoggerFactory.getLogger(UtilityProviderController.class);

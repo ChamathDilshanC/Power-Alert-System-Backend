@@ -25,6 +25,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/user/devices")
+@CrossOrigin
 public class UserDeviceController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserDeviceController.class);

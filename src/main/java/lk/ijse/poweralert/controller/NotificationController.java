@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api")
+@CrossOrigin
 public class NotificationController {
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationController.class);
