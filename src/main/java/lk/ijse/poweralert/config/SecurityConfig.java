@@ -29,7 +29,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(12);
     }
 
     @Bean
@@ -53,6 +53,10 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
+                                "/api/auth/forgot-password",
+                                "/api/auth/validate-reset-token",
+                                "/api/auth/verify-reset-code",
+                                "/api/auth/reset-password",
                                 "/login",
                                 "/css/**",
                                 "/js/**",
@@ -64,7 +68,7 @@ public class SecurityConfig {
                         // User endpoints
                         .requestMatchers("/api/user/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
                         // Utility provider endpoints
-                        .requestMatchers("/api/provider/**").hasAuthority("ROLE_UTILITY_PROVIDER")
+                        .requestMatchers("/api/provider/**").hasAnyAuthority("ROLE_UTILITY_PROVIDER", "ROLE_ADMIN")
                         // Any other request needs authentication
                         .anyRequest().authenticated()
                 )

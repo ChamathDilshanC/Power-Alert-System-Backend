@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-
 @Entity
 @Table(name = "alternative_resources")
 @Data
@@ -44,6 +42,17 @@ public class AlternativeResource {
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
+
+    // Add these new fields for image storage
+    @Lob
+    @Column(name = "image_data", columnDefinition = "MEDIUMBLOB")
+    private byte[] imageData;
+
+    @Column(name = "image_content_type")
+    private String imageContentType;
+
+    @Column(name = "image_name")
+    private String imageName;
 
     @ManyToOne
     @JoinColumn(name = "area_id", nullable = false)

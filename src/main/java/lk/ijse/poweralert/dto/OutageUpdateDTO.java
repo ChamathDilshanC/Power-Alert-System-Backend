@@ -26,5 +26,4 @@ public class OutageUpdateDTO {
     private LocalDateTime updatedEstimatedEndTime;
     private String reason;
     private OutageStatus newStatus;
-    private LocalDateTime createdAt;
 }

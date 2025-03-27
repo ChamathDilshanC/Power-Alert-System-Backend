@@ -42,11 +42,6 @@ public class Address {
     @Column(nullable = false)
     private Double longitude;
 
-    /* Remove PostGIS specific Point
-    @Column(columnDefinition = "geometry(Point,4326)")
-    private Point location;
-    */
-
     @Column(name = "is_primary", nullable = false)
     private boolean isPrimary;
 }

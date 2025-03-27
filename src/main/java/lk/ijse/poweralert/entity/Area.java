@@ -27,12 +27,6 @@ public class Area {
     @Column(nullable = false)
     private String province;
 
-    /* Remove PostGIS specific Polygon
-    @Column(columnDefinition = "geometry(Polygon,4326)")
-    private Polygon boundary;
-    */
-
-    // Instead store boundary as GeoJSON string
     @Column(name = "boundary_json", columnDefinition = "TEXT")
     private String boundaryJson;
 

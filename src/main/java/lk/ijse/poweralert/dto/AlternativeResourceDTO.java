@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
 @Builder
@@ -36,6 +37,13 @@ public class AlternativeResourceDTO {
     private String contactNumber;
     private String operatingHours;
     private boolean isActive = true;
+
+    // Add fields for image metadata but not the binary data itself
+    private String imageName;
+    private String imageContentType;
+
+    // This field indicates if this resource has an image
+    private boolean hasImage;
 
     @NotNull(message = "Area ID is required")
     private Long areaId;

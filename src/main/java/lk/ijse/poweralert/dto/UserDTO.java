@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -20,8 +21,9 @@ public class UserDTO {
     private String phoneNumber;
     private Role role;
     private String preferredLanguage;
-    private List<AddressDTO> addresses;
-    private List<NotificationPreferenceDTO> notificationPreferences;
+    private List<AddressDTO> addresses = new ArrayList<>();
+    private List<NotificationPreferenceDTO> notificationPreferences = new ArrayList<>();
+
     private boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
