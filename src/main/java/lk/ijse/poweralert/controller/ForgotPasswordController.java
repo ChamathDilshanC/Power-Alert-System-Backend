@@ -26,7 +26,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:63342","http://localhost:5500"})
+@CrossOrigin
 public class ForgotPasswordController {
 
     private static final Logger logger = LoggerFactory.getLogger(ForgotPasswordController.class);

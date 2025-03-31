@@ -38,4 +38,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /** Find users by geographical area */
     @Query("SELECT DISTINCT u FROM User u JOIN u.addresses a JOIN Area area WHERE area.id = :areaId AND a.district = area.district AND u.isActive = true")
     List<User> findUsersByAreaId(@Param("areaId") Long areaId);
+
+    boolean existsByPhoneNumber(String phoneNumber);
 }
