@@ -220,21 +220,22 @@ public class NotificationServiceImpl implements NotificationService {
                             updateNotificationStatus(emailNotification, success));
                     break;
 
+// In NotificationServiceImpl.java - just the relevant part:
+
                 case SMS:
                     if (smsService != null && user.getPhoneNumber() != null && !user.getPhoneNumber().isEmpty()) {
-                        // For SMS, use direct message without casting
+                        // For SMS, use templated message with language
                         String[] params = getMessageParams(outage);
 
-                        // Use direct sendSms instead of casting to TwilioSmsServiceImpl
+                        // Use sendTemplatedSms with explicit language parameter
                         CompletableFuture<Boolean> smsFuture;
                         if (smsService instanceof TwilioSmsServiceImpl) {
-                            // Only use sendTemplatedSms if available (safer than cast)
                             TwilioSmsServiceImpl twilioSms = (TwilioSmsServiceImpl) smsService;
                             smsFuture = twilioSms.sendTemplatedSms(
                                     user.getPhoneNumber(),
                                     messageKey,
                                     params,
-                                    user.getPreferredLanguage()// This correctly passes the user's language
+                                    user.getPreferredLanguage() // Pass user's preferred language
                             );
                         } else {
                             // Fall back to regular SMS

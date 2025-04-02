@@ -12,6 +12,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
+
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -217,10 +219,22 @@ public class TwilioWhatsAppServiceImpl implements WhatsAppService {
                 return CompletableFuture.completedFuture(false);
             }
 
+            // Ensure proper UTF-8 encoding for the message
+            byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
+            String encodedMessage = new String(messageBytes, StandardCharsets.UTF_8);
+
+            // Create a message with parameters for encoding
+            Map<String, String> params = new HashMap<>();
+            params.put("To", toNumber);
+            params.put("From", fromNumber);
+            params.put("Body", encodedMessage);
+            params.put("CharacterSet", "UTF-8");
+
+            // Use the parameterized approach for creating the message
             Message messageResult = Message.creator(
                             new PhoneNumber(toNumber),
                             new PhoneNumber(fromNumber),
-                            message)
+                            encodedMessage)
                     .create();
 
             logger.info("WhatsApp message sent successfully, SID: {}", messageResult.getSid());
@@ -233,7 +247,6 @@ public class TwilioWhatsAppServiceImpl implements WhatsAppService {
             return CompletableFuture.completedFuture(false);
         }
     }
-
     @Override
     @Async
     public CompletableFuture<Boolean> sendTemplateMessage(String phoneNumber, String templateName, String[] parameters) {

@@ -3,12 +3,25 @@ package lk.ijse.poweralert.service;
 import java.util.concurrent.CompletableFuture;
 
 public interface SmsService {
+    /**
+     * Send an SMS message directly
+     *
+     * @param phoneNumber The recipient's phone number
+     * @param messageContent The message content
+     * @return CompletableFuture indicating success or failure
+     */
     CompletableFuture<Boolean> sendSms(String phoneNumber, String messageContent);
-    boolean isValidPhoneNumber(String phoneNumber); // This method can stay as boolean since it's not @Async
 
     /**
-     * Send an SMS using a template (default implementation returns unsupported)
-     * This allows TwilioSmsServiceImpl to implement it without requiring casting
+     * Check if a phone number is valid
+     *
+     * @param phoneNumber The phone number to validate
+     * @return true if valid, false otherwise
+     */
+    boolean isValidPhoneNumber(String phoneNumber);
+
+    /**
+     * Send an SMS using a template
      *
      * @param phoneNumber The recipient's phone number
      * @param templateKey The template key (e.g., "outage.new", "outage.update")
