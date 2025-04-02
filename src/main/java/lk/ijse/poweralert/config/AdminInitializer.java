@@ -20,7 +20,7 @@ public class AdminInitializer implements CommandLineRunner {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Value("${admin.email:admin@poweralert.lk}")
+    @Value("${admin.email:alerts.poweralert@gmail.com}")
     private String adminEmail;
 
     @Value("${admin.password:Admin@123}")

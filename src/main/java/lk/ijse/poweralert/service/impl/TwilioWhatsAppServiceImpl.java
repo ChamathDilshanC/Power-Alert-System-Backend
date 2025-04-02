@@ -58,64 +58,137 @@ public class TwilioWhatsAppServiceImpl implements WhatsAppService {
         }
     }
 
+
     private void initTemplateMap() {
-        // Add default template mappings for outage notifications
-        templateMap.put("outage_notification", "Your {{1}} service will be interrupted in {{2}} from {{3}} to {{4}}. Reason: {{5}}");
+        // Base templates
+        templateMap.put("outage.new", "Your {{1}} service will be interrupted in {{2}} from {{3}} to {{4}}. Reason: {{5}}");
+        templateMap.put("outage.update", "Update on your {{1}} outage in {{2}}: Status is now {{3}}. Estimated restoration: {{4}}");
+        templateMap.put("outage.cancelled", "The scheduled {{1}} outage in {{2}} for {{3}} has been cancelled.");
+        templateMap.put("outage.restored", "Good news! {{1}} services in {{2}} have been restored. Thank you for your patience.");
+
+        // Base templates with underscores (for compatibility)
+        templateMap.put("outage_new", "Your {{1}} service will be interrupted in {{2}} from {{3}} to {{4}}. Reason: {{5}}");
         templateMap.put("outage_update", "Update on your {{1}} outage in {{2}}: Status is now {{3}}. Estimated restoration: {{4}}");
-        templateMap.put("outage_restoration", "Good news! {{1}} services in {{2}} have been restored. Thank you for your patience.");
-        templateMap.put("outage_cancellation", "The scheduled {{1}} outage in {{2}} for {{3}} has been cancelled.");
+        templateMap.put("outage_cancelled", "The scheduled {{1}} outage in {{2}} for {{3}} has been cancelled.");
+        templateMap.put("outage_restored", "Good news! {{1}} services in {{2}} have been restored. Thank you for your patience.");
 
-        // Add mappings for outage.new, outage.update, etc. that match message keys in ResourceBundle
-        templateMap.put("outage.new", "{{0}} outage scheduled in {{1}} from {{2}} to {{3}}. Reason: {{4}}");
-        templateMap.put("outage.update", "{{0}} outage in {{1}} status updated to {{2}}. Estimated end time: {{3}}");
-        templateMap.put("outage.cancelled", "{{0}} outage in {{1}} scheduled for {{2}} has been cancelled");
-        templateMap.put("outage.restored", "{{0}} services in {{1}} have been restored");
+        // Sinhala templates
+        templateMap.put("outage.new_si", "ඔබගේ {{1}} සේවාව {{2}} හි {{3}} සිට {{4}} දක්වා අත්හිටුවනු ලැබේ. හේතුව: {{5}}");
+        templateMap.put("outage.update_si", "{{1}} හි {{2}} විදුලි බිඳවැටීමේ යාවත්කාලීන තොරතුරු: තත්ත්වය {{3}}. අවසන් වන ඇස්තමේන්තු වේලාව: {{4}}");
+        templateMap.put("outage.cancelled_si", "{{2}} හි {{3}} සඳහා සැලසුම් කළ {{1}} බිඳවැටීම අවලංගු කර ඇත.");
+        templateMap.put("outage.restored_si", "{{2}} හි {{1}} සේවා යථා තත්ත්වයට පත් කර ඇත. ඔබේ ඉවසීම සඳහා ස්තූතියි.");
 
-        // Try to load from resource bundles for better localization
+        // Sinhala templates with underscores (for compatibility)
+        templateMap.put("outage_new_si", "ඔබගේ {{1}} සේවාව {{2}} හි {{3}} සිට {{4}} දක්වා අත්හිටුවනු ලැබේ. හේතුව: {{5}}");
+        templateMap.put("outage_update_si", "{{1}} හි {{2}} විදුලි බිඳවැටීමේ යාවත්කාලීන තොරතුරු: තත්ත්වය {{3}}. අවසන් වන ඇස්තමේන්තු වේලාව: {{4}}");
+        templateMap.put("outage_cancelled_si", "{{2}} හි {{3}} සඳහා සැලසුම් කළ {{1}} බිඳවැටීම අවලංගු කර ඇත.");
+        templateMap.put("outage_restored_si", "{{2}} හි {{1}} සේවා යථා තත්ත්වයට පත් කර ඇත. ඔබේ ඉවසීම සඳහා ස්තූතියි.");
+
+        // Tamil templates
+        templateMap.put("outage.new_ta", "உங்கள் {{1}} சேவை {{2}} இல் {{3}} முதல் {{4}} வரை தடைப்படும். காரணம்: {{5}}");
+        templateMap.put("outage.update_ta", "{{2}} இல் {{1}} சேவை தடை புதுப்பிப்பு: நிலை இப்போது {{3}}. மதிப்பிடப்பட்ட மீட்பு நேரம்: {{4}}");
+        templateMap.put("outage.cancelled_ta", "{{2}} இல் {{3}} க்கு திட்டமிடப்பட்ட {{1}} சேவை தடை ரத்து செய்யப்பட்டது.");
+        templateMap.put("outage.restored_ta", "நல்ல செய்தி! {{2}} இல் {{1}} சேவைகள் மீட்டமைக்கப்பட்டுள்ளன. உங்கள் பொறுமைக்கு நன்றி.");
+
+        // Tamil templates with underscores (for compatibility)
+        templateMap.put("outage_new_ta", "உங்கள் {{1}} சேவை {{2}} இல் {{3}} முதல் {{4}} வரை தடைப்படும். காரணம்: {{5}}");
+        templateMap.put("outage_update_ta", "{{2}} இல் {{1}} சேவை தடை புதுப்பிப்பு: நிலை இப்போது {{3}}. மதிப்பிடப்பட்ட மீட்பு நேரம்: {{4}}");
+        templateMap.put("outage_cancelled_ta", "{{2}} இல் {{3}} க்கு திட்டமிடப்பட்ட {{1}} சேவை தடை ரத்து செய்யப்பட்டது.");
+        templateMap.put("outage_restored_ta", "நல்ல செய்தி! {{2}} இல் {{1}} சேவைகள் மீட்டமைக்கப்பட்டுள்ளன. உங்கள் பொறுமைக்கு நன்றி.");
+
+        // Load additional templates from resource bundles
+        loadAllTemplatesFromResourceBundles();
+    }
+
+    // Add a new method to load all templates from resource bundles
+    private void loadAllTemplatesFromResourceBundles() {
         try {
-            ResourceBundle bundle = ResourceBundle.getBundle("messages");
-            if (bundle.containsKey("outage.new")) {
-                String template = bundle.getString("outage.new");
-                // Convert from {0} format to {{0}} format for WhatsApp
-                template = template.replaceAll("\\{(\\d+)\\}", "{{$1}}");
-                templateMap.put("outage.new", template);
-            }
-            // Same for other keys
+            loadTemplatesFromBundle("messages", "");
+            loadTemplatesFromBundle("messages_si", "_si");
+            loadTemplatesFromBundle("messages_ta", "_ta");
         } catch (Exception e) {
-            logger.warn("Could not load templates from resource bundle, using defaults", e);
+            logger.warn("Error loading templates from resource bundles", e);
+        }
+    }
+
+    private void loadTemplatesFromBundle(String bundleName, String suffix) {
+        try {
+            ResourceBundle bundle = ResourceBundle.getBundle(bundleName);
+            for (String key : new String[]{"outage.new", "outage.update", "outage.cancelled", "outage.restored"}) {
+                if (bundle.containsKey(key)) {
+                    String template = bundle.getString(key);
+                    // Convert from {0} format to {{0}} format for WhatsApp
+                    template = template.replaceAll("\\{(\\d+)\\}", "{{$1}}");
+                    templateMap.put(key + suffix, template);
+                    logger.info("Loaded template {} from {}", key + suffix, bundleName);
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Could not load templates from {}: {}", bundleName, e.getMessage());
+        }
+    }
+
+    @Override
+    @Async
+    public CompletableFuture<Boolean> sendTemplateMessage(String phoneNumber, String templateName, String[] parameters, String language) {
+        if (!whatsappEnabled) {
+            logger.info("WhatsApp template sending is disabled. Would have sent to: {}, template: {}, language: {}",
+                    phoneNumber, templateName, language);
+            return CompletableFuture.completedFuture(true);
         }
 
-        // Add language-specific templates
-        templateMap.put("outage_notification_si", "ඔබගේ {{2}} ප්‍රදේශයේ {{1}} සේවාව {{3}} සිට {{4}} දක්වා අත්හිටුවනු ලැබේ. හේතුව: {{5}}");
-        templateMap.put("outage_notification_ta", "உங்கள் {{2}} பகுதியில் {{1}} சேவை {{3}} முதல் {{4}} வரை தடைப்படும். காரணம்: {{5}}");
-
-        // Add mappings for outage.new_si, outage.new_ta, etc.
         try {
-            ResourceBundle bundleSi = ResourceBundle.getBundle("messages_si");
-            if (bundleSi.containsKey("outage.new")) {
-                String template = bundleSi.getString("outage.new");
-                template = template.replaceAll("\\{(\\d+)\\}", "{{$1}}");
-                templateMap.put("outage.new_si", template);
-            }
-        } catch (Exception e) {
-            logger.warn("Could not load Sinhala templates", e);
-        }
+            logger.info("Sending WhatsApp template message to: {}, template: {}, language: {}",
+                    phoneNumber, templateName, language);
 
-        try {
-            ResourceBundle bundleTa = ResourceBundle.getBundle("messages_ta");
-            if (bundleTa.containsKey("outage.new")) {
-                String template = bundleTa.getString("outage.new");
-                template = template.replaceAll("\\{(\\d+)\\}", "{{$1}}");
-                templateMap.put("outage.new_ta", template);
+            // First try language-specific template format (e.g., outage.new_si)
+            String langSpecificKey = templateName;
+            if (language != null && !language.equals("en")) {
+                langSpecificKey = templateName + "_" + language.toLowerCase();
             }
-        } catch (Exception e) {
-            logger.warn("Could not load Tamil templates", e);
-        }
 
-        // Add different outage types templates
-        templateMap.put("electricity_outage", "⚡ ELECTRICITY OUTAGE: There will be a power outage in {{1}} from {{2}} to {{3}}. Reason: {{4}}");
-        templateMap.put("water_outage", "💧 WATER OUTAGE: Water supply will be interrupted in {{1}} from {{2}} to {{3}}. Reason: {{4}}");
-        templateMap.put("gas_outage", "🔥 GAS OUTAGE: Gas supply will be interrupted in {{1}} from {{2}} to {{3}}. Reason: {{4}}");
+            // Get template content, trying different possible formats
+            String templateContent = null;
+
+            // 1. Try with language suffix using dots (e.g., outage.new_si)
+            templateContent = getTemplateContent(langSpecificKey, parameters);
+
+            // 2. Try with language suffix using underscores (e.g., outage_new_si)
+            if (templateContent == null) {
+                templateContent = getTemplateContent(langSpecificKey.replace(".", "_"), parameters);
+            }
+
+            // 3. Try the base template with dots (e.g., outage.new)
+            if (templateContent == null) {
+                templateContent = getTemplateContent(templateName, parameters);
+            }
+
+            // 4. Try the base template with underscores (e.g., outage_new)
+            if (templateContent == null) {
+                templateContent = getTemplateContent(templateName.replace(".", "_"), parameters);
+            }
+
+            // If still no template found, use a generic message
+            if (templateContent == null) {
+                logger.warn("No template found for '{}' in language '{}', using generic message",
+                        templateName, language);
+
+                // Create a basic fallback message
+                String fallbackMessage = "PowerAlert notification";
+                if (parameters != null && parameters.length > 0) {
+                    fallbackMessage = "PowerAlert: " + String.join(" ", parameters);
+                }
+
+                return sendWhatsAppMessage(phoneNumber, fallbackMessage);
+            }
+
+            // Send the template message
+            logger.info("Using template content: {}", templateContent);
+            return sendWhatsAppMessage(phoneNumber, templateContent);
+        } catch (Exception e) {
+            logger.error("Failed to send WhatsApp template message to {}: {}", phoneNumber, e.getMessage(), e);
+            return CompletableFuture.completedFuture(false);
+        }
     }
 
     @Override

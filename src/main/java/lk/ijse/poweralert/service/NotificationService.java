@@ -2,6 +2,7 @@ package lk.ijse.poweralert.service;
 
 import lk.ijse.poweralert.entity.Outage;
 import lk.ijse.poweralert.entity.User;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -23,6 +24,9 @@ public interface NotificationService {
      * @param outage The updated outage to send notifications for
      */
     void sendOutageUpdateNotifications(Outage outage);
+
+    @Async
+    void sendOutageUpdateNotification(User user, Outage outage);
 
     /**
      * Send notifications for a cancelled outage

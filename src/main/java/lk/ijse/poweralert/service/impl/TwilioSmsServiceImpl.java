@@ -42,7 +42,7 @@ public class TwilioSmsServiceImpl implements SmsService {
     private boolean smsEnabled;
 
     // Cache for SMS templates
-    private Map<String, String> templateCache = new HashMap<>();
+    private final Map<String, String> templateCache = new HashMap<>();
 
     @PostConstruct
     public void init() {
@@ -78,48 +78,119 @@ public class TwilioSmsServiceImpl implements SmsService {
             try {
                 // Load the templates from the resource bundle
                 ResourceBundle bundle = ResourceBundle.getBundle("messages");
+                logger.info("Default resource bundle loaded successfully");
 
                 // Only override if found in the bundle
                 if (bundle.containsKey("outage.new")) {
                     templateCache.put("outage.new", bundle.getString("outage.new"));
+                    logger.info("Loaded English template for outage.new");
                 }
                 if (bundle.containsKey("outage.update")) {
                     templateCache.put("outage.update", bundle.getString("outage.update"));
+                    logger.info("Loaded English template for outage.update");
                 }
                 if (bundle.containsKey("outage.cancelled")) {
                     templateCache.put("outage.cancelled", bundle.getString("outage.cancelled"));
+                    logger.info("Loaded English template for outage.cancelled");
                 }
                 if (bundle.containsKey("outage.restored")) {
                     templateCache.put("outage.restored", bundle.getString("outage.restored"));
+                    logger.info("Loaded English template for outage.restored");
                 }
             } catch (Exception e) {
-                logger.warn("Failed to load default templates from resource bundle", e);
+                logger.warn("Failed to load default templates from resource bundle: {}", e.getMessage());
                 // Continue with fallbacks already set
             }
 
             // Try to load Sinhala templates
             try {
                 ResourceBundle bundleSi = ResourceBundle.getBundle("messages_si");
-                templateCache.put("outage.new_si", bundleSi.getString("outage.new"));
-                templateCache.put("outage.update_si", bundleSi.getString("outage.update"));
-                templateCache.put("outage.cancelled_si", bundleSi.getString("outage.cancelled"));
-                templateCache.put("outage.restored_si", bundleSi.getString("outage.restored"));
+                logger.info("Sinhala resource bundle loaded successfully");
+
+                // Load Sinhala templates
+                if (bundleSi.containsKey("outage.new")) {
+                    String template = bundleSi.getString("outage.new");
+                    templateCache.put("outage.new_si", template);
+                    logger.info("Loaded Sinhala template for outage.new: {}", template);
+                } else {
+                    logger.warn("Sinhala bundle missing key: outage.new");
+                }
+
+                if (bundleSi.containsKey("outage.update")) {
+                    String template = bundleSi.getString("outage.update");
+                    templateCache.put("outage.update_si", template);
+                    logger.info("Loaded Sinhala template for outage.update");
+                } else {
+                    logger.warn("Sinhala bundle missing key: outage.update");
+                }
+
+                if (bundleSi.containsKey("outage.cancelled")) {
+                    String template = bundleSi.getString("outage.cancelled");
+                    templateCache.put("outage.cancelled_si", template);
+                    logger.info("Loaded Sinhala template for outage.cancelled");
+                } else {
+                    logger.warn("Sinhala bundle missing key: outage.cancelled");
+                }
+
+                if (bundleSi.containsKey("outage.restored")) {
+                    String template = bundleSi.getString("outage.restored");
+                    templateCache.put("outage.restored_si", template);
+                    logger.info("Loaded Sinhala template for outage.restored");
+                } else {
+                    logger.warn("Sinhala bundle missing key: outage.restored");
+                }
+
             } catch (Exception e) {
-                logger.warn("Failed to load Sinhala templates", e);
+                logger.warn("Failed to load Sinhala templates: {}", e.getMessage());
             }
 
             // Try to load Tamil templates
             try {
                 ResourceBundle bundleTa = ResourceBundle.getBundle("messages_ta");
-                templateCache.put("outage.new_ta", bundleTa.getString("outage.new"));
-                templateCache.put("outage.update_ta", bundleTa.getString("outage.update"));
-                templateCache.put("outage.cancelled_ta", bundleTa.getString("outage.cancelled"));
-                templateCache.put("outage.restored_ta", bundleTa.getString("outage.restored"));
+                logger.info("Tamil resource bundle loaded successfully");
+
+                // Load Tamil templates
+                if (bundleTa.containsKey("outage.new")) {
+                    String template = bundleTa.getString("outage.new");
+                    templateCache.put("outage.new_ta", template);
+                    logger.info("Loaded Tamil template for outage.new: {}", template);
+                } else {
+                    logger.warn("Tamil bundle missing key: outage.new");
+                }
+
+                if (bundleTa.containsKey("outage.update")) {
+                    String template = bundleTa.getString("outage.update");
+                    templateCache.put("outage.update_ta", template);
+                    logger.info("Loaded Tamil template for outage.update");
+                } else {
+                    logger.warn("Tamil bundle missing key: outage.update");
+                }
+
+                if (bundleTa.containsKey("outage.cancelled")) {
+                    String template = bundleTa.getString("outage.cancelled");
+                    templateCache.put("outage.cancelled_ta", template);
+                    logger.info("Loaded Tamil template for outage.cancelled");
+                } else {
+                    logger.warn("Tamil bundle missing key: outage.cancelled");
+                }
+
+                if (bundleTa.containsKey("outage.restored")) {
+                    String template = bundleTa.getString("outage.restored");
+                    templateCache.put("outage.restored_ta", template);
+                    logger.info("Loaded Tamil template for outage.restored");
+                } else {
+                    logger.warn("Tamil bundle missing key: outage.restored");
+                }
+
             } catch (Exception e) {
-                logger.warn("Failed to load Tamil templates", e);
+                logger.warn("Failed to load Tamil templates: {}", e.getMessage());
             }
 
+            // Log all templates in cache
             logger.info("SMS template cache initialized with {} templates", templateCache.size());
+            for (Map.Entry<String, String> entry : templateCache.entrySet()) {
+                logger.debug("Template key: {}", entry.getKey());
+            }
         } catch (Exception e) {
             logger.error("Failed to initialize SMS template cache", e);
         }
@@ -156,7 +227,7 @@ public class TwilioSmsServiceImpl implements SmsService {
             logger.error("Twilio API error sending SMS to {}: {}", phoneNumber, e.getMessage(), e);
             return CompletableFuture.completedFuture(false);
         } catch (Exception e) {
-            logger.error("Failed to send SMS to {}", phoneNumber, e);
+            logger.error("Failed to send SMS to {}: {}", phoneNumber, e.getMessage(), e);
             return CompletableFuture.completedFuture(false);
         }
     }
@@ -179,24 +250,33 @@ public class TwilioSmsServiceImpl implements SmsService {
         }
 
         try {
-            // Get the template with language code
-            String templateContent = null;
+            // Normalize language to lowercase for consistency
+            String normalizedLanguage = language != null ? language.toLowerCase() : "en";
 
-            // Try language-specific template first
-            if (language != null && !language.isEmpty() && !language.equalsIgnoreCase("en")) {
-                templateContent = templateCache.get(templateKey + "_" + language.toLowerCase());
+            // Build template cache key
+            String templateCacheKey = templateKey;
+
+            // For non-English languages, append language code to template key
+            if (!"en".equals(normalizedLanguage)) {
+                templateCacheKey = templateKey + "_" + normalizedLanguage;
+                logger.info("Using language-specific template key: {}", templateCacheKey);
             }
 
-            // Fall back to default language template
+            // Get the template content
+            String templateContent = templateCache.get(templateCacheKey);
+
+            // If not found, fall back to default English template
             if (templateContent == null) {
+                logger.info("No template found for key: {}, falling back to default", templateCacheKey);
                 templateContent = templateCache.get(templateKey);
             }
 
             // If still no template, create a generic message
             if (templateContent == null) {
-                logger.warn("No template found for key: {}", templateKey);
-                StringBuilder fallback = new StringBuilder("PowerAlert: ");
+                logger.warn("No template found for key: {} or {}, using fallback message",
+                        templateCacheKey, templateKey);
 
+                StringBuilder fallback = new StringBuilder("PowerAlert: ");
                 if (params != null && params.length > 0) {
                     fallback.append(String.join(" ", params));
                 } else {
@@ -206,14 +286,21 @@ public class TwilioSmsServiceImpl implements SmsService {
                 return sendSms(phoneNumber, fallback.toString());
             }
 
+            // Log the template being used
+            logger.info("Using template for key '{}': '{}'", templateCacheKey, templateContent);
+
             // Replace parameters in template
             String finalMessage = templateContent;
             if (params != null) {
                 for (int i = 0; i < params.length; i++) {
                     // Replace {0}, {1}, etc. with parameter values
-                    finalMessage = finalMessage.replace("{" + i + "}", params[i]);
+                    String placeholder = "{" + i + "}";
+                    String paramValue = params[i] != null ? params[i] : "";
+                    finalMessage = finalMessage.replace(placeholder, paramValue);
                 }
             }
+
+            logger.info("Sending SMS in language '{}' with message: {}", normalizedLanguage, finalMessage);
 
             // Send the formatted message
             return sendSms(phoneNumber, finalMessage);

@@ -78,6 +78,24 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
 
+    @Override
+    public void sendOutageUpdateNotifications(Outage outage) {
+        logger.info("Sending notifications for updated outage ID: {}", outage.getId());
+
+        try {
+            // Get affected users IDs
+            List<Long> affectedUserIds = findAffectedUserIds(outage);
+            logger.info("Found {} affected users for outage update ID: {}", affectedUserIds.size(), outage.getId());
+
+            // Process each user in their own transaction
+            for (Long userId : affectedUserIds) {
+                processUserNotification(userId, outage, "outage-update.ftl", "outage.update");
+            }
+        } catch (Exception e) {
+            logger.error("Error sending outage update notifications: {}", e.getMessage(), e);
+        }
+    }
+
     /**
      * Find user IDs affected by an outage
      *
@@ -216,7 +234,7 @@ public class NotificationServiceImpl implements NotificationService {
                                     user.getPhoneNumber(),
                                     messageKey,
                                     params,
-                                    user.getPreferredLanguage()
+                                    user.getPreferredLanguage()// This correctly passes the user's language
                             );
                         } else {
                             // Fall back to regular SMS
@@ -240,18 +258,12 @@ public class NotificationServiceImpl implements NotificationService {
                         // For WhatsApp, we use template messages
                         String[] params = getMessageParams(outage);
 
-                        // Convert message key to WhatsApp template format (underscores instead of dots)
-                        String templateName = messageKey.replace(".", "_");
-
-                        // Add language suffix if available
-                        if (user.getPreferredLanguage() != null && !user.getPreferredLanguage().equalsIgnoreCase("en")) {
-                            templateName += "_" + user.getPreferredLanguage().toLowerCase();
-                        }
-
+                        // Use the overloaded method with language parameter
                         CompletableFuture<Boolean> whatsappFuture = whatsAppService.sendTemplateMessage(
                                 user.getPhoneNumber(),
-                                templateName,
-                                params
+                                messageKey,
+                                params,
+                                user.getPreferredLanguage() // Pass the language explicitly
                         );
 
                         Notification whatsappNotification = createNotificationRecord(
@@ -305,23 +317,17 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public void sendOutageUpdateNotifications(Outage outage) {
-        logger.info("Sending notifications for updated outage ID: {}", outage.getId());
+    public void sendOutageUpdateNotification(User user, Outage outage) {
+        String language = user.getPreferredLanguage(); // Get user's preferred language
 
-        try {
-            // Get affected user IDs
-            List<Long> affectedUserIds = findAffectedUserIds(outage);
-            logger.info("Found {} affected users for outage update ID: {}", affectedUserIds.size(), outage.getId());
+        // For WhatsApp - Now using the overloaded method with language parameter
+        String[] params = {outage.getType().toString(), outage.getAffectedArea().getName(),
+                outage.getStatus().toString(), outage.getEstimatedEndTime().format(DATE_FORMATTER)};
+        whatsAppService.sendTemplateMessage(user.getPhoneNumber(), "outage.update", params, language);
 
-            // Process each user separately
-            for (Long userId : affectedUserIds) {
-                processUserNotification(userId, outage, "outage-update.ftl", "outage.update");
-            }
-        } catch (Exception e) {
-            logger.error("Error sending outage update notifications: {}", e.getMessage(), e);
-        }
+        // For Email - Using the specific outage update method
+        emailService.sendOutageUpdateEmail(user, outage, language);
     }
-
     @Override
     @Async
     public void sendOutageCancellationNotifications(Outage outage) {

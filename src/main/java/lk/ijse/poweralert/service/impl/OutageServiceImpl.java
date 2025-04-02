@@ -141,38 +141,6 @@ public class OutageServiceImpl implements OutageService {
             // Send notifications via the notification service
             notificationService.sendOutageNotifications(outage);
 
-            // Get affected users and send email notifications
-            List<User> affectedUsers = findAffectedUsers(outage);
-            logger.info("Found {} affected users for outage ID: {}", affectedUsers.size(), outageId);
-
-            // Send emails to affected users using template
-            for (User user : affectedUsers) {
-                try {
-                    // Create template model
-                    Map<String, Object> templateModel = createOutageTemplateModel(outage, user);
-
-                    // Send email with template
-                    String subject = outage.getType() + " Outage Alert - " + outage.getAffectedArea().getName();
-
-                    CompletableFuture<Boolean> emailResult = emailService.sendTemplateEmail(
-                            user.getEmail(),
-                            subject,
-                            "outage-notification",
-                            templateModel
-                    );
-
-                    // If template fails, send direct notification
-                    emailResult.exceptionally(ex -> {
-                        logger.warn("Template email failed for user {}, falling back to direct notification", user.getEmail(), ex);
-                        emailService.sendOutageNotificationEmail(user, outage, user.getPreferredLanguage());
-                        return false;
-                    });
-
-                } catch (Exception e) {
-                    logger.error("Error sending email to user {}: {}", user.getEmail(), e.getMessage());
-                }
-            }
-
             logger.info("Notifications sent successfully for outage ID: {}", outageId);
         } catch (Exception e) {
             logger.error("Error sending notifications for outage ID {}: {}", outageId, e.getMessage(), e);
@@ -339,7 +307,7 @@ public class OutageServiceImpl implements OutageService {
                     CompletableFuture<Boolean> emailResult = emailService.sendTemplateEmail(
                             user.getEmail(),
                             subject,
-                            "outage-update",
+                            "outage-update.ftl",
                             templateModel
                     );
 
@@ -485,8 +453,8 @@ public class OutageServiceImpl implements OutageService {
             Outage outage = outageRepository.findById(outageId)
                     .orElseThrow(() -> new EntityNotFoundException("Outage not found with ID: " + outageId));
 
-            // Send notifications via notification service
-            notificationService.sendOutageCancellationNotifications(outage);
+//            // Send notifications via notification service
+//            notificationService.sendOutageCancellationNotifications(outage);
 
             // Find affected users
             List<User> affectedUsers = findAffectedUsers(outage);
@@ -504,7 +472,7 @@ public class OutageServiceImpl implements OutageService {
                     CompletableFuture<Boolean> emailResult = emailService.sendTemplateEmail(
                             user.getEmail(),
                             subject,
-                            "outage-cancellation",
+                            "outage-cancellation.ftl",
                             templateModel
                     );
 

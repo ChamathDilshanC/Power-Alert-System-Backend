@@ -13,6 +13,39 @@ import java.util.concurrent.CompletableFuture;
 public interface EmailService {
 
     /**
+     * Send an outage update email to a user
+     *
+     * @param user the user to send the email to
+     * @param outage the outage details
+     * @param language the user's preferred language
+     * @return CompletableFuture containing a boolean indicating success
+     */
+    @Async
+    CompletableFuture<Boolean> sendOutageUpdateEmail(User user, Outage outage, String language);
+
+    /**
+     * Send an outage cancellation email to a user
+     *
+     * @param user the user to send the email to
+     * @param outage the outage details
+     * @param language the user's preferred language
+     * @return CompletableFuture containing a boolean indicating success
+     */
+    @Async
+    CompletableFuture<Boolean> sendOutageCancellationEmail(User user, Outage outage, String language);
+
+    /**
+     * Send an outage restoration email to a user
+     *
+     * @param user the user to send the email to
+     * @param outage the outage details
+     * @param language the user's preferred language
+     * @return CompletableFuture containing a boolean indicating success
+     */
+    @Async
+    CompletableFuture<Boolean> sendOutageRestorationEmail(User user, Outage outage, String language);
+
+    /**
      * Send an email with the given details
      *
      * @param to the recipient email address

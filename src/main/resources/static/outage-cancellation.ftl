@@ -3,101 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${outageType} Outage Cancellation</title>
+    <title>${outageType} Outage Cancelled</title>
     <style>
-        /* Base styles */
+        :root {
+            --primary-color: #DC2626;
+            --primary-light: #FEE2E2;
+            --text-dark: #334155;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;
+            --border-color: #e2e8f0;
+            --shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             line-height: 1.6;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
+            color: var(--text-dark);
+            background-color: #f5f5f5;
         }
 
         .container {
             max-width: 600px;
-            margin: 0 auto;
-            padding: 0;
+            margin: 20px auto;
+            border-radius: 12px;
+            overflow: hidden;
             background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         .header {
-            background-color: #DC2626;
+            background-color: var(--primary-color);
             color: white;
-            padding: 20px;
+            padding: 24px 20px;
             text-align: center;
-            border-radius: 8px 8px 0 0;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
         }
 
         .content {
             padding: 30px;
-            background-color: #ffffff;
+            color: var(--text-dark);
+        }
+
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
         }
 
         .outage-card {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .alert-icon {
-            width: 40px;
-            height: 40px;
-            margin-bottom: 15px;
-            display: block;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 24px;
+            margin: 24px 0;
+            box-shadow: var(--shadow);
         }
 
         .outage-label {
             font-weight: 600;
             margin-bottom: 5px;
-            color: #64748b;
+            color: var(--text-muted);
+            font-size: 14px;
         }
 
         .outage-value {
             margin-top: 0;
-            margin-bottom: 15px;
-            color: #334155;
+            margin-bottom: 16px;
+            color: var(--text-dark);
+            font-size: 16px;
         }
 
         .status-badge {
             display: inline-block;
-            padding: 5px 12px;
+            padding: 6px 12px;
             border-radius: 16px;
             font-size: 14px;
             font-weight: 600;
-            background-color: #FEE2E2;
-            color: #DC2626;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
         }
 
         .footer {
-            background-color: #f8fafc;
-            padding: 20px;
+            background-color: var(--bg-light);
+            padding: 24px;
             text-align: center;
-            font-size: 12px;
-            color: #64748b;
-            border-radius: 0 0 8px 8px;
-            border-top: 1px solid #e2e8f0;
+            font-size: 13px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
         }
 
         .social-links {
-            margin-top: 15px;
+            margin-top: 16px;
         }
 
         .social-links a {
             display: inline-block;
             margin: 0 8px;
-            color: #64748b;
+            color: var(--primary-color);
             text-decoration: none;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+
+            .content {
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -108,13 +132,13 @@
     </div>
 
     <div class="content">
-        <p>Hello ${username},</p>
+        <p class="greeting">Hello ${username},</p>
 
         <p>We're writing to inform you that the scheduled <strong>${outageType}</strong> outage in your area: <strong>${areaName}</strong> has been <strong>cancelled</strong>.</p>
 
         <div class="outage-card">
-            <svg xmlns="http://www.w3.org/2000/svg" class="alert-icon" fill="none" viewBox="0 0 24 24" stroke="#DC2626">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 18L18 6M6 6l12 12" />
             </svg>
 
             <p class="outage-label">Type:</p>
@@ -137,10 +161,9 @@
             </#if>
         </div>
 
-        <p>You may continue to use the services as normal. There is no interruption to expect.</p>
+        <p>You may continue to use services as normal. There is no interruption to expect.</p>
 
         <p>We apologize for any inconvenience the previous notification may have caused.</p>
-
     </div>
 
     <div class="footer">

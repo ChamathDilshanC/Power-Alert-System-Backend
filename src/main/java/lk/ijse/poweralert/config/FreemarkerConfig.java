@@ -14,26 +14,9 @@ public class FreemarkerConfig {
     private static final Logger logger = LoggerFactory.getLogger(FreemarkerConfig.class);
 
     @Bean
-    public FreeMarkerConfigurer freeMarkerConfigurer() {
-        logger.info("Configuring FreeMarker");
-
+    public FreeMarkerConfigurer freemarkerConfigurer() {
         FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
-
-        // Set template loader path
-        configurer.setTemplateLoaderPath("classpath:/templates/");
-        configurer.setDefaultEncoding("UTF-8");
-
-        // Configure FreeMarker properties
-        Properties settings = new Properties();
-        settings.setProperty("template_exception_handler", "rethrow");
-        settings.setProperty("default_encoding", "UTF-8");
-        settings.setProperty("number_format", "computer");
-        settings.setProperty("auto_import", "");
-        settings.setProperty("whitespace_stripping", "true");
-
-        configurer.setFreemarkerSettings(settings);
-
-        logger.info("FreeMarker configured with template path: classpath:/templates/");
+        configurer.setTemplateLoaderPath("classpath:/static/");
         return configurer;
     }
 }
