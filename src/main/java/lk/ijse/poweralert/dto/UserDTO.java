@@ -1,5 +1,6 @@
 package lk.ijse.poweralert.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lk.ijse.poweralert.enums.AppEnums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,9 @@ public class UserDTO {
     private List<NotificationPreferenceDTO> notificationPreferences = new ArrayList<>();
     private boolean active;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastLoginAt;
 }

@@ -36,4 +36,7 @@ public class UserCreateDTO {
 
     private Role role = Role.USER;
     private String preferredLanguage = "si"; // Default to Sinhala
+
+    // Add this field
+    private boolean active = true; // Default to active
 }

@@ -1,5 +1,6 @@
 package lk.ijse.poweralert.controller;
 
+import com.google.firebase.database.annotations.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lk.ijse.poweralert.dto.ResponseDTO;
@@ -86,10 +87,11 @@ public class AdminController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ResponseDTO> registerUser(@Valid @RequestBody UserCreateDTO userCreateDTO, BindingResult bindingResult) {
+    public ResponseEntity<ResponseDTO> registerUser(@Valid @RequestBody UserCreateDTO userCreateDTO,
+                                                    @Nullable BindingResult bindingResult) {
         try {
             // Check for validation errors
-            if (bindingResult.hasErrors()) {
+            if (bindingResult != null && bindingResult.hasErrors()) {
                 // Get all validation errors
                 List<String> errors = bindingResult.getAllErrors().stream()
                         .map(DefaultMessageSourceResolvable::getDefaultMessage)
@@ -108,11 +110,6 @@ public class AdminController {
             responseDTO.setData(registeredUser);
 
             return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-        } catch (ValidationException e) {
-            responseDTO.setCode(VarList.Bad_Request);
-            responseDTO.setMessage(e.getMessage());
-            responseDTO.setData(null);
-            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             logger.error("Error registering user: {}", e.getMessage(), e);
 
