@@ -207,4 +207,23 @@ public class OutageController {
             return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // Public endpoint to get all outages
+    @GetMapping("/public/outages/all")
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDTO> getAllOutages() {
+        try {
+            List<OutageDTO> outages = outageService.getAllOutages();
+            responseDTO.setCode(VarList.OK);
+            responseDTO.setMessage("All outages retrieved successfully");
+            responseDTO.setData(outages);
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error retrieving all outages: {}", e.getMessage(), e);
+            responseDTO.setCode(VarList.Internal_Server_Error);
+            responseDTO.setMessage("Error: " + e.getMessage());
+            responseDTO.setData(null);
+            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

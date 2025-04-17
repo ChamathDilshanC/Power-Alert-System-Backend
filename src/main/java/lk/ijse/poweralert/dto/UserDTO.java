@@ -23,8 +23,8 @@ public class UserDTO {
     private String preferredLanguage;
     private List<AddressDTO> addresses = new ArrayList<>();
     private List<NotificationPreferenceDTO> notificationPreferences = new ArrayList<>();
+    private boolean active;
 
-    private boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
 }

@@ -21,4 +21,13 @@ public interface UtilityProviderService {
 
     /** Create a new utility provider and link to a user */
     UtilityProviderDTO createUtilityProvider(UtilityProviderDTO utilityProviderDTO, Long userId);
+
+    int linkProviderToAreas(Long providerId, List<Long> areaIds);
+
+    /**
+     * Delete a utility provider
+     * @param id the ID of the provider to delete
+     * @return true if deleted successfully
+     */
+    boolean deleteUtilityProvider(Long id);
 }

@@ -1,5 +1,6 @@
 package lk.ijse.poweralert.service.impl;
 
+import jakarta.validation.ValidationException;
 import lk.ijse.poweralert.dto.AddressDTO;
 import lk.ijse.poweralert.dto.NotificationPreferenceDTO;
 import lk.ijse.poweralert.dto.UserCreateDTO;
@@ -9,6 +10,7 @@ import lk.ijse.poweralert.entity.NotificationPreference;
 import lk.ijse.poweralert.entity.User;
 import lk.ijse.poweralert.repository.UserRepository;
 import lk.ijse.poweralert.service.UserService;
+import lk.ijse.poweralert.util.PhoneNumberValidator;
 import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -47,6 +49,15 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDTO registerUser(UserCreateDTO userCreateDTO) {
         logger.info("Registering new user with username: {}", userCreateDTO.getUsername());
+
+        String phoneNumber = userCreateDTO.getPhoneNumber();
+        if (!PhoneNumberValidator.isValidSriLankanMobile(phoneNumber)) {
+            throw new ValidationException("Invalid Sri Lankan mobile number. It should start with +94 followed by 9 digits.");
+        }
+
+        // Format phone number if needed
+        phoneNumber = PhoneNumberValidator.formatPhoneNumber(phoneNumber);
+        userCreateDTO.setPhoneNumber(phoneNumber);
 
         // Create user entity
         User user = new User();
@@ -170,23 +181,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public UserDTO getUserById(Long id) {
-        logger.info("Fetching user with ID: {}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
 
-        return convertToBasicDTO(user);
+        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+
+        // Explicitly set the active status to ensure it's mapped correctly
+        userDTO.setActive(user.isActive());
+
+        return userDTO;
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<UserDTO> getAllUsers() {
-        logger.info("Fetching all users");
         List<User> users = userRepository.findAll();
 
         return users.stream()
-                .map(this::convertToBasicDTO)
+                .map(user -> {
+                    UserDTO dto = modelMapper.map(user, UserDTO.class);
+                    // Explicitly set the active status
+                    dto.setActive(user.isActive());
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -264,4 +281,46 @@ public class UserServiceImpl implements UserService {
 
         return userDTO;
     }
+
+    public UserDTO updateUserStatus(Long id, boolean isActive) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
+
+        user.setActive(isActive);
+        user = userRepository.save(user);
+
+        return modelMapper.map(user, UserDTO.class);
+    }
+
+    public UserDTO resetUserPassword(Long id, String newPassword) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user = userRepository.save(user);
+
+        return modelMapper.map(user, UserDTO.class);
+    }
+
+
+    @Override
+    public UserDTO updateUser(UserDTO userDTO) {
+        User user = userRepository.findById(userDTO.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userDTO.getId()));
+
+        // Update the user properties
+        user.setUsername(userDTO.getUsername());
+        user.setEmail(userDTO.getEmail());
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        user.setRole(userDTO.getRole());
+        user.setPreferredLanguage(userDTO.getPreferredLanguage());
+        user.setActive(userDTO.isActive());
+
+        // Save the updated user
+        user = userRepository.save(user);
+
+        // Return the updated user DTO
+        return modelMapper.map(user, UserDTO.class);
+    }
+
 }

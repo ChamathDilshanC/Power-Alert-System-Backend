@@ -1,11 +1,13 @@
 package lk.ijse.poweralert.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,6 +23,13 @@ public class Area {
     @Column(nullable = false)
     private String name;
 
+    // Add these new fields
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "postal_code")
+    private String postalCode;
+
     @Column(nullable = false)
     private String district;
 
@@ -30,13 +39,9 @@ public class Area {
     @Column(name = "boundary_json", columnDefinition = "TEXT")
     private String boundaryJson;
 
-    @ManyToMany
-    @JoinTable(
-            name = "area_utility_providers",
-            joinColumns = @JoinColumn(name = "area_id"),
-            inverseJoinColumns = @JoinColumn(name = "utility_provider_id")
-    )
-    private List<UtilityProvider> utilityProviders;
+    @JsonBackReference
+    @ManyToMany(mappedBy = "serviceAreas")
+    private List<UtilityProvider> utilityProviders = new ArrayList<>();
 
     @OneToMany(mappedBy = "affectedArea")
     private List<Outage> outages;

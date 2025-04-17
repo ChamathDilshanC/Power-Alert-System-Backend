@@ -40,4 +40,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findUsersByAreaId(@Param("areaId") Long areaId);
 
     boolean existsByPhoneNumber(String phoneNumber);
+
+    List<User> findByUtilityProviderId(Long utilityProviderId);
 }

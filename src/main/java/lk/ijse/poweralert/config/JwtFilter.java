@@ -1,5 +1,7 @@
 package lk.ijse.poweralert.config;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -73,37 +75,39 @@ public class JwtFilter extends OncePerRequestFilter {
         String username = null;
         String jwt = null;
 
-
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
             try {
                 username = jwtUtil.extractUsername(jwt);
                 logger.debug("Extracted username from token: {}", username);
+
+                // Validate token and set authentication
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+
+                    if (jwtUtil.validateToken(jwt, userDetails)) {
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                        logger.debug("Authentication set for user: {} with authorities: {}",
+                                username, userDetails.getAuthorities());
+                    } else {
+                        logger.warn("Invalid JWT token for user: {}", username);
+                    }
+                }
+            } catch (ExpiredJwtException e) {
+                logger.warn("JWT token has expired: {}", e.getMessage());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"message\":\"JWT token has expired\",\"code\":401}");
+                return;
+            } catch (SignatureException e) {
+                logger.error("Invalid JWT signature: {}", e.getMessage());
             } catch (Exception e) {
-                logger.error("Error extracting username from token: {}", e.getMessage());
+                logger.error("Error processing JWT token: {}", e.getMessage());
             }
         } else {
             logger.debug("Authorization header is missing or does not start with 'Bearer '");
-        }
-
-        // Validate token and set authentication
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            try {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
-                if (jwtUtil.validateToken(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                    logger.debug("Authentication set for user: {} with authorities: {}",
-                            username, userDetails.getAuthorities());
-                } else {
-                    logger.warn("Invalid JWT token for user: {}", username);
-                }
-            } catch (Exception e) {
-                logger.error("Error processing authentication: {}", e.getMessage());
-            }
         }
 
         filterChain.doFilter(request, response);

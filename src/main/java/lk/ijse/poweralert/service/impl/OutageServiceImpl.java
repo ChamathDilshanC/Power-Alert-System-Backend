@@ -732,4 +732,15 @@ public class OutageServiceImpl implements OutageService {
         return outageDTO;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<OutageDTO> getAllOutages() {
+        logger.info("Fetching all outages regardless of status");
+        List<Outage> allOutages = outageRepository.findAll();
+
+        return allOutages.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
 }

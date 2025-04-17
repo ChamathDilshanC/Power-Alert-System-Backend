@@ -413,10 +413,14 @@
             </#if>
         </div>
 
-        <p class="paragraph">If this was you, you can safely ignore this email. If you don't recognize this activity, we recommend taking immediate action to secure your account.</p>
+        <p class="paragraph">
+            If this was you, you can safely ignore this email. If you don't recognize this activity, we recommend taking immediate action to secure your account.
+        </p>
 
         <div class="actions">
-            <a href="${accountSecurityUrl}" class="button-primary">Secure My Account</a>
+            <a href="http://localhost:63342/Power-Alert-System-Frontend/passwordReset.html?_ijt=65417ilt17idiu4l8hfvih7i3g" class="button-primary">
+                Secure My Account
+            </a>
             <a href="mailto:support@poweralert.lk" class="button-secondary">Contact Support</a>
         </div>
 

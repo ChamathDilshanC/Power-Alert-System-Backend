@@ -17,6 +17,7 @@ public interface UserService {
      */
     UserDTO registerUser(UserCreateDTO userCreateDTO);
 
+    UserDTO updateUser(UserDTO userDTO);
     /**
      * Get user by email
      * @param email the user email
@@ -91,4 +92,8 @@ public interface UserService {
      * @return the deactivated user
      */
     UserDTO deactivateUser(Long id);
+
+    UserDTO updateUserStatus(Long id, boolean newStatus);
+
+    UserDTO resetUserPassword(Long id, String newPassword);
 }

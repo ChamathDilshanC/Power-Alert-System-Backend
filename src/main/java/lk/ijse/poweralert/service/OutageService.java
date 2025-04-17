@@ -31,4 +31,7 @@ public interface OutageService {
 
     /** Get outages relevant to the current authenticated user */
     List<OutageDTO> getOutagesForCurrentUser();
+
+    /** Get all outages regardless of status */
+    List<OutageDTO> getAllOutages();
 }

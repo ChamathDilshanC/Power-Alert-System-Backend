@@ -1,11 +1,14 @@
 package lk.ijse.poweralert.service.impl;
 
+import lk.ijse.poweralert.dto.AreaSummaryDTO;
 import lk.ijse.poweralert.dto.OutageDTO;
 import lk.ijse.poweralert.dto.UtilityProviderDTO;
+import lk.ijse.poweralert.entity.Area;
 import lk.ijse.poweralert.entity.Outage;
 import lk.ijse.poweralert.entity.User;
 import lk.ijse.poweralert.entity.UtilityProvider;
 import lk.ijse.poweralert.enums.AppEnums.Role;
+import lk.ijse.poweralert.repository.AreaRepository;
 import lk.ijse.poweralert.repository.OutageRepository;
 import lk.ijse.poweralert.repository.UtilityProviderRepository;
 import lk.ijse.poweralert.repository.UserRepository;
@@ -20,8 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,11 +47,18 @@ public class UtilityProviderServiceImpl implements UtilityProviderService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private AreaRepository areaRepository;
+
     @Override
+    @Transactional(readOnly = true)  // Add the @Transactional annotation here
     public List<UtilityProviderDTO> getAllUtilityProviders() {
         logger.info("Fetching all utility providers");
 
         List<UtilityProvider> providers = utilityProviderRepository.findAll();
+
+        // Use the join fetch query instead if possible
+        // List<UtilityProvider> providers = utilityProviderRepository.findAllWithServiceAreas();
 
         return providers.stream()
                 .map(this::convertToDTO)
@@ -69,23 +79,61 @@ public class UtilityProviderServiceImpl implements UtilityProviderService {
     @Transactional
     public UtilityProviderDTO updateUtilityProvider(UtilityProviderDTO utilityProviderDTO) {
         logger.info("Updating utility provider with ID: {}", utilityProviderDTO.getId());
+        logger.debug("Update data received: {}", utilityProviderDTO);
 
-        // Verify provider exists
         UtilityProvider provider = utilityProviderRepository.findById(utilityProviderDTO.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Utility provider not found with ID: " + utilityProviderDTO.getId()));
 
-        // Update fields
+        // Update basic fields
         provider.setName(utilityProviderDTO.getName());
+        provider.setType(utilityProviderDTO.getType());
         provider.setContactEmail(utilityProviderDTO.getContactEmail());
         provider.setContactPhone(utilityProviderDTO.getContactPhone());
         provider.setWebsite(utilityProviderDTO.getWebsite());
-        // Don't update the type as it's a fundamental property
 
-        // Save updated provider
-        UtilityProvider updatedProvider = utilityProviderRepository.save(provider);
-        logger.info("Utility provider updated with ID: {}", updatedProvider.getId());
+        // Handle service areas
+        if (utilityProviderDTO.getServiceAreaIds() != null) {
+            logger.debug("Processing service area IDs: {}", utilityProviderDTO.getServiceAreaIds());
 
-        return convertToDTO(updatedProvider);
+            // Initialize collections if needed
+            if (provider.getServiceAreas() == null) {
+                provider.setServiceAreas(new ArrayList<>());
+            }
+
+            // Get current areas for cleanup
+            List<Area> currentAreas = new ArrayList<>(provider.getServiceAreas());
+
+            // Remove all current associations
+            for (Area area : currentAreas) {
+                if (area.getUtilityProviders() != null) {
+                    area.getUtilityProviders().remove(provider);
+                }
+                provider.getServiceAreas().remove(area);
+            }
+
+            // Add new associations if any
+            if (!utilityProviderDTO.getServiceAreaIds().isEmpty()) {
+                List<Area> areasToAdd = areaRepository.findAllById(utilityProviderDTO.getServiceAreaIds());
+
+                for (Area area : areasToAdd) {
+                    // Initialize if needed
+                    if (area.getUtilityProviders() == null) {
+                        area.setUtilityProviders(new ArrayList<>());
+                    }
+
+                    provider.getServiceAreas().add(area);
+                    area.getUtilityProviders().add(provider);
+                }
+            }
+        }
+
+        // Save the provider with updated relationships
+        UtilityProvider savedProvider = utilityProviderRepository.save(provider);
+
+        logger.info("Utility provider updated successfully with ID: {}", savedProvider.getId());
+
+        // Convert to DTO for response
+        return convertToDTO(savedProvider);
     }
 
     @Override
@@ -153,10 +201,47 @@ public class UtilityProviderServiceImpl implements UtilityProviderService {
     }
 
     /**
-     * Convert UtilityProvider entity to DTO
+     * Convert UtilityProvider entity to DTO, breaking circular references
      */
     private UtilityProviderDTO convertToDTO(UtilityProvider provider) {
-        return modelMapper.map(provider, UtilityProviderDTO.class);
+        UtilityProviderDTO dto = new UtilityProviderDTO();
+        dto.setId(provider.getId());
+        dto.setName(provider.getName());
+        dto.setContactEmail(provider.getContactEmail());
+        dto.setContactPhone(provider.getContactPhone());
+        dto.setWebsite(provider.getWebsite());
+        dto.setType(provider.getType());
+
+        // Use area summaries instead of full area DTOs to break circular references
+        if (provider.getServiceAreas() != null) {
+            dto.setServiceAreas(mapToAreaSummaries(provider.getServiceAreas()));
+
+            // Set service area IDs for frontend use
+            List<Long> serviceAreaIds = provider.getServiceAreas().stream()
+                    .map(Area::getId)
+                    .collect(Collectors.toList());
+            dto.setServiceAreaIds(serviceAreaIds);
+        }
+
+        return dto;
+    }
+
+    /**
+     * Maps areas to simplified AreaSummaryDTO objects to avoid circular references
+     */
+    private List<AreaSummaryDTO> mapToAreaSummaries(List<Area> areas) {
+        if (areas == null) {
+            return Collections.emptyList();
+        }
+
+        return areas.stream()
+                .map(area -> AreaSummaryDTO.builder()
+                        .id(area.getId())
+                        .name(area.getName())
+                        .district(area.getDistrict())
+                        .province(area.getProvince())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -179,18 +264,6 @@ public class UtilityProviderServiceImpl implements UtilityProviderService {
             }
             return providers.get(0).getId();
         } else if (user.getRole() == Role.UTILITY_PROVIDER) {
-            // For utility provider users, we need to determine which provider they're associated with
-
-            // Option 1: If User has a direct reference to UtilityProvider entity
-            // Uncomment this if you have this relationship set up
-            /*
-            if (user.getUtilityProvider() != null) {
-                return user.getUtilityProvider().getId();
-            }
-            */
-
-            // Option 2: Look up the provider based on some criteria
-            // This is a placeholder - replace with your actual logic
             List<UtilityProvider> allProviders = utilityProviderRepository.findAll();
 
             // For demonstration, let's find a provider with a name or email that matches the user's username or email
@@ -203,8 +276,6 @@ public class UtilityProviderServiceImpl implements UtilityProviderService {
                 return matchingProvider.get().getId();
             }
 
-            // Fallback: Just use the first provider if we can't find a match
-            // In production, you should have a proper mapping
             if (!allProviders.isEmpty()) {
                 logger.warn("No direct mapping found between user {} and a utility provider. Using the first available provider.",
                         user.getUsername());
@@ -214,6 +285,95 @@ public class UtilityProviderServiceImpl implements UtilityProviderService {
             throw new IllegalStateException("No utility provider found for user: " + user.getUsername());
         } else {
             throw new IllegalStateException("User role not authorized to access utility provider information");
+        }
+    }
+
+    @Transactional
+    public int linkProviderToAreas(Long providerId, List<Long> areaIds) {
+        logger.debug("Linking utility provider {} to service areas: {}", providerId, areaIds);
+
+        if (areaIds == null || areaIds.isEmpty()) {
+            return 0;
+        }
+
+        // Get utility provider
+        UtilityProvider provider = utilityProviderRepository.findById(providerId)
+                .orElseThrow(() -> new EntityNotFoundException("Utility provider not found with ID: " + providerId));
+
+        // Get areas to link - using the autowired repository instance
+        List<Area> areasToLink = areaRepository.findAllById(areaIds);
+
+        if (areasToLink.isEmpty()) {
+            logger.warn("No areas found for the provided IDs: {}", areaIds);
+            return 0;
+        }
+
+        // Check if provider already has service areas
+        if (provider.getServiceAreas() == null) {
+            provider.setServiceAreas(new ArrayList<>());
+        }
+
+        int linkedCount = 0;
+
+        // Link each area
+        for (Area area : areasToLink) {
+            if (!provider.getServiceAreas().contains(area)) {
+                provider.getServiceAreas().add(area);
+                linkedCount++;
+
+                // Update the area's providers list if needed
+                if (area.getUtilityProviders() == null) {
+                    area.setUtilityProviders(new ArrayList<>());
+                }
+
+                if (!area.getUtilityProviders().contains(provider)) {
+                    area.getUtilityProviders().add(provider);
+                }
+            }
+        }
+
+        // Save the provider with updated service areas
+        utilityProviderRepository.save(provider);
+
+        // Log the result
+        logger.info("Successfully linked utility provider {} to {} areas", providerId, linkedCount);
+
+        return linkedCount;
+    }
+
+    // Add better error handling in deleteUtilityProvider
+    @Override
+    @Transactional
+    public boolean deleteUtilityProvider(Long id) {
+        logger.info("Deleting utility provider with ID: {}", id);
+
+        try {
+            // Check if utility provider exists
+            UtilityProvider provider = utilityProviderRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Utility provider not found with ID: " + id));
+
+            // Remove associations with areas to avoid constraint violations
+            if (provider.getServiceAreas() != null) {
+                provider.getServiceAreas().clear();
+                utilityProviderRepository.save(provider);
+            }
+
+            // Check for related users and handle appropriately
+            List<User> relatedUsers = userRepository.findByUtilityProviderId(id);
+            if (!relatedUsers.isEmpty()) {
+                // Either update users or throw exception based on your business rules
+                for (User user : relatedUsers) {
+                    user.setUtilityProvider(null);
+                    userRepository.save(user);
+                }
+            }
+
+            // Delete the utility provider
+            utilityProviderRepository.deleteById(id);
+            return true;
+        } catch (Exception e) {
+            logger.error("Error deleting utility provider: {}", e.getMessage(), e);
+            throw e;
         }
     }
 }

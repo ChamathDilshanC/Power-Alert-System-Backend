@@ -72,6 +72,8 @@ public class AreaServiceImpl implements AreaService {
         area.setDistrict(areaDTO.getDistrict());
         area.setProvince(areaDTO.getProvince());
         area.setBoundaryJson(areaDTO.getBoundaryJson());
+        area.setCity(areaDTO.getCity());           // Add this line
+        area.setPostalCode(areaDTO.getPostalCode()); // Add this line
         area.setUtilityProviders(new ArrayList<>());
 
         // Save area
@@ -95,6 +97,8 @@ public class AreaServiceImpl implements AreaService {
         existingArea.setDistrict(areaDTO.getDistrict());
         existingArea.setProvince(areaDTO.getProvince());
         existingArea.setBoundaryJson(areaDTO.getBoundaryJson());
+        existingArea.setCity(areaDTO.getCity());           // Add this line
+        existingArea.setPostalCode(areaDTO.getPostalCode()); // Add this line
 
         // Save updated area
         Area updatedArea = areaRepository.save(existingArea);

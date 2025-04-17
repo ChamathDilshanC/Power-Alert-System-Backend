@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OutageRepository extends JpaRepository<Outage, Long> {
@@ -73,5 +74,9 @@ public interface OutageRepository extends JpaRepository<Outage, Long> {
      * Find outages by status and with start time after specified time
      */
     List<Outage> findByStatusAndStartTimeAfter(OutageStatus status, LocalDateTime startTimeFrom);
+    @Query("SELECT o FROM Outage o LEFT JOIN FETCH o.updates WHERE o.id = :id")
+    Optional<Outage> findByIdWithUpdates(@Param("id") Long id);
 
+    @Query("SELECT o FROM Outage o LEFT JOIN FETCH o.updates")
+    List<Outage> findAllWithUpdates();
 }

@@ -103,7 +103,7 @@ public class AuthController {
         }
     }
 
-    // Helper method to get client IP address 
+    // Helper method to get client IP address
     private String getClientIp(HttpServletRequest request) {
         String ipAddress = request.getHeader("X-Forwarded-For");
         if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
