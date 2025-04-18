@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
 @Builder
@@ -31,7 +30,5 @@ public class AreaDTO {
 
     private String boundaryJson;
 
-    // Add JsonIgnore to break the circular reference
-    @JsonIgnore
     private List<UtilityProviderDTO> utilityProviders;
 }

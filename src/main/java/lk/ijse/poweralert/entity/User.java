@@ -52,6 +52,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<NotificationPreference> notificationPreferences = new ArrayList<>();
 
+    // Messages sent by this user
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Message> messages = new ArrayList<>();
+
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
 

@@ -160,4 +160,26 @@ public class AuthController {
             return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/check")
+    public ResponseEntity<?> checkAuth(HttpServletRequest request) {
+        // Get token from header
+        String authHeader = request.getHeader("Authorization");
+
+        // Check if Authorization header exists and starts with "Bearer "
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // Extract the token
+        String token = authHeader.substring(7);
+
+        // Simple token validation - replace with your actual token validation logic
+        if (token != null && !token.isEmpty()) {
+            // Very basic validation - you should implement proper token validation
+            // like checking against your database or validating a JWT
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
 }
