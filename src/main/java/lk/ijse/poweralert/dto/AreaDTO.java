@@ -18,6 +18,10 @@ public class AreaDTO {
     @NotBlank(message = "Area name is required")
     private String name;
 
+    // Add these new fields
+    private String city;
+    private String postalCode;
+
     @NotBlank(message = "District is required")
     private String district;
 
@@ -25,5 +29,6 @@ public class AreaDTO {
     private String province;
 
     private String boundaryJson;
+
     private List<UtilityProviderDTO> utilityProviders;
 }

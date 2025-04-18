@@ -1,5 +1,6 @@
 package lk.ijse.poweralert.dto;
 
+import jakarta.validation.constraints.Size;
 import lk.ijse.poweralert.enums.AppEnums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,8 @@ import jakarta.validation.constraints.Pattern;
 @AllArgsConstructor
 public class UserCreateDTO {
     @NotBlank(message = "Username is required")
+    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+    @Pattern(regexp = "^[a-zA-Z0-9_.-]+$", message = "Username can only contain letters, numbers, dots, underscores, and hyphens")
     private String username;
 
     @NotBlank(message = "Email is required")
@@ -33,4 +36,7 @@ public class UserCreateDTO {
 
     private Role role = Role.USER;
     private String preferredLanguage = "si"; // Default to Sinhala
+
+    // Add this field
+    private boolean active = true; // Default to active
 }

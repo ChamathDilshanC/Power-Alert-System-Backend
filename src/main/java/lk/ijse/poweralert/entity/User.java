@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -40,11 +41,20 @@ public class User {
     @Column(name = "preferred_language", nullable = false)
     private String preferredLanguage;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Address> addresses;
+    // Change fetch type to LAZY
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Address> addresses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<NotificationPreference> notificationPreferences;
+    @ManyToOne
+    @JoinColumn(name = "utility_provider_id")
+    private UtilityProvider utilityProvider;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<NotificationPreference> notificationPreferences = new ArrayList<>();
+
+    // Messages sent by this user
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Message> messages = new ArrayList<>();
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive;

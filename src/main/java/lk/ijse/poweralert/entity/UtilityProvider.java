@@ -1,5 +1,7 @@
 package lk.ijse.poweralert.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import lk.ijse.poweralert.enums.AppEnums;
@@ -8,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,11 +38,22 @@ public class UtilityProvider {
     @Column(nullable = false)
     private AppEnums.UtilityType type;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "utilityProvider")
+    private List<User> users;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "utilityProvider")
     private List<Outage> outages;
 
-    @ManyToMany(mappedBy = "utilityProviders")
-    private List<Area> serviceAreas;
+    @JsonManagedReference
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "provider_service_areas",
+            joinColumns = @JoinColumn(name = "provider_id"),
+            inverseJoinColumns = @JoinColumn(name = "area_id")
+    )
+    private List<Area> serviceAreas = new ArrayList<>();
 
     @Column(name = "api_endpoint")
     private String apiEndpoint;

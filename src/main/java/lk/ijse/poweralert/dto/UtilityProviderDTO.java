@@ -10,6 +10,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -28,4 +30,10 @@ public class UtilityProviderDTO {
 
     @NotNull(message = "Utility type is required")
     private UtilityType type;
+
+    // Replace with a simplified DTO that doesn't reference back to UtilityProviderDTO
+    private List<AreaSummaryDTO> serviceAreas;
+
+    // For receiving updates from the frontend
+    private List<Long> serviceAreaIds;
 }

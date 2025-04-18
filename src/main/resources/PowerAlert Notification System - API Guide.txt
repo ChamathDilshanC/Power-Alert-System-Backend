@@ -1,0 +1,342 @@
+# PowerAlert Notification System - API Guide
+
+This document provides comprehensive documentation for the PowerAlert notification system and its API endpoints. The notification system is designed to keep users informed about utility outages, updates, and restorations in their areas.
+
+## Overview
+
+The PowerAlert notification system allows users to:
+
+- Receive notifications about utility outages (electricity, water, gas)
+- Configure notification preferences (channels, frequency, types of updates)
+- View and manage their notification history
+- Mark notifications as read or delete them
+
+Administrators can:
+- Send test notifications to users
+- Manage notification delivery channels
+- View notification statistics
+
+## Notification Types
+
+The system supports multiple notification types:
+
+1. **New Outage Notifications**: Alerts about upcoming or newly reported outages
+2. **Outage Updates**: Changes to existing outages (status, estimated restoration time)
+3. **Cancellation Notifications**: Alerts about cancelled scheduled outages
+4. **Restoration Notifications**: Alerts when services are restored
+
+## Notification Channels
+
+Users can receive notifications through multiple channels:
+
+- **Email**: Detailed HTML emails with outage information
+- **SMS**: Brief text messages with essential information
+- **Push Notifications**: For mobile app users
+- **WhatsApp**: Rich messaging with outage details (where available)
+
+## API Endpoints
+
+### User Notification Endpoints
+
+#### 1. Get All Notifications
+
+Retrieves all notifications for the current authenticated user.
+
+```
+GET /api/user/notifications
+```
+
+**Authentication Required**: Yes (JWT Bearer Token)
+**Response**: List of notification objects with details
+
+#### 2. Get Unread Notifications
+
+Retrieves only unread (SENT status) notifications for the current user.
+
+```
+GET /api/user/notifications/unread
+```
+
+**Authentication Required**: Yes (JWT Bearer Token)
+**Response**: List of unread notification objects
+
+#### 3. Mark Notification as Read
+
+Marks a specific notification as read (changes status to DELIVERED).
+
+```
+PUT /api/user/notifications/{id}/read
+```
+
+**Authentication Required**: Yes (JWT Bearer Token)
+**Path Parameters**:
+- `id`: Notification ID
+
+**Response**: Updated notification object
+
+#### 4. Mark All Notifications as Read
+
+Marks all unread notifications for the current user as read.
+
+```
+PUT /api/user/notifications/read-all
+```
+
+**Authentication Required**: Yes (JWT Bearer Token)
+**Response**: Count of notifications marked as read
+
+#### 5. Delete Notification
+
+Deletes a specific notification.
+
+```
+DELETE /api/user/notifications/{id}
+```
+
+**Authentication Required**: Yes (JWT Bearer Token)
+**Path Parameters**:
+- `id`: Notification ID
+
+**Response**: Success message
+
+### Notification Preference Endpoints
+
+#### 1. Get All Notification Preferences
+
+Retrieves all notification preferences for the current user.
+
+```
+GET /api/user/notification-preferences
+```
+
+**Authentication Required**: Yes (JWT Bearer Token)
+**Response**: List of notification preference objects
+
+#### 2. Get Notification Preference by ID
+
+Retrieves a specific notification preference.
+
+```
+GET /api/user/notification-preferences/{id}
+```
+
+**Authentication Required**: Yes (JWT Bearer Token)
+**Path Parameters**:
+- `id`: Preference ID
+
+**Response**: Notification preference object
+
+#### 3. Add Notification Preference
+
+Creates a new notification preference for the current user.
+
+```
+POST /api/user/notification-preferences
+```
+
+**Authentication Required**: Yes (JWT Bearer Token)
+**Request Body**:
+```json
+{
+    "outageType": "ELECTRICITY",
+    "channelType": "EMAIL",
+    "enabled": true,
+    "advanceNoticeMinutes": 60,
+    "receiveUpdates": true,
+    "receiveRestoration": true
+}
+```
+
+**Response**: Created notification preference object
+
+#### 4. Update Notification Preference
+
+Updates an existing notification preference.
+
+```
+PUT /api/user/notification-preferences/{id}
+```
+
+**Authentication Required**: Yes (JWT Bearer Token)
+**Path Parameters**:
+- `id`: Preference ID
+
+**Request Body**:
+```json
+{
+    "outageType": "ELECTRICITY",
+    "channelType": "EMAIL",
+    "enabled": true,
+    "advanceNoticeMinutes": 120,
+    "receiveUpdates": true,
+    "receiveRestoration": true
+}
+```
+
+**Response**: Updated notification preference object
+
+#### 5. Delete Notification Preference
+
+Deletes a notification preference.
+
+```
+DELETE /api/user/notification-preferences/{id}
+```
+
+**Authentication Required**: Yes (JWT Bearer Token)
+**Path Parameters**:
+- `id`: Preference ID
+
+**Response**: Success message
+
+### Admin Notification Endpoints
+
+#### 1. Send Test Notification
+
+Sends a test notification to a specific user (admin only).
+
+```
+POST /api/admin/test-notification
+```
+
+**Authentication Required**: Yes (JWT Bearer Token with ADMIN role)
+**Request Body**:
+```json
+{
+    "username": "testuser",
+    "message": "This is a test notification from the admin panel."
+}
+```
+
+**Response**: Success message and notification details
+
+## Data Models
+
+### Notification Object
+
+```json
+{
+    "id": 1,
+    "outageId": 123,
+    "userId": 456,
+    "type": "EMAIL",
+    "status": "SENT",
+    "content": "Electricity outage scheduled in Colombo from 2023-08-01 14:00 to 2023-08-01 18:00",
+    "language": "en",
+    "createdAt": "2023-08-01T10:00:00",
+    "sentAt": "2023-08-01T10:01:00",
+    "deliveredAt": null
+}
+```
+
+### NotificationPreference Object
+
+```json
+{
+    "id": 1,
+    "outageType": "ELECTRICITY",
+    "channelType": "EMAIL",
+    "enabled": true,
+    "advanceNoticeMinutes": 60,
+    "receiveUpdates": true,
+    "receiveRestoration": true
+}
+```
+
+## Status Codes
+
+- **PENDING**: Notification is created but not yet sent
+- **SENT**: Notification has been sent to the delivery channel
+- **DELIVERED**: User has viewed/read the notification
+- **FAILED**: Notification failed to send
+
+## Best Practices
+
+1. **Channel Selection**: Choose appropriate channels based on urgency and content type
+2. **Frequency Control**: Avoid overwhelming users with too many notifications
+3. **Localization**: Use the user's preferred language for notification content
+4. **Progressive Enhancement**: Deliver rich content where supported, gracefully fallback elsewhere
+5. **Notification Grouping**: Group related notifications to reduce notification fatigue
+
+## Error Handling
+
+All API endpoints return standard HTTP status codes:
+
+- 200 OK: Request successful
+- 201 Created: Resource created successfully
+- 400 Bad Request: Invalid input
+- 401 Unauthorized: Authentication required
+- 403 Forbidden: Permission denied
+- 404 Not Found: Resource not found
+- 500 Internal Server Error: Server-side error
+
+Error responses include a message explaining the error and, where applicable, validation details.
+
+```json
+{
+    "code": 400,
+    "message": "Validation Error",
+    "data": {
+        "outageType": "Outage type is required"
+    }
+}
+```
+
+## Implementation Examples
+
+### Marking a Notification as Read (JavaScript)
+
+```javascript
+const markAsRead = async (notificationId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/user/notifications/${notificationId}/read`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to mark notification as read');
+    }
+
+    const result = await response.json();
+    return result.data;
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+    throw error;
+  }
+};
+```
+
+### Adding a Notification Preference (JavaScript)
+
+```javascript
+const addNotificationPreference = async (preference) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/user/notification-preferences`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(preference)
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to add notification preference');
+    }
+
+    const result = await response.json();
+    return result.data;
+  } catch (error) {
+    console.error('Error adding notification preference:', error);
+    throw error;
+  }
+};
+```
+
+## Conclusion
+
+This notification system provides a robust, flexible framework for keeping users informed about utility outages and related updates. By following these API guidelines, developers can easily integrate with the PowerAlert notification system to create custom notification experiences.
