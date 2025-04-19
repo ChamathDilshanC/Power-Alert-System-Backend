@@ -106,6 +106,26 @@ public class OutageController {
         }
     }
 
+    // Admin endpoint to create outage (accessible by both ADMIN and UTILITY_PROVIDER)
+    @PostMapping("/admin/outages")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_UTILITY_PROVIDER')")
+    public ResponseEntity<ResponseDTO> createOutageAdmin(@Valid @RequestBody OutageCreateDTO outageCreateDTO) {
+        try {
+            logger.debug("Creating outage via admin endpoint");
+            OutageDTO createdOutage = outageService.createOutage(outageCreateDTO);
+            responseDTO.setCode(VarList.Created);
+            responseDTO.setMessage("Outage created successfully");
+            responseDTO.setData(createdOutage);
+            return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+        } catch (Exception e) {
+            logger.error("Error creating outage: {}", e.getMessage(), e);
+            responseDTO.setCode(VarList.Internal_Server_Error);
+            responseDTO.setMessage("Error: " + e.getMessage());
+            responseDTO.setData(null);
+            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // Provider endpoint to update outage
     @PutMapping("/provider/outages/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_UTILITY_PROVIDER', 'ROLE_ADMIN')")
@@ -172,7 +192,7 @@ public class OutageController {
 
     // Admin endpoint to cancel outage
     @PutMapping("/admin/outages/{id}/cancel")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_UTILITY_PROVIDER')")
     public ResponseEntity<ResponseDTO> cancelOutage(@PathVariable Long id) {
         try {
             OutageDTO cancelledOutage = outageService.cancelOutage(id);

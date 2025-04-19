@@ -34,6 +34,7 @@ public class OutageCreateDTO {
     private String reason;
     private String additionalInfo;
 
+    // Make utility provider required
     @NotNull(message = "Utility provider ID is required")
     private Long utilityProviderId;
 }

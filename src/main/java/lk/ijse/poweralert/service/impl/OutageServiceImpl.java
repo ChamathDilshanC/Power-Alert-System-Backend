@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +52,12 @@ public class OutageServiceImpl implements OutageService {
 
     @Autowired
     private NotificationEventPublisher eventPublisher;
+
+    @Autowired
+    private WhatsAppService whatsAppService;
+
+    @Autowired
+    private  SmsService smsService;
 
     @Autowired
     public OutageServiceImpl(
@@ -450,43 +457,70 @@ public class OutageServiceImpl implements OutageService {
             logger.info("Sending cancellation notifications asynchronously for outage ID: {}", outageId);
 
             // Fetch a fresh instance of the outage in this new transaction
-            Outage outage = outageRepository.findById(outageId)
+            final Outage outage = outageRepository.findById(outageId)
                     .orElseThrow(() -> new EntityNotFoundException("Outage not found with ID: " + outageId));
 
-//            // Send notifications via notification service
-//            notificationService.sendOutageCancellationNotifications(outage);
+            // Send notifications via notification service
+            notificationService.sendOutageCancellationNotifications(outage);
 
             // Find affected users
             List<User> affectedUsers = findAffectedUsers(outage);
             logger.info("Found {} affected users for outage cancellation ID: {}", affectedUsers.size(), outageId);
 
-            // Send email cancellation notifications to affected users
-            for (User user : affectedUsers) {
+            // Send notifications to affected users
+            for (final User user : affectedUsers) {
                 try {
-                    // Create the template model
+                    // Email notification
                     Map<String, Object> templateModel = createOutageCancellationTemplateModel(outage, user);
-
-                    // Send the cancellation email
                     String subject = outage.getType() + " Outage Cancellation - " + outage.getAffectedArea().getName();
-
                     CompletableFuture<Boolean> emailResult = emailService.sendTemplateEmail(
                             user.getEmail(),
                             subject,
                             "outage-cancellation.ftl",
                             templateModel
                     );
-
-                    // If template fails, create simple HTML
                     emailResult.exceptionally(ex -> {
                         logger.warn("Cancellation template email failed for user {}, using simplified format", user.getEmail(), ex);
-                        // Create simplified HTML
                         String simpleContent = createSimpleCancellationEmail(outage, user);
                         emailService.sendEmail(user.getEmail(), subject, simpleContent);
                         return false;
                     });
 
+                    // SMS notification
+                    if (user.getPhoneNumber() != null && !user.getPhoneNumber().isEmpty() &&
+                            smsService.isValidPhoneNumber(user.getPhoneNumber())) {
+
+                        final String cancellationReason = extractCancellationReason(outage);
+                        final String language = user.getPreferredLanguage() != null ? user.getPreferredLanguage() : "en";
+
+                        String[] smsParams = new String[] {
+                                outage.getType().toString(),
+                                outage.getAffectedArea().getName(),
+                                outage.getStartTime().format(DATE_FORMATTER),
+                                cancellationReason
+                        };
+
+                        smsService.sendTemplatedSms(user.getPhoneNumber(), "outage.cancelled", smsParams, language);
+                    }
+
+                    // WhatsApp notification
+                    if (user.getPhoneNumber() != null && !user.getPhoneNumber().isEmpty()) {
+                        final String cancellationReason = extractCancellationReason(outage);
+                        final String language = user.getPreferredLanguage() != null ? user.getPreferredLanguage() : "en";
+
+                        String[] whatsappParams = new String[] {
+                                user.getUsername(),
+                                outage.getType().toString(),
+                                outage.getAffectedArea().getName(),
+                                outage.getStartTime().format(DATE_FORMATTER),
+                                cancellationReason
+                        };
+
+                        whatsAppService.sendTemplateMessage(user.getPhoneNumber(), "outage_cancellation", whatsappParams, language);
+                    }
+
                 } catch (Exception e) {
-                    logger.error("Error sending cancellation email to user {}: {}", user.getEmail(), e.getMessage());
+                    logger.error("Error sending cancellation notifications to user {}: {}", user.getEmail(), e.getMessage());
                 }
             }
 
@@ -495,6 +529,18 @@ public class OutageServiceImpl implements OutageService {
             logger.error("Error sending cancellation notifications for outage ID {}: {}", outageId, e.getMessage(), e);
             // Don't propagate the exception to prevent transaction rollback
         }
+    }
+
+    /**
+     * Extract cancellation reason from the latest cancellation update
+     */
+    private String extractCancellationReason(Outage outage) {
+        return outage.getUpdates().stream()
+                .filter(u -> u.getNewStatus() == OutageStatus.CANCELLED)
+                .max(Comparator.comparing(OutageUpdate::getCreatedAt))
+                .map(OutageUpdate::getUpdateInfo)
+                .filter(info -> info != null && !info.isEmpty())
+                .orElse("Administrative decision");
     }
 
     @Override
