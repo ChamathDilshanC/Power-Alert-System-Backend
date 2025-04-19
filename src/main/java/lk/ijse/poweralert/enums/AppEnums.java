@@ -23,9 +23,8 @@ public class AppEnums {
     }
 
     public enum ResourceType {
-        WATER_SUPPLY, CHARGING_STATION, GENERATOR
+        WATER_SUPPLY, CHARGING_STATION, GENERATOR, BATTERY, SOLAR, OTHER
     }
-
     public enum FeedbackType {
         REPORT_OUTAGE, CONFIRM_OUTAGE, REPORT_RESTORATION
     }

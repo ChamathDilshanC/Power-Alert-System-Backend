@@ -48,4 +48,9 @@ public class Area {
 
     @OneToMany(mappedBy = "area")
     private List<AlternativeResource> alternativeResources;
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
 }
