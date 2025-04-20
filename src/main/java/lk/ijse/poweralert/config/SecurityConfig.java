@@ -67,6 +67,8 @@ public class SecurityConfig {
                                 "/api/public/check-username",
                                 "/api/public/check-email",
                                 "/api/public/check-phone",
+                                "/api/provider/public/utility-providers",
+                                "/api/public/utility-providers",
                                 "/login",
                                 "/css/**",
                                 "/js/**",
