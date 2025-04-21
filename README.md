@@ -12,6 +12,15 @@ PowerAlert is a modern utility notification service designed to address Sri Lank
 
 This repository contains the backend services that power the PowerAlert system.
 
+## 🎬 Demo Video
+
+<div align="center">
+  <a href="https://youtu.be/bxJTsn6AoK0">
+    <img src="https://img.youtube.com/vi/bxJTsn6AoK0/maxresdefault.jpg" alt="PowerAlert Demo Video" width="600" />
+  </a>
+  <p>Click the image above to watch the demo video</p>
+</div>
+
 ## 🚀 Features
 
 - **Real-time Outage Notifications**: Geo-targeted alerts for relevant utility disruptions
